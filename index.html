@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -444,23 +444,47 @@
 <script>
 /* ══════════════════════════════════════════════
    Intro audio
-   Muted-first trick: browser allows muted autoplay,
-   then we unmute immediately in the same JS tick.
+   - Loads from GitHub raw URL so it works when
+     hosted on GitHub Pages alongside the HTML.
+   - Muted-first trick: browser allows muted autoplay,
+     then we unmute immediately in the same JS tick.
+   - Fades out and stops when the overlay dismisses.
 ══════════════════════════════════════════════ */
-(function () {
-  const sfx = new Audio('intro.mp3');
-  sfx.muted = true;
-  sfx.volume = 1.0;
+const sfx = new Audio('https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/intro.mp3');
+sfx.preload = 'auto';
+sfx.volume  = 1.0;
+sfx.muted   = true;
+
+function playIntroAudio() {
   sfx.play().then(() => {
     sfx.muted = false;
-  }).catch(() => {
-    sfx.muted = false;
-    const unlock = () => sfx.play().catch(() => {});
-    ['click', 'touchstart', 'pointerdown'].forEach(evt =>
-      document.addEventListener(evt, unlock, { once: true, capture: true })
-    );
-  });
-})();
+  }).catch(() => {/* silently ignore if browser still blocks */});
+}
+
+function stopIntroAudio() {
+  const fadeStep = 0.05;
+  const fade = setInterval(() => {
+    if (sfx.volume > fadeStep) {
+      sfx.volume -= fadeStep;
+    } else {
+      sfx.pause();
+      sfx.currentTime = 0;
+      sfx.volume = 1.0;
+      clearInterval(fade);
+    }
+  }, 40);
+}
+
+// Attempt autoplay immediately; fall back to first user interaction
+sfx.play().then(() => {
+  sfx.muted = false;
+}).catch(() => {
+  sfx.muted = false;
+  const unlock = () => { playIntroAudio(); };
+  ['click', 'touchstart', 'pointerdown'].forEach(evt =>
+    document.addEventListener(evt, unlock, { once: true, capture: true })
+  );
+});
 
 /* ══════════════════════════════════════════════
    Intro overlay sequence
@@ -473,6 +497,7 @@ requestAnimationFrame(() => {
 
 setTimeout(() => {
   overlay.classList.add('fade-out');
+  stopIntroAudio();
   setTimeout(() => {
     overlay.style.display = 'none';
     document.body.classList.add('page-ready');
