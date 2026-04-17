@@ -379,6 +379,206 @@
       opacity: 0.6;
     }
     .jeffrey-watermark:hover { color: rgba(240,244,255,0.7); opacity: 1; }
+
+    /* ─── Gold shimmer on frame ─── */
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    .player-frame::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(
+        105deg,
+        transparent 35%,
+        rgba(255,230,120,0.45) 50%,
+        transparent 65%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 3.5s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ─── Buffering spinner ─── */
+    @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+    #bufferSpinner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 48px; height: 48px;
+      border: 3px solid rgba(255,255,255,0.12);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      z-index: 15;
+      display: none;
+      pointer-events: none;
+    }
+
+    /* ─── Caption fade ─── */
+    #captionBox {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #captionBox.visible { opacity: 1; }
+
+    /* ─── Fullscreen caption lift ─── */
+    :fullscreen #captionBox,
+    :-webkit-full-screen #captionBox { bottom: 90px; }
+
+    /* ─── Below-player content wrapper ─── */
+    .below-player {
+      width: 100%; max-width: 1400px; margin: 0 auto;
+      padding: 3rem clamp(1.5rem, 5vw, 4rem) 0;
+      display: flex; flex-direction: column; gap: 4rem;
+    }
+
+    /* ─── Info panel ─── */
+    .info-panel {
+      display: flex; gap: 2.5rem; align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .info-main { flex: 1; min-width: 260px; }
+    .info-title {
+      font-family: 'Cinzel', serif; font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      color: var(--white); margin-bottom: 0.4rem; letter-spacing: 0.05em;
+    }
+    .info-meta {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1.1rem;
+    }
+    .info-meta span {
+      font-family: 'Cinzel', serif; font-size: 0.58rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+    }
+    .info-meta .dot { color: var(--dim); }
+    .genre-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+    .genre-tag {
+      font-family: 'Cinzel', serif; font-size: 0.5rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); border: 1px solid rgba(201,168,76,0.35);
+      padding: 0.3em 0.9em; border-radius: 20px;
+      background: rgba(201,168,76,0.06);
+    }
+    .info-synopsis {
+      font-family: 'Philosopher', serif; font-size: clamp(0.85rem, 1.5vw, 1rem);
+      color: rgba(240,244,255,0.7); line-height: 1.85; max-width: 680px;
+    }
+    .info-divider {
+      width: 1px; background: var(--border); align-self: stretch;
+      min-height: 80px;
+    }
+    .info-stats { display: flex; flex-direction: column; gap: 1.1rem; min-width: 160px; }
+    .stat-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .stat-label {
+      font-family: 'Cinzel', serif; font-size: 0.48rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted);
+    }
+    .stat-value {
+      font-family: 'Philosopher', serif; font-size: 0.95rem;
+      color: var(--white);
+    }
+
+    /* ─── Social share ─── */
+    .share-row {
+      display: flex; align-items: center; gap: 0.8rem; margin-top: 1.4rem; flex-wrap: wrap;
+    }
+    .share-label {
+      font-family: 'Cinzel', serif; font-size: 0.5rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted);
+    }
+    .share-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'Cinzel', serif; font-size: 0.5rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(240,244,255,0.55); border: 1px solid var(--dim);
+      background: none; padding: 0.4em 0.9em; border-radius: 20px;
+      cursor: pointer; text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .share-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+    .share-btn svg { width: 11px; height: 11px; fill: currentColor; flex-shrink: 0; }
+
+    /* ─── Section divider ─── */
+    .section-divider {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+    }
+    .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .section-divider-title {
+      font-family: 'Cinzel', serif; font-size: 0.55rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ─── About section ─── */
+    .about-section { display: flex; gap: 3rem; flex-wrap: wrap; }
+    .about-text {
+      flex: 2; min-width: 260px;
+      font-family: 'Philosopher', serif; font-size: clamp(0.88rem, 1.5vw, 1.02rem);
+      color: rgba(240,244,255,0.65); line-height: 2; max-width: 700px;
+    }
+    .about-text p + p { margin-top: 1.1rem; }
+    .about-side { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 1.2rem; }
+    .about-fact {
+      padding: 1rem 1.2rem;
+      background: rgba(10,17,28,0.6);
+      border: 1px solid var(--border);
+      border-left: 2px solid rgba(201,168,76,0.4);
+      border-radius: 8px;
+    }
+    .about-fact-label {
+      font-family: 'Cinzel', serif; font-size: 0.46rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.35rem;
+    }
+    .about-fact-value {
+      font-family: 'Philosopher', serif; font-size: 0.9rem;
+      color: rgba(240,244,255,0.8); line-height: 1.5;
+    }
+
+    /* ─── Cast section ─── */
+    .cast-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1.2rem;
+    }
+    .cast-card {
+      background: rgba(10,17,28,0.55);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .cast-card:hover { border-color: rgba(201,168,76,0.35); transform: translateY(-3px); }
+    .cast-avatar {
+      width: 100%; aspect-ratio: 1;
+      background: var(--panel);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem; user-select: none;
+    }
+    .cast-info { padding: 0.8rem; }
+    .cast-char {
+      font-family: 'Cinzel', serif; font-size: 0.6rem;
+      letter-spacing: 0.1em; color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .cast-element {
+      font-family: 'Philosopher', serif; font-size: 0.72rem;
+      font-style: italic; color: var(--muted);
+    }
+    .cast-element.air   { color: var(--air);   }
+    .cast-element.water { color: var(--water); }
+    .cast-element.earth { color: var(--earth); }
+    .cast-element.fire  { color: var(--fire);  }
+
+    /* ─── Footer ─── */
+    footer { padding: 5rem 2rem 3rem; }
+
+    /* ─── Responsive tweaks ─── */
+    @media (max-width: 768px) {
+      .info-divider { display: none; }
+      .info-stats { flex-direction: row; flex-wrap: wrap; gap: 1.2rem; }
+    }
   </style>
 </head>
 <body>
@@ -448,6 +648,7 @@
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
 
+        <div id="bufferSpinner"></div>
         <div class="click-area" id="clickArea"></div>
         <div id="captionBox"></div>
 
@@ -483,8 +684,190 @@
     </div>
   </section>
 
+
   <footer></footer>
 </div>
+
+<!-- ── Below-player content ── -->
+<div class="below-player anim-player">
+
+  <!-- Info Panel -->
+  <div class="info-panel">
+    <div class="info-main">
+      <h2 class="info-title">Legend of Aang: The Last Airbender</h2>
+      <div class="info-meta">
+        <span>2025</span><span class="dot">·</span>
+        <span id="runtimeDisplay">Loading…</span><span class="dot">·</span>
+        <span>Animation</span>
+      </div>
+      <div class="genre-tags">
+        <span class="genre-tag">Adventure</span>
+        <span class="genre-tag">Fantasy</span>
+        <span class="genre-tag">Action</span>
+        <span class="genre-tag">Mythology</span>
+      </div>
+      <p class="info-synopsis">
+        In a world torn apart by a century of war, a young Air Nomad awakens from a hundred-year
+        slumber to fulfil his destiny as the Avatar — the only being capable of mastering all four
+        elements. With the Fire Nation tightening its grip on the world, Aang must journey across
+        tundra, desert, and mountain to learn waterbending, earthbending, and firebending before
+        the comet arrives and grants the Fire Lord unstoppable power. Friendship, sacrifice,
+        and the weight of an entire world rest on one twelve-year-old boy's shoulders.
+      </p>
+      <div class="share-row">
+        <span class="share-label">Share</span>
+        <a class="share-btn" id="shareTwitter" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.736-8.858L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X / Twitter
+        </a>
+        <a class="share-btn" id="shareFacebook" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <button class="share-btn" id="shareCopy">
+          <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy Link
+        </button>
+      </div>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-stats">
+      <div class="stat-item">
+        <span class="stat-label">Director</span>
+        <span class="stat-value">Jeffrey Hamilton</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Studio</span>
+        <span class="stat-value">Jeffrey Creates</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Rating</span>
+        <span class="stat-value">TV-Y7</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Language</span>
+        <span class="stat-value">English</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- About section -->
+  <div>
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-title">About the Film</span>
+      <div class="section-divider-line"></div>
+    </div>
+    <div class="about-section">
+      <div class="about-text">
+        <p>
+          <em>Legend of Aang</em> is a fan-crafted cinematic retelling of the beloved animated series,
+          reimagined as a sweeping epic. Drawing on the rich mythology of the Four Nations — the
+          Air Nomads, the Water Tribes, the Earth Kingdom, and the Fire Nation — the film distils the
+          core of Aang's journey into a single breathtaking experience.
+        </p>
+        <p>
+          The project was built from the ground up as a passion project by Jeffrey Hamilton, blending
+          original animation, reimagined score, and meticulously recomposed sequences to honour the
+          source material while delivering something cinematic in scope. Every frame carries the weight
+          of two decades of fan devotion.
+        </p>
+        <p>
+          The world of Avatar is one of elemental balance — when that balance is broken, only the
+          Avatar can restore harmony. This film captures that tension at its most concentrated,
+          following Aang not just as a warrior, but as a child asked to carry the world.
+        </p>
+      </div>
+      <div class="about-side">
+        <div class="about-fact">
+          <div class="about-fact-label">Universe</div>
+          <div class="about-fact-value">Avatar: The Last Airbender</div>
+        </div>
+        <div class="about-fact">
+          <div class="about-fact-label">Setting</div>
+          <div class="about-fact-value">The Four Nations — a world of elemental bending and ancient spirits</div>
+        </div>
+        <div class="about-fact">
+          <div class="about-fact-label">Theme</div>
+          <div class="about-fact-value">Balance, duty, identity, and the cost of peace</div>
+        </div>
+        <div class="about-fact">
+          <div class="about-fact-label">Soundtrack</div>
+          <div class="about-fact-value">Original score drawing from world music and traditional instruments</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cast section -->
+  <div>
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-title">Characters</span>
+      <div class="section-divider-line"></div>
+    </div>
+    <div class="cast-grid">
+      <div class="cast-card">
+        <div class="cast-avatar">🌀</div>
+        <div class="cast-info">
+          <div class="cast-char">Aang</div>
+          <div class="cast-element air">Air Nomad · Avatar</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">💧</div>
+        <div class="cast-info">
+          <div class="cast-char">Katara</div>
+          <div class="cast-element water">Southern Water Tribe</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">🦅</div>
+        <div class="cast-info">
+          <div class="cast-char">Sokka</div>
+          <div class="cast-element">Warrior · Strategist</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">🌿</div>
+        <div class="cast-info">
+          <div class="cast-char">Toph</div>
+          <div class="cast-element earth">Earth Kingdom</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">🔥</div>
+        <div class="cast-info">
+          <div class="cast-char">Zuko</div>
+          <div class="cast-element fire">Fire Nation · Prince</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">⚡</div>
+        <div class="cast-info">
+          <div class="cast-char">Azula</div>
+          <div class="cast-element fire">Fire Nation · Princess</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">🐉</div>
+        <div class="cast-info">
+          <div class="cast-char">Iroh</div>
+          <div class="cast-element fire">Dragon of the West</div>
+        </div>
+      </div>
+      <div class="cast-card">
+        <div class="cast-avatar">🦬</div>
+        <div class="cast-info">
+          <div class="cast-char">Appa</div>
+          <div class="cast-element air">Sky Bison · Guardian</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 
 <!-- ── Jeffrey Creates watermark ── -->
 <a class="jeffrey-watermark" href="https://www.youtube.com/@Jeffrey_Creates" target="_blank" rel="noopener">
@@ -727,6 +1110,7 @@ vid.addEventListener('timeupdate', () => {
   progFill.style.width  = pct + '%';
   progThumb.style.left  = pct + '%';
   curEl.textContent     = fmt(vid.currentTime);
+  localStorage.setItem('aang_position', vid.currentTime);
 });
 
 /* ── Seek bar ── */
@@ -804,18 +1188,23 @@ fetch('captions.srt')
   .then(text => { srtCues = parseSRT(text); })
   .catch(() => {});
 
+function showCaption(text) {
+  captionBox.innerHTML = '<span>' + text.replace(/\n/g, '<br>') + '</span>';
+  captionBox.style.display = 'block';
+  requestAnimationFrame(() => captionBox.classList.add('visible'));
+}
+function hideCaption() {
+  captionBox.classList.remove('visible');
+  setTimeout(() => { if (!captionBox.classList.contains('visible')) captionBox.style.display = 'none'; }, 200);
+}
+
 function renderCaption() {
-  if (!captionsOn || !srtCues.length) { captionBox.style.display = 'none'; return; }
+  if (!captionsOn || !srtCues.length) { hideCaption(); return; }
   const cue = srtCues.find(c => vid.currentTime >= c.start && vid.currentTime <= c.end);
   const text = cue?.text ?? null;
-  if (text === lastCueText) return; // no-op if unchanged
+  if (text === lastCueText) return;
   lastCueText = text;
-  if (text) {
-    captionBox.innerHTML = '<span>' + text.replace(/\n/g, '<br>') + '</span>';
-    captionBox.style.display = 'block';
-  } else {
-    captionBox.style.display = 'none';
-  }
+  text ? showCaption(text) : hideCaption();
 }
 
 vid.addEventListener('timeupdate', renderCaption);
@@ -823,7 +1212,59 @@ vid.addEventListener('timeupdate', renderCaption);
 ccBtn.addEventListener('click', () => {
   captionsOn = !captionsOn;
   ccBtn.classList.toggle('active', captionsOn);
-  if (!captionsOn) { captionBox.style.display = 'none'; lastCueText = null; }
+  if (!captionsOn) { hideCaption(); lastCueText = null; }
+});
+
+/* ── Buffering spinner ── */
+const bufferSpinner = document.getElementById('bufferSpinner');
+vid.addEventListener('waiting', () => { bufferSpinner.style.display = 'block'; });
+vid.addEventListener('playing', () => { bufferSpinner.style.display = 'none'; });
+vid.addEventListener('canplay', () => { bufferSpinner.style.display = 'none'; });
+
+/* ── Persist volume ── */
+const savedVol = localStorage.getItem('aang_volume');
+const savedMuted = localStorage.getItem('aang_muted');
+if (savedVol !== null) { vid.volume = parseFloat(savedVol); volSlider.value = savedVol; }
+if (savedMuted === 'true') { vid.muted = true; volSlider.value = 0; }
+updateVolUI();
+
+vid.addEventListener('volumechange', () => {
+  localStorage.setItem('aang_volume', vid.volume);
+  localStorage.setItem('aang_muted', vid.muted);
+});
+
+/* ── Persist playback position ── */
+vid.addEventListener('loadedmetadata', () => {
+  durEl.textContent = fmt(vid.duration);
+  // Show runtime in info panel
+  const rtEl = document.getElementById('runtimeDisplay');
+  if (rtEl && isFinite(vid.duration)) {
+    const totalMin = Math.round(vid.duration / 60);
+    rtEl.textContent = totalMin >= 60
+      ? Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm'
+      : totalMin + ' min';
+  }
+  const saved = parseFloat(localStorage.getItem('aang_position') || 0);
+  if (saved > 5 && saved < vid.duration - 10) vid.currentTime = saved;
+});
+
+
+
+/* ── Social share ── */
+const pageUrl = encodeURIComponent(window.location.href);
+const pageTitle = encodeURIComponent('Legend of Aang: The Last Airbender');
+
+document.getElementById('shareTwitter').href =
+  'https://twitter.com/intent/tweet?text=' + pageTitle + '&url=' + pageUrl;
+document.getElementById('shareFacebook').href =
+  'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl;
+document.getElementById('shareCopy').addEventListener('click', () => {
+  navigator.clipboard?.writeText(window.location.href).then(() => {
+    const btn = document.getElementById('shareCopy');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  });
 });
 </script>
 </body>
