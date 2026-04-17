@@ -1,1249 +1,4347 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avatar: Aang, The Last Airbender</title>
-  <link rel="icon" type="image/jpeg" href="favicon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cinzel+Decorative:wght@400;700;900&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    /* ─── Design tokens ─── */
-    :root {
-      --deep:   #04070d;
-      --panel:  #0a111c;
-      --blue:   #4db8ff;
-      --white:  #f0f4ff;
-      --muted:  #6b8aab;
-      --dim:    #2d3f56;
-      --border: rgba(255, 255, 255, 0.06);
-      --gold:   #c9a84c;
-      --air:    #f5c518;
-      --water:  #4db8ff;
-      --earth:  #6abf69;
-      --fire:   #f97316;
-
-      /* GitHub raw base — swap branch if needed */
-      --gh: "https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main";
-    }
-
-    /* ─── Keyframes ─── */
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(36px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes overlayFadeOut {
-      from { opacity: 1; }
-      to   { opacity: 0; }
-    }
-
-    /* Element glow pulses */
-    @keyframes pulseGlowAir   { 0%,100%{filter:drop-shadow(0 0 5px #f5c518)} 50%{filter:drop-shadow(0 0 18px #f5c518)} }
-    @keyframes pulseGlowWater { 0%,100%{filter:drop-shadow(0 0 5px #4db8ff)} 50%{filter:drop-shadow(0 0 18px #4db8ff)} }
-    @keyframes pulseGlowEarth { 0%,100%{filter:drop-shadow(0 0 5px #6abf69)} 50%{filter:drop-shadow(0 0 18px #6abf69)} }
-    @keyframes pulseGlowFire  { 0%,100%{filter:drop-shadow(0 0 5px #f97316)} 50%{filter:drop-shadow(0 0 18px #f97316)} }
-    @keyframes cornerGlowAir   { 0%,100%{filter:drop-shadow(0 0 3px #f5c518)} 50%{filter:drop-shadow(0 0 10px #f5c518)} }
-    @keyframes cornerGlowWater { 0%,100%{filter:drop-shadow(0 0 3px #4db8ff)} 50%{filter:drop-shadow(0 0 10px #4db8ff)} }
-    @keyframes cornerGlowEarth { 0%,100%{filter:drop-shadow(0 0 3px #6abf69)} 50%{filter:drop-shadow(0 0 10px #6abf69)} }
-    @keyframes cornerGlowFire  { 0%,100%{filter:drop-shadow(0 0 3px #f97316)} 50%{filter:drop-shadow(0 0 10px #f97316)} }
-
-    /* ─── Page-ready animations (fire only once overlay is gone) ─── */
-    .anim-header, .anim-title, .anim-sub, .anim-player { opacity: 0; }
-    body.page-ready .anim-header { animation: slideUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both; }
-    body.page-ready .anim-title  { animation: slideUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.18s both; }
-    body.page-ready .anim-sub    { animation: slideUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.30s both; }
-    body.page-ready .anim-player { animation: slideUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.42s both; }
-
-    /* ─── Base ─── */
-    body {
-      background: var(--deep);
-      color: var(--white);
-      font-family: 'Philosopher', Georgia, serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ─── Background ─── */
-    .bg-layer {
-      position: fixed; inset: 0;
-      background-image: url('https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/background.png');
-      background-size: cover;
-      background-position: center top;
-      filter: blur(8px) brightness(0.22) saturate(1.4);
-      transform: scale(1.04);
-      z-index: 0;
-    }
-    .bg-layer::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(4,7,13,0.55) 0%, transparent 35%,
-        transparent 65%, rgba(4,7,13,0.7) 100%
-      );
-    }
-
-    /* ─── Intro overlay ─── */
-    #introOverlay {
-      position: fixed; inset: 0; z-index: 100;
-      background: rgba(4,7,13,0.72);
-      backdrop-filter: blur(2px);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 3rem;
-    }
-    #introOverlay.fade-out {
-      animation: overlayFadeOut 0.65s ease forwards;
-      pointer-events: none;
-    }
-
-    .intro-tagline {
-      font-family: 'Philosopher', serif;
-      font-size: clamp(0.6rem, 1.6vw, 0.8rem);
-      font-style: italic;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      color: rgba(200, 180, 120, 0.55);
-      opacity: 0;
-      transition: opacity 0.6s ease 0.15s;
-    }
-    #introOverlay.symbols-in .intro-tagline { opacity: 1; }
-
-    .symbols-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: clamp(2rem, 5vw, 5rem);
-      align-items: center;
-      justify-items: center;
-    }
-    @media (max-width: 600px) {
-      .symbols-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-    }
-
-    .sym-item {
-      display: flex; flex-direction: column;
-      align-items: center; gap: 0.9rem;
-      opacity: 0; transform: scale(0.78);
-      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1);
-    }
-    #introOverlay.symbols-in .sym-item { opacity: 1; transform: scale(1); }
-
-    .sym-img { width: clamp(64px, 8vw, 100px); height: clamp(64px, 8vw, 100px); object-fit: contain; }
-    .sym-item.air   .sym-img { animation: pulseGlowAir   2.6s ease-in-out infinite 0.0s; }
-    .sym-item.water .sym-img { animation: pulseGlowWater 2.6s ease-in-out infinite 0.4s; }
-    .sym-item.earth .sym-img { animation: pulseGlowEarth 2.6s ease-in-out infinite 0.8s; }
-    .sym-item.fire  .sym-img { animation: pulseGlowFire  2.6s ease-in-out infinite 1.2s; }
-
-    .sym-label {
-      font-family: 'Philosopher', serif;
-      font-size: clamp(0.55rem, 1.3vw, 0.7rem);
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-    }
-    .sym-item.air   .sym-label { color: var(--air);   }
-    .sym-item.water .sym-label { color: var(--water); }
-    .sym-item.earth .sym-label { color: var(--earth); }
-    .sym-item.fire  .sym-label { color: var(--fire);  }
-
-    /* ─── Page layout ─── */
-    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
-
-    header {
-      padding: 2rem 4rem;
-      display: flex; align-items: center; justify-content: flex-end; gap: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .header-tag {
-      font-family: 'Cinzel', serif; font-size: 0.55rem;
-      letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--muted); border: 1px solid var(--dim);
-      padding: 0.4em 1.2em; border-radius: 30px;
-    }
-
-    /* ─── Hero ─── */
-    .hero { text-align: center; padding: 6rem 2rem 4rem; }
-    .hero-main {
-      font-family: 'Cinzel Decorative', serif; font-weight: 900;
-      font-size: clamp(3rem, 7vw, 5.5rem);
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: linear-gradient(135deg, #ffffff 0%, #b3d4ff 50%, #4db8ff 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      margin-bottom: 0.5rem;
-    }
-    .hero-sub {
-      font-family: 'Philosopher', serif; font-weight: 400; font-style: italic;
-      font-size: clamp(1.2rem, 3vw, 1.8rem);
-      color: var(--muted); letter-spacing: 0.25em; margin-bottom: 2rem;
-    }
-
-    /* ─── Player section ─── */
-    .player-section {
-      width: 100%; max-width: 1400px; margin: 0 auto;
-      padding: 0 clamp(1.5rem, 5vw, 4rem);
-    }
-
-    /* Engraved gold frame — border thickened to 5px */
-    .player-frame {
-      position: relative;
-      padding: 5px;
-      border-radius: 20px;
-      background: linear-gradient(
-        135deg,
-        rgba(201,168,76,0.75)  0%,
-        rgba(120,95,40,0.35)   25%,
-        rgba(255,210,100,0.55) 50%,
-        rgba(120,95,40,0.30)   75%,
-        rgba(201,168,76,0.70) 100%
-      );
-      box-shadow:
-        0 0 0 1px rgba(201,168,76,0.18),
-        0 0 40px rgba(201,168,76,0.13),
-        0 0 80px rgba(201,168,76,0.06),
-        inset 0 1px 0 rgba(255,240,180,0.18);
-    }
-
-    /* ─── Corner ornaments ─── */
-    .corner {
-      position: absolute; z-index: 30;
-      width: 44px; height: 44px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(4,7,13,0.85);
-      border-radius: 50%;
-      box-shadow: 0 0 0 1px rgba(201,168,76,0.3);
-    }
-    .corner-img { width: 26px; height: 26px; object-fit: contain; opacity: 0.85; }
-    .corner-tl { top: -20px; left: -20px; }
-    .corner-tr { top: -20px; right: -20px; }
-    .corner-bl { bottom: -20px; left: -20px; }
-    .corner-br { bottom: -20px; right: -20px; }
-    .corner-air   { animation: cornerGlowAir   2.6s ease-in-out infinite 0.0s; }
-    .corner-water { animation: cornerGlowWater 2.6s ease-in-out infinite 0.4s; }
-    .corner-earth { animation: cornerGlowEarth 2.6s ease-in-out infinite 0.8s; }
-    .corner-fire  { animation: cornerGlowFire  2.6s ease-in-out infinite 1.2s; }
-
-    /* ─── Player shell ─── */
-    .player-shell {
-      position: relative; background: #000;
-      border-radius: 16px; overflow: hidden;
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.7), inset 0 2px 4px rgba(0,0,0,0.5);
-    }
-    .player-shell.idle { cursor: none; }
-    .player-shell.idle .controls { opacity: 0; pointer-events: none; transform: translateY(10px); }
-
-    #mainVideo {
-      display: block; width: 100%;
-      aspect-ratio: 239 / 100;
-      background: #000; pointer-events: none; object-fit: cover;
-    }
-
-    /* ─── Big play button ─── */
-    .big-play {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 80px; height: 80px; border-radius: 50%;
-      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 10; pointer-events: none; transition: all 0.4s ease;
-    }
-    .big-play svg { width: 28px; height: 28px; fill: var(--white); margin-left: 4px; }
-    .big-play.hidden { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-
-    .click-area { position: absolute; inset: 0; z-index: 11; cursor: pointer; }
-
-    /* ─── Caption overlay ─── */
-    #captionBox {
-      position: absolute;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 19;
-      text-align: center;
-      pointer-events: none;
-      width: max-content;
-      max-width: 75%;
-      display: none;
-      transition: opacity 0.15s ease;
-    }
-    #captionBox span {
-      display: inline;
-      background: rgba(0, 0, 0, 0.78);
-      color: #fff;
-      font-family: 'Philosopher', serif;
-      font-size: clamp(0.9rem, 1.8vw, 1.2rem);
-      font-weight: 400;
-      line-height: 1.7;
-      padding: 0.25em 0.6em;
-      border-radius: 3px;
-      box-decoration-break: clone;
-      -webkit-box-decoration-break: clone;
-      letter-spacing: 0.01em;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    }
-
-    /* ─── CC button ─── */
-    #ccBtn {
-      font-family: 'Cinzel', serif;
-      font-size: 0.52rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      border-radius: 4px;
-      border: 1px solid transparent;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    #ccBtn.active {
-      color: var(--blue);
-      border-color: var(--blue);
-    }
-
-    /* ─── Controls bar ─── */
-    .controls {
-      position: absolute; bottom: 24px; left: 24px; right: 24px; z-index: 20;
-      background: rgba(10,15,25,0.65); backdrop-filter: blur(24px);
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
-      padding: 14px 24px; transition: all 0.4s ease;
-    }
-    .progress {
-      position: relative; height: 18px;
-      display: flex; align-items: center;
-      margin-bottom: 10px; cursor: pointer;
-    }
-    .progress-track {
-      position: absolute; left: 0; right: 0; height: 3px;
-      background: rgba(255,255,255,0.1); border-radius: 4px;
-    }
-    .prog-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--blue); border-radius: 4px; width: 0%; }
-    .prog-thumb {
-      position: absolute; top: 50%; transform: translate(-50%, -50%);
-      width: 12px; height: 12px; border-radius: 50%; background: var(--white);
-      left: 0%; opacity: 0; transition: opacity 0.2s; pointer-events: none;
-    }
-    .progress:hover .prog-thumb { opacity: 1; }
-
-    .ctrls-row { display: flex; align-items: center; gap: 10px; }
-    .cbtn {
-      background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,0.6);
-      width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s;
-    }
-    .cbtn:hover { color: var(--white); }
-    .cbtn svg { width: 20px; height: 20px; }
-
-    .vol-wrap { display: flex; align-items: center; gap: 6px; }
-    .vol-slider {
-      -webkit-appearance: none; appearance: none;
-      width: 70px; height: 3px; border-radius: 4px; cursor: pointer;
-      background: linear-gradient(to right, var(--blue) 100%, rgba(255,255,255,0.15) 100%);
-      outline: none; border: none;
-    }
-    .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--white); cursor: pointer; }
-    .vol-slider::-moz-range-thumb    { width: 12px; height: 12px; border-radius: 50%; background: var(--white); cursor: pointer; border: none; }
-
-    .time-disp { font-family: 'Cinzel', serif; font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-left: 8px; }
-    .time-disp b { color: var(--white); }
-    .flex-grow { flex: 1; }
-
-    /* ─── Fullscreen ─── */
-    :fullscreen .player-shell,
-    :-webkit-full-screen .player-shell {
-      width: 100vw; height: 100vh; border-radius: 0;
-      display: flex; flex-direction: column; justify-content: center; background: #000;
-    }
-    :fullscreen #mainVideo,
-    :-webkit-full-screen #mainVideo {
-      width: 100vw; height: 100vh; max-width: 100%; max-height: 100%;
-      aspect-ratio: unset; object-fit: contain;
-    }
-    :fullscreen .controls,
-    :-webkit-full-screen .controls { bottom: 28px; left: 28px; right: 28px; }
-
-    footer { padding: 4rem 2rem 3rem; }
-
-    /* ─── Responsive ─── */
-    @media (max-width: 768px) {
-      header { padding: 1.5rem 2rem; }
-      .controls { bottom: 12px; left: 12px; right: 12px; }
-    }
-
-    /* ─── Jeffrey Creates watermark ─── */
-    .jeffrey-watermark {
-      position: fixed; bottom: 14px; right: 18px; z-index: 50;
-      display: inline-flex; align-items: center; gap: 5px;
-      text-decoration: none; font-family: 'Cinzel', serif;
-      font-size: 0.42rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(107,138,171,0.45);
-      transition: color 0.2s ease, opacity 0.2s ease;
-      opacity: 0.6;
-    }
-    .jeffrey-watermark:hover { color: rgba(240,244,255,0.7); opacity: 1; }
-
-    /* ─── Gold shimmer on frame ─── */
-    @keyframes shimmer {
-      0%   { background-position: -200% center; }
-      100% { background-position:  200% center; }
-    }
-    .player-frame::before {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: 20px;
-      background: linear-gradient(
-        105deg,
-        transparent 35%,
-        rgba(255,230,120,0.45) 50%,
-        transparent 65%
-      );
-      background-size: 200% 100%;
-      animation: shimmer 3.5s linear infinite;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* ─── Buffering spinner ─── */
-    @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
-    #bufferSpinner {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 48px; height: 48px;
-      border: 3px solid rgba(255,255,255,0.12);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      z-index: 15;
-      display: none;
-      pointer-events: none;
-    }
-
-    /* ─── Caption fade ─── */
-    #captionBox {
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    #captionBox.visible { opacity: 1; }
-
-    /* ─── Fullscreen caption lift ─── */
-    :fullscreen #captionBox,
-    :-webkit-full-screen #captionBox { bottom: 90px; }
-
-    /* ─── Below-player content wrapper ─── */
-    .below-player {
-      width: 100%; max-width: 1400px; margin: 0 auto;
-      padding: 3rem clamp(1.5rem, 5vw, 4rem) 5rem;
-      display: flex; flex-direction: column; gap: 3rem;
-    }
-
-    /* ─── Info panel ─── */
-    .info-panel {
-      display: flex; gap: 2.5rem; align-items: flex-start;
-      flex-wrap: wrap;
-    }
-    .info-main { flex: 1; min-width: 260px; }
-    .info-title {
-      font-family: 'Cinzel', serif; font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      color: var(--white); margin-bottom: 0.4rem; letter-spacing: 0.05em;
-    }
-    .info-meta {
-      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-      margin-bottom: 1.1rem;
-    }
-    .info-meta span {
-      font-family: 'Cinzel', serif; font-size: 0.58rem;
-      letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
-    }
-    .info-meta .dot { color: var(--dim); }
-    .genre-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
-    .genre-tag {
-      font-family: 'Cinzel', serif; font-size: 0.5rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--gold); border: 1px solid rgba(201,168,76,0.35);
-      padding: 0.3em 0.9em; border-radius: 20px;
-      background: rgba(201,168,76,0.06);
-    }
-    .info-synopsis {
-      font-family: 'Philosopher', serif; font-size: clamp(0.85rem, 1.5vw, 1rem);
-      color: rgba(240,244,255,0.7); line-height: 1.85; max-width: 680px;
-    }
-    .info-divider {
-      width: 1px; background: var(--border); align-self: stretch;
-      min-height: 80px;
-    }
-    .info-stats { display: flex; flex-direction: column; gap: 1.1rem; min-width: 160px; }
-    .stat-item { display: flex; flex-direction: column; gap: 0.2rem; }
-    .stat-label {
-      font-family: 'Cinzel', serif; font-size: 0.48rem;
-      letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted);
-    }
-    .stat-value {
-      font-family: 'Philosopher', serif; font-size: 0.95rem;
-      color: var(--white);
-    }
-
-    /* ─── Section divider ─── */
-    .section-divider {
-      display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
-    }
-    .section-divider-line { flex: 1; height: 1px; background: var(--border); }
-    .section-divider-title {
-      font-family: 'Cinzel', serif; font-size: 0.55rem;
-      letter-spacing: 0.35em; text-transform: uppercase; color: var(--muted);
-      white-space: nowrap;
-    }
-
-    /* ─── About section ─── */
-    .about-section { display: flex; gap: 3rem; flex-wrap: wrap; align-items: flex-start; }
-    .about-text {
-      flex: 3; min-width: 280px;
-      font-family: 'Philosopher', serif; font-size: clamp(0.9rem, 1.5vw, 1.05rem);
-      color: rgba(240,244,255,0.65); line-height: 2; max-width: 760px;
-    }
-    .about-text p + p { margin-top: 1.1rem; }
-    .about-side { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 1.2rem; }
-    .about-fact {
-      padding: 1rem 1.2rem;
-      background: rgba(10,17,28,0.6);
-      border: 1px solid var(--border);
-      border-left: 2px solid rgba(201,168,76,0.4);
-      border-radius: 8px;
-    }
-    .about-fact-label {
-      font-family: 'Cinzel', serif; font-size: 0.46rem;
-      letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold);
-      margin-bottom: 0.35rem;
-    }
-    .about-fact-value {
-      font-family: 'Philosopher', serif; font-size: 0.9rem;
-      color: rgba(240,244,255,0.8); line-height: 1.5;
-    }
-
-    /* ─── Footer ─── */
-    footer { padding: 5rem 2rem 3rem; }
-
-    /* ─── Responsive tweaks ─── */
-    @media (max-width: 768px) {
-      .info-divider { display: none; }
-      .info-stats { flex-direction: row; flex-wrap: wrap; gap: 1.2rem; }
-    }
-
-    /* ─── Scroll reveal ─── */
-    [data-reveal] {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
-    }
-    [data-reveal].revealed {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ─── Animated divider symbol ─── */
-    .section-divider-inner {
-      display: flex; align-items: center; gap: 0.7rem; white-space: nowrap;
-    }
-    .divider-sym {
-      width: 14px; height: 14px; object-fit: contain; opacity: 0.55;
-    }
-    .divider-sym-air   { animation: cornerGlowAir   2.6s ease-in-out infinite; }
-    .divider-sym-water { animation: cornerGlowWater 2.6s ease-in-out infinite; }
-    .divider-sym-earth { animation: cornerGlowEarth 2.6s ease-in-out infinite; }
-    .divider-sym-fire  { animation: cornerGlowFire  2.6s ease-in-out infinite; }
-    @keyframes divSymSpin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ── Intro overlay ── -->
-<div id="introOverlay" style="cursor:pointer;" title="Click to enter">
-  <p class="intro-tagline">Four elements. One destiny.</p>
-  <div class="symbols-grid">
-    <div class="sym-item water">
-      <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/water.png" alt="Water symbol" class="sym-img">
-      <span class="sym-label">Water</span>
-    </div>
-    <div class="sym-item earth">
-      <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/earth.png" alt="Earth symbol" class="sym-img">
-      <span class="sym-label">Earth</span>
-    </div>
-    <div class="sym-item fire">
-      <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/fire.png" alt="Fire symbol" class="sym-img">
-      <span class="sym-label">Fire</span>
-    </div>
-    <div class="sym-item air">
-      <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/air.png" alt="Air symbol" class="sym-img">
-      <span class="sym-label">Air</span>
-    </div>
-  </div>
-
-</div>
-
-<!-- ── Background ── -->
-<div class="bg-layer"></div>
-<canvas id="particleCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.55;"></canvas>
-
-<div class="page">
-  <header class="anim-header">
-    <div class="header-tag">Exclusive Screening</div>
-  </header>
-
-  <section class="hero">
-    <h1 class="hero-main anim-title">Legend of Aang</h1>
-    <p class="hero-sub anim-sub">The Last Airbender</p>
-  </section>
-
-  <section class="player-section anim-player">
-    <div class="player-frame">
-
-      <!-- Corner ornaments: Water TL · Earth TR · Fire BL · Air BR -->
-      <div class="corner corner-tl">
-        <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/water.png" alt="Water" class="corner-img corner-water">
-      </div>
-      <div class="corner corner-tr">
-        <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/earth.png" alt="Earth" class="corner-img corner-earth">
-      </div>
-      <div class="corner corner-bl">
-        <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/fire.png" alt="Fire" class="corner-img corner-fire">
-      </div>
-      <div class="corner corner-br">
-        <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/air.png" alt="Air" class="corner-img corner-air">
-      </div>
-
-      <div class="player-shell idle" id="playerShell">
-        <video id="mainVideo" preload="metadata" playsinline
-               poster="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/preview.jpg">
-          <source src="https://github.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/releases/download/V1.0/aang.mp4" type="video/mp4">
-          <track kind="subtitles" src="captions.srt" srclang="en" label="English" default>
-        </video>
-
-        <div class="big-play" id="bigPlay">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-
-        <div id="bufferSpinner"></div>
-        <div class="click-area" id="clickArea"></div>
-        <div id="captionBox"></div>
-
-        <div class="controls" id="controls">
-          <div class="progress" id="prog">
-            <div class="progress-track">
-              <div class="prog-fill" id="progFill"></div>
-            </div>
-            <div class="prog-thumb" id="progThumb"></div>
-          </div>
-          <div class="ctrls-row">
-            <button class="cbtn" id="playBtn" aria-label="Play / Pause">
-              <svg id="icPlay"  viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              <svg id="icPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-            <div class="time-disp"><b id="curTime">0:00</b> / <span id="durTime">0:00</span></div>
-            <div class="flex-grow"></div>
-            <div class="vol-wrap">
-              <button class="cbtn" id="volBtn" aria-label="Toggle mute">
-                <svg id="icVolOn"  viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                <svg id="icVolOff" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-              </button>
-              <input type="range" id="volSlider" class="vol-slider" min="0" max="1" step="0.02" value="1" aria-label="Volume">
-            </div>
-            <button class="cbtn" id="ccBtn" aria-label="Toggle captions">CC</button>
-            <button class="cbtn" id="fsBtn" aria-label="Toggle fullscreen">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-
-  <footer></footer>
-</div>
-
-<!-- ── Below-player content ── -->
-<div class="below-player anim-player">
-
-  <!-- Info Panel -->
-  <div class="info-panel" data-reveal>
-    <div class="info-main">
-      <h2 class="info-title">Avatar: Aang, The Last Airbender</h2>
-      <div class="info-meta">
-        <span>2026</span><span class="dot">·</span>
-        <span id="runtimeDisplay">Loading…</span><span class="dot">·</span>
-        <span>Animated Fantasy</span>
-      </div>
-      <div class="genre-tags">
-        <span class="genre-tag">Adventure</span>
-        <span class="genre-tag">Fantasy</span>
-        <span class="genre-tag">Action</span>
-        <span class="genre-tag">Mythology</span>
-      </div>
-      <p class="info-synopsis">
-        In a world torn apart by a century of war, a young Air Nomad awakens from a hundred-year
-        slumber to fulfil his destiny as the Avatar — the only being capable of mastering all four
-        elements. With the Fire Nation tightening its grip on the world, Aang must journey across
-        tundra, desert, and mountain to learn waterbending, earthbending, and firebending before
-        the comet arrives and grants the Fire Lord unstoppable power. Friendship, sacrifice,
-        and the weight of an entire world rest on one twelve-year-old boy's shoulders.
-      </p>
-
-    </div>
-    <div class="info-divider"></div>
-    <div class="info-stats">
-      <div class="stat-item">
-        <span class="stat-label">Director</span>
-        <span class="stat-value">Lauren Montgomery</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Screenplay</span>
-        <span class="stat-value">Tim Hedrick &amp; Christopher Yost</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Studio</span>
-        <span class="stat-value">Avatar Studios / Nickelodeon</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Streaming</span>
-        <span class="stat-value">Paramount+ · Oct 9, 2026</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Animation</span>
-        <span class="stat-value">Flying Bark &amp; Studio Mir</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Composer</span>
-        <span class="stat-value">Jeremy Zuckerman</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- About section -->
-  <div data-reveal>
-    <div class="section-divider">
-      <div class="section-divider-line"></div>
-      <div class="section-divider-inner">
-        <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/air.png" alt="" class="divider-sym divider-sym-air">
-        <span class="section-divider-title">About the Film</span>
-        <img src="https://raw.githubusercontent.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/main/air.png" alt="" class="divider-sym divider-sym-air">
-      </div>
-      <div class="section-divider-line"></div>
-    </div>
-    <div class="about-section">
-      <div class="about-text">
-        <p>
-          <em>Avatar: Aang, The Last Airbender</em> is the first feature film from Avatar Studios —
-          a dedicated division of Nickelodeon founded in 2021 by the franchise's original creators,
-          Bryan Konietzko and Michael DiMartino. Set after the defeat of Fire Lord Ozai, the film
-          continues the story of Team Avatar in their young adulthood, picking up the threads of a
-          world still healing from a century of war.
-        </p>
-        <p>
-          Directed by Lauren Montgomery — a storyboard artist on the original series and supervising
-          producer of <em>The Legend of Korra</em> — the film blends 2D hand-drawn characters with
-          3D computer-animated environments via Deep Canvas technology, the same hybrid technique
-          pioneered by Walt Disney Animation in <em>Tarzan</em> and <em>Treasure Planet</em>.
-        </p>
-        <p>
-          The principal cast was thoughtfully recast to reflect the cultural backgrounds of each
-          nation, with Eric Nam leading as Aang, joined by Jessica Matten, Román Zaragoza, Dionne
-          Quan, and Steven Yeun. Original series composer Jeremy Zuckerman returns with full
-          orchestral support for a score that expands on what was possible in the television series.
-        </p>
-      </div>
-      <div class="about-side">
-        <div class="about-fact">
-          <div class="about-fact-label">Franchise</div>
-          <div class="about-fact-value">Avatar: The Last Airbender — first Avatar Studios production</div>
-        </div>
-        <div class="about-fact">
-          <div class="about-fact-label">Story</div>
-          <div class="about-fact-value">Bryan Konietzko, Michael DiMartino, Tim Hedrick &amp; Kenneth Lin</div>
-        </div>
-        <div class="about-fact">
-          <div class="about-fact-label">Antagonists</div>
-          <div class="about-fact-value">The Denied — a group threatening the fragile post-war peace</div>
-        </div>
-        <div class="about-fact">
-          <div class="about-fact-label">Composer</div>
-          <div class="about-fact-value">Jeremy Zuckerman, returning with full orchestral arrangements</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-</div>
-
-
-<!-- ── Jeffrey Creates watermark ── -->
-<a class="jeffrey-watermark" href="https://www.youtube.com/@Jeffrey_Creates" target="_blank" rel="noopener">
-  <svg viewBox="0 0 24 24" style="width:9px;height:9px;fill:#ff1c1c;flex-shrink:0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-  Jeffrey Creates
-</a>
-
-<script>
-/* ══════════════════════════════════════════════
-   Intro audio — Web Audio API unlock for instant
-   playback on first gesture; no perceptible delay.
-══════════════════════════════════════════════ */
-const sfx = new Audio('intro.mp3');
-sfx.preload = 'auto';
-sfx.volume  = 1.0;
-
-// Pre-fetch + decode into AudioContext so buffer is warm
-// and plays with zero latency on the first user gesture.
-let _actx = null;
-let _sfxBuf = null;
-let _gainNode = null;
-let audioStarted = false;
-
-(function warmAudio() {
-  try {
-    _actx = new (window.AudioContext || window.webkitAudioContext)();
-    fetch('intro.mp3')
-      .then(r => r.arrayBuffer())
-      .then(ab => _actx.decodeAudioData(ab))
-      .then(buf => { _sfxBuf = buf; })
-      .catch(() => {});
-  } catch(e) {}
-})();
-
-function startAudio() {
-  if (audioStarted) return;
-  audioStarted = true;
-  // If buffer is decoded, play via Web Audio (instant, no buffering delay)
-  if (_actx && _sfxBuf) {
-    _actx.resume().then(() => {
-      _gainNode = _actx.createGain();
-      _gainNode.gain.setValueAtTime(1, _actx.currentTime);
-      _gainNode.connect(_actx.destination);
-      const src = _actx.createBufferSource();
-      src.buffer = _sfxBuf;
-      src.connect(_gainNode);
-      src.start(0);
-    });
-  } else {
-    // Fallback to HTMLAudio
-    sfx.play().catch(() => {});
-  }
-}
-
-// Fallback: fire on first real interaction if blocked
-['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt =>
-  document.addEventListener(evt, startAudio, { once: true, capture: true })
-);
-
-function stopIntroAudio() {
-  // Fade via gain node if Web Audio was used
-  if (_actx && _gainNode && _actx.state === 'running') {
-    try {
-      _gainNode.gain.setValueAtTime(_gainNode.gain.value, _actx.currentTime);
-      _gainNode.gain.linearRampToValueAtTime(0, _actx.currentTime + 0.4);
-      setTimeout(() => { try { _actx.close(); } catch(e) {} }, 450);
-    } catch(e) {}
-  }
-  // Also fade HTMLAudio fallback (no-op if not playing)
-  const fadeStep = 0.05;
-  const fade = setInterval(() => {
-    if (sfx.volume > fadeStep) {
-      sfx.volume -= fadeStep;
-    } else {
-      sfx.pause();
-      sfx.currentTime = 0;
-      sfx.volume = 1.0;
-      clearInterval(fade);
-    }
-  }, 40);
-}
-
-/* ══════════════════════════════════════════════
-   Intro overlay sequence
-══════════════════════════════════════════════ */
-const overlay = document.getElementById('introOverlay');
-
-requestAnimationFrame(() => {
-  setTimeout(() => {
-    overlay.classList.add('symbols-in');
-  }, 80);
-});
-
-function dismissOverlay() {
-  if (overlay.classList.contains('fade-out')) return;
-  startAudio();                          // play on user gesture (no-op if already started)
-  overlay.classList.add('fade-out');
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    document.body.classList.add('page-ready');
-  }, 650);
-  setTimeout(stopIntroAudio, 2000);      // let it play ~2s then fade out
-}
-
-// Auto-dismiss after 2.4s
-setTimeout(dismissOverlay, 2400);
-
-// Also dismiss on click
-overlay.addEventListener('click', dismissOverlay);
-
-/* ══════════════════════════════════════════════
-   Video player
-══════════════════════════════════════════════ */
-const vid       = document.getElementById('mainVideo');
-const shell     = document.getElementById('playerShell');
-const bigPlay   = document.getElementById('bigPlay');
-const clickArea = document.getElementById('clickArea');
-const playBtn   = document.getElementById('playBtn');
-const icPlay    = document.getElementById('icPlay');
-const icPause   = document.getElementById('icPause');
-const curEl     = document.getElementById('curTime');
-const durEl     = document.getElementById('durTime');
-const progFill  = document.getElementById('progFill');
-const progThumb = document.getElementById('progThumb');
-const prog      = document.getElementById('prog');
-const volBtn    = document.getElementById('volBtn');
-const volSlider = document.getElementById('volSlider');
-const icVolOn   = document.getElementById('icVolOn');
-const icVolOff  = document.getElementById('icVolOff');
-
-/* ── Idle cursor hiding ── */
-let idleTimer;
-function resetIdle() {
-  shell.classList.remove('idle');
-  clearTimeout(idleTimer);
-  if (!vid.paused) idleTimer = setTimeout(() => shell.classList.add('idle'), 1250);
-}
-document.addEventListener('mousemove', resetIdle);
-document.addEventListener('keydown',   resetIdle);
-
-/* ── Keyboard shortcuts ── */
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  switch (e.code) {
-    case 'Space':
-    case 'KeyK':
-      e.preventDefault(); togglePlay(); break;
-    case 'ArrowRight':
-      e.preventDefault();
-      if (isFinite(vid.duration)) vid.currentTime = Math.min(vid.duration, vid.currentTime + 5);
-      break;
-    case 'ArrowLeft':
-      e.preventDefault();
-      vid.currentTime = Math.max(0, vid.currentTime - 5);
-      break;
-    case 'ArrowUp':
-      e.preventDefault();
-      vid.volume = Math.min(1, vid.volume + 0.1);
-      vid.muted = false;
-      volSlider.value = vid.volume;
-      updateVolUI();
-      break;
-    case 'ArrowDown':
-      e.preventDefault();
-      vid.volume = Math.max(0, vid.volume - 0.1);
-      vid.muted = vid.volume === 0;
-      volSlider.value = vid.volume;
-      updateVolUI();
-      break;
-    case 'KeyM':
-      vid.muted = !vid.muted;
-      volSlider.value = vid.muted ? 0 : (vid.volume || 1);
-      updateVolUI();
-      break;
-    case 'KeyF':
-      e.preventDefault();
-      toggleFullscreen();
-      break;
-  }
-});
-
-/* ── Touch: single tap shows controls, double tap toggles play ── */
-let tapTimer = null;
-clickArea.addEventListener('touchend', e => {
-  e.preventDefault();
-  resetIdle();
-  if (tapTimer) {
-    clearTimeout(tapTimer);
-    tapTimer = null;
-    togglePlay();
-  } else {
-    tapTimer = setTimeout(() => { tapTimer = null; }, 300);
-  }
-}, { passive: false });
-
-/* ── Helpers ── */
-function fmt(s) {
-  s = Math.floor(s || 0);
-  const h  = Math.floor(s / 3600);
-  const m  = Math.floor((s % 3600) / 60);
-  const sc = s % 60;
-  return h > 0
-    ? `${h}:${String(m).padStart(2, '0')}:${String(sc).padStart(2, '0')}`
-    : `${m}:${String(sc).padStart(2, '0')}`;
-}
-
-function togglePlay() {
-  vid.paused ? vid.play() : vid.pause();
-}
-
-function toggleFullscreen() {
-  document.fullscreenElement
-    ? document.exitFullscreen()
-    : shell.requestFullscreen().catch(() => {});
-}
-
-/* ── Play / pause state ── */
-clickArea.addEventListener('click', togglePlay);
-playBtn.addEventListener('click', togglePlay);
-
-vid.addEventListener('play', () => {
-  icPlay.style.display  = 'none';
-  icPause.style.display = '';
-  bigPlay.classList.add('hidden');
-  resetIdle();
-});
-vid.addEventListener('pause', () => {
-  icPlay.style.display  = '';
-  icPause.style.display = 'none';
-  bigPlay.classList.remove('hidden');
-  shell.classList.remove('idle');
-});
-
-/* ── Duration / time display ── */
-vid.addEventListener('loadedmetadata', () => { durEl.textContent = fmt(vid.duration); });
-
-vid.addEventListener('timeupdate', () => {
-  if (isSeeking) return;
-  const pct = (vid.currentTime / vid.duration) * 100 || 0;
-  progFill.style.width  = pct + '%';
-  progThumb.style.left  = pct + '%';
-  curEl.textContent     = fmt(vid.currentTime);
-  localStorage.setItem('aang_position', vid.currentTime);
-});
-
-/* ── Seek bar ── */
-let isSeeking = false;
-
-function seekTo(clientX) {
-  const rect = prog.getBoundingClientRect();
-  const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-  const t    = pct * vid.duration;
-  vid.currentTime       = t;
-  progFill.style.width  = (pct * 100) + '%';
-  progThumb.style.left  = (pct * 100) + '%';
-  curEl.textContent     = fmt(t);
-}
-
-prog.addEventListener('mousedown', e => { isSeeking = true; seekTo(e.clientX); e.stopPropagation(); });
-document.addEventListener('mousemove', e => { if (isSeeking) seekTo(e.clientX); });
-document.addEventListener('mouseup',   () => { isSeeking = false; });
-
-prog.addEventListener('touchstart',   e => { isSeeking = true; seekTo(e.touches[0].clientX); }, { passive: true });
-document.addEventListener('touchmove', e => { if (isSeeking) seekTo(e.touches[0].clientX); }, { passive: true });
-document.addEventListener('touchend',  () => { isSeeking = false; });
-
-/* ── Volume ── */
-function updateVolUI() {
-  const muted = vid.muted || vid.volume === 0;
-  icVolOn.style.display  = muted ? 'none' : '';
-  icVolOff.style.display = muted ? '' : 'none';
-  const pct = muted ? 0 : vid.volume * 100;
-  volSlider.style.background =
-    `linear-gradient(to right, var(--blue) ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
-}
-
-volSlider.addEventListener('input', () => {
-  vid.volume = parseFloat(volSlider.value);
-  vid.muted  = vid.volume === 0;
-  updateVolUI();
-});
-volBtn.addEventListener('click', () => {
-  vid.muted       = !vid.muted;
-  volSlider.value = vid.muted ? 0 : (vid.volume || 1);
-  updateVolUI();
-});
-vid.addEventListener('volumechange', updateVolUI);
-updateVolUI();
-
-/* ── Fullscreen button ── */
-document.getElementById('fsBtn').addEventListener('click', toggleFullscreen);
-
-/* ── Captions ── */
-const ccBtn      = document.getElementById('ccBtn');
-const captionBox = document.getElementById('captionBox');
-let captionsOn   = false;
-let srtCues      = [];
-let lastCueText  = null;
-
-function parseSRT(text) {
-  return text.replace(/\r/g, '').trim().split(/\n\n+/).reduce((cues, block) => {
-    const lines = block.split('\n');
-    const times = lines[1]?.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s-->\s(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
-    if (times && lines.length >= 3) {
-      const t = (h,m,s,ms) => +h*3600 + +m*60 + +s + +ms/1000;
-      cues.push({
-        start: t(times[1],times[2],times[3],times[4]),
-        end:   t(times[5],times[6],times[7],times[8]),
-        text:  lines.slice(2).join('\n')
-      });
-    }
-    return cues;
-  }, []);
-}
-
-fetch('captions.srt')
-  .then(r => r.text())
-  .then(text => { srtCues = parseSRT(text); })
-  .catch(() => {});
-
-function showCaption(text) {
-  captionBox.innerHTML = '<span>' + text.replace(/\n/g, '<br>') + '</span>';
-  captionBox.style.display = 'block';
-  requestAnimationFrame(() => captionBox.classList.add('visible'));
-}
-function hideCaption() {
-  captionBox.classList.remove('visible');
-  setTimeout(() => { if (!captionBox.classList.contains('visible')) captionBox.style.display = 'none'; }, 200);
-}
-
-function renderCaption() {
-  if (!captionsOn || !srtCues.length) { hideCaption(); return; }
-  const cue = srtCues.find(c => vid.currentTime >= c.start && vid.currentTime <= c.end);
-  const text = cue?.text ?? null;
-  if (text === lastCueText) return;
-  lastCueText = text;
-  text ? showCaption(text) : hideCaption();
-}
-
-vid.addEventListener('timeupdate', renderCaption);
-
-ccBtn.addEventListener('click', () => {
-  captionsOn = !captionsOn;
-  ccBtn.classList.toggle('active', captionsOn);
-  if (!captionsOn) { hideCaption(); lastCueText = null; }
-});
-
-/* ── Buffering spinner ── */
-const bufferSpinner = document.getElementById('bufferSpinner');
-vid.addEventListener('waiting', () => { bufferSpinner.style.display = 'block'; });
-vid.addEventListener('playing', () => { bufferSpinner.style.display = 'none'; });
-vid.addEventListener('canplay', () => { bufferSpinner.style.display = 'none'; });
-
-/* ── Persist volume ── */
-const savedVol = localStorage.getItem('aang_volume');
-const savedMuted = localStorage.getItem('aang_muted');
-if (savedVol !== null) { vid.volume = parseFloat(savedVol); volSlider.value = savedVol; }
-if (savedMuted === 'true') { vid.muted = true; volSlider.value = 0; }
-updateVolUI();
-
-vid.addEventListener('volumechange', () => {
-  localStorage.setItem('aang_volume', vid.volume);
-  localStorage.setItem('aang_muted', vid.muted);
-});
-
-/* ── Persist playback position ── */
-vid.addEventListener('loadedmetadata', () => {
-  durEl.textContent = fmt(vid.duration);
-  // Show runtime in info panel
-  const rtEl = document.getElementById('runtimeDisplay');
-  if (rtEl && isFinite(vid.duration)) {
-    const totalMin = Math.round(vid.duration / 60);
-    rtEl.textContent = totalMin >= 60
-      ? Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm'
-      : totalMin + ' min';
-  }
-  const saved = parseFloat(localStorage.getItem('aang_position') || 0);
-  if (saved > 5 && saved < vid.duration - 10) vid.currentTime = saved;
-});
-
-
-
-/* ── Ambient particles ── */
-(function() {
-  const canvas = document.getElementById('particleCanvas');
-  const ctx    = canvas.getContext('2d');
-
-  const SYMBOLS = [
-    { char: '᪤', color: '#f5c518' }, // air-like glyph
-    { char: '◈', color: '#4db8ff' }, // water
-    { char: '⬡', color: '#6abf69' }, // earth
-    { char: '✦', color: '#f97316' }, // fire
-    { char: '⊕', color: '#f5c518' },
-    { char: '∞', color: '#4db8ff' },
-  ];
-
-  let W, H, particles = [];
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  function rand(a, b) { return a + Math.random() * (b - a); }
-
-  function spawn() {
-    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    return {
-      x: rand(0, W),
-      y: rand(0, H),
-      vy: rand(-0.12, -0.32),
-      vx: rand(-0.08, 0.08),
-      alpha: rand(0.04, 0.13),
-      size: rand(10, 22),
-      char: sym.char,
-      color: sym.color,
-      rot: rand(0, Math.PI * 2),
-      vrot: rand(-0.003, 0.003),
-    };
-  }
-
-  const COUNT = 38;
-  for (let i = 0; i < COUNT; i++) particles.push(spawn());
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    for (const p of particles) {
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.font = `${p.size}px serif`;
-      ctx.fillStyle = p.color;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(p.char, 0, 0);
-      ctx.restore();
-
-      p.x   += p.vx;
-      p.y   += p.vy;
-      p.rot += p.vrot;
-
-      if (p.y < -40 || p.x < -40 || p.x > W + 40) {
-        Object.assign(p, spawn(), { x: rand(0, W), y: H + 20 });
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* ── Scroll reveal ── */
-(function() {
-  const els = document.querySelectorAll('[data-reveal]');
-  if (!els.length) return;
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('revealed');
-        io.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.08 });
-  els.forEach(el => io.observe(el));
-})();
-
-
-</html>
+1
+00:00:55,980 --> 00:00:57,000
+Whoever gets to the temple first
+ 
+2
+00:00:57,002 --> 00:00:58,000
+wins!
+
+2
+00:01:00,000 --> 00:01:02,480
+Let's get him!
+
+3
+00:01:02,481 --> 00:01:03,481
+Hurry up!
+
+4
+00:01:04,960 --> 00:01:12,960
+Hi, Nima.
+
+5
+00:01:12,961 --> 00:01:13,940
+Good morning, Aang.
+
+6
+00:01:13,941 --> 00:01:14,540
+Hey, my mirror.
+
+7
+00:01:14,541 --> 00:01:15,340
+Oh, hello, Aang.
+
+8
+00:01:15,420 --> 00:01:23,420
+Oh, perfect timing.
+
+9
+00:01:23,421 --> 00:01:26,060
+I don't mind giving me a lift.
+
+10
+00:01:26,140 --> 00:01:28,040
+Piazzo, this isn't the best time.
+
+11
+00:01:28,041 --> 00:01:29,700
+I'm getting old, you know.
+
+12
+00:01:29,701 --> 00:01:32,280
+My body doesn't move like it used to.
+
+13
+00:01:32,281 --> 00:01:34,180
+I'm kind of in the middle of something.
+
+14
+00:01:34,181 --> 00:01:35,780
+You are so heavy.
+
+15
+00:01:35,781 --> 00:01:36,380
+Heavy?
+
+16
+00:01:36,381 --> 00:01:37,080
+Me?
+
+17
+00:01:37,081 --> 00:01:38,960
+I eat nothing but vegetables.
+
+18
+00:01:39,259 --> 00:01:40,580
+Pie is not a vegetable.
+
+19
+00:01:40,581 --> 00:01:42,680
+I'm gonna lose the race.
+
+20
+00:01:42,681 --> 00:01:43,300
+Race?
+
+21
+00:01:43,301 --> 00:01:44,360
+What race?
+
+22
+00:01:45,139 --> 00:01:46,120
+We finally are!
+
+23
+00:01:46,121 --> 00:01:49,059
+We won!
+
+24
+00:01:51,044 --> 00:01:58,820
+Aang, as an airbender, it's important
+that you know when to show restraint.
+
+25
+00:02:00,219 --> 00:02:04,120
+Even if you have the power
+to win, you are the Avatar.
+
+26
+00:02:04,980 --> 00:02:08,699
+A lot of people are
+going to rely on the Isle.
+
+27
+00:02:13,380 --> 00:02:21,380
+He's gone!
+
+28
+00:02:21,381 --> 00:02:22,380
+He ran away!
+
+29
+00:02:22,381 --> 00:02:22,680
+What?
+
+30
+00:02:22,681 --> 00:02:23,580
+I'm here!
+
+31
+00:02:23,581 --> 00:02:25,400
+Where's the Avatar?
+
+32
+00:02:25,401 --> 00:02:26,840
+I'm here!
+
+33
+00:02:26,841 --> 00:02:29,580
+Aang, where are you?
+
+34
+00:02:29,581 --> 00:02:31,100
+Piazzo, I'm here!
+
+35
+00:02:31,160 --> 00:02:41,840
+I'm here!
+
+36
+00:02:43,890 --> 00:02:47,240
+Hey, Momo.
+
+37
+00:02:47,241 --> 00:02:49,540
+Hi, Appa.
+
+38
+00:02:49,541 --> 00:02:51,140
+Was I asleep for long?
+
+39
+00:02:51,240 --> 00:02:52,640
+Okay, okay.
+
+40
+00:02:52,740 --> 00:02:53,960
+I'm awake already.
+
+41
+00:02:54,410 --> 00:02:55,160
+I know, I know.
+
+42
+00:02:55,410 --> 00:02:56,340
+We've got a job to finish.
+
+43
+00:02:56,341 --> 00:02:59,440
+Let's continue our journey.
+
+44
+00:03:00,540 --> 00:03:01,540
+Back to our old home.
+
+45
+00:03:46,980 --> 00:03:50,403
+This may not have been
+our best trip, but any
+
+46
+00:03:50,415 --> 00:03:54,080
+airbender relic we find
+makes it all worthwhile.
+
+47
+00:03:56,130 --> 00:04:02,580
+This could be the oldest
+piece in our collection.
+
+48
+00:04:04,980 --> 00:04:09,120
+So numb.
+
+49
+00:04:21,650 --> 00:04:23,300
+I miss you.
+
+50
+00:04:27,360 --> 00:04:31,960
+Momo, go outside with Appa.
+
+51
+00:04:32,160 --> 00:04:34,440
+Now!
+
+52
+00:04:36,900 --> 00:04:44,900
+Who are you?
+
+53
+00:04:44,901 --> 00:04:46,320
+Why are you doing this?
+
+54
+00:04:46,321 --> 00:04:51,320
+Please, stop!
+
+55
+00:04:51,321 --> 00:04:52,860
+I don't want to hurt you.
+
+56
+00:04:52,861 --> 00:04:57,620
+Where is it?
+
+57
+00:04:57,621 --> 00:04:58,320
+Where is it?
+
+58
+00:04:58,321 --> 00:04:59,640
+Nope, that's not it.
+
+59
+00:04:59,641 --> 00:05:00,140
+Hey!
+
+60
+00:05:00,141 --> 00:05:01,141
+Those are antiques!
+
+61
+00:05:05,790 --> 00:05:13,640
+Enough!
+
+62
+00:05:13,641 --> 00:05:17,640
+Wait!
+
+63
+00:05:18,090 --> 00:05:19,020
+I found it!
+
+64
+00:05:19,021 --> 00:05:23,440
+Zonam, why ain't after you?
+
+65
+00:05:35,060 --> 00:05:43,060
+Wait!
+
+66
+00:05:43,061 --> 00:05:48,680
+No, that's a thousand years old!
+
+67
+00:05:48,681 --> 00:05:49,920
+Give it to me!
+
+68
+00:05:49,921 --> 00:05:51,140
+Why don't we just talk?
+
+69
+00:05:51,141 --> 00:05:52,140
+Maybe I can help.
+
+70
+00:05:52,141 --> 00:05:53,140
+We don't need your help, Avatar.
+
+71
+00:05:53,141 --> 00:05:55,140
+We're done living in a world where Vendors
+have all the power and we have none!
+
+72
+00:05:55,141 --> 00:05:56,140
+Who are you?
+
+73
+00:05:56,141 --> 00:05:57,140
+We're the Denied!
+
+74
+00:05:57,141 --> 00:05:58,140
+The Denied?
+
+75
+00:05:58,141 --> 00:05:59,140
+Just kill him already!
+
+76
+00:05:59,141 --> 00:06:00,140
+No!
+
+77
+00:06:00,141 --> 00:06:01,140
+He'll bring the whole place down!
+
+78
+00:06:01,141 --> 00:06:03,140
+have all the power and we have none.
+
+79
+00:06:03,141 --> 00:06:04,140
+Who are you?
+
+80
+00:06:04,141 --> 00:06:05,140
+We're the Denied!
+
+81
+00:06:05,141 --> 00:06:06,140
+The Denied?
+
+82
+00:06:06,141 --> 00:06:08,140
+Just kill him already!
+
+83
+00:06:08,141 --> 00:06:10,140
+No! He'll bring the whole place down!
+
+84
+00:06:32,140 --> 00:06:40,140
+You... saved me.
+
+85
+00:06:40,141 --> 00:06:43,140
+Kaliq! Grab the map! Let's go!
+
+86
+00:06:50,140 --> 00:06:58,140
+Oh no!
+
+87
+00:07:01,140 --> 00:07:03,140
+Oh no!
+
+88
+00:07:31,140 --> 00:07:33,140
+I'm fine. Momo, I'm fine.
+
+89
+00:07:33,141 --> 00:07:35,140
+I'm fine. Momo, I'm fine.
+
+90
+00:07:35,141 --> 00:07:37,140
+We've got to get to Republic City.
+
+91
+00:07:37,141 --> 00:07:39,140
+Appa, yip yip!
+
+92
+00:07:39,141 --> 00:07:41,140
+I'm fine. Momo, I'm fine.
+
+93
+00:07:41,141 --> 00:07:43,140
+We've got to get to Republic City.
+
+94
+00:07:43,141 --> 00:07:45,140
+Appa, yip yip!
+
+95
+00:07:45,141 --> 00:07:47,140
+I'm fine. Momo, I'm fine.
+
+96
+00:07:47,141 --> 00:07:49,140
+We've got to get to Republic City.
+
+97
+00:07:49,141 --> 00:07:51,140
+Appa, yip yip!
+
+98
+00:07:51,141 --> 00:07:54,140
+I'm fine. Momo, I'm fine.
+
+99
+00:07:54,141 --> 00:07:56,140
+I'm fine. Momo, I'm fine.
+
+100
+00:07:56,141 --> 00:07:58,140
+We've got to get to Republic City.
+
+101
+00:07:58,590 --> 00:08:00,140
+Appa, yip yip!
+
+102
+00:08:00,141 --> 00:08:04,140
+We've got to get to Republic City.
+
+103
+00:08:04,141 --> 00:08:05,140
+Appa, yip yip!
+
+104
+00:08:05,141 --> 00:08:06,141
+Yip yip!
+
+105
+00:08:16,140 --> 00:08:24,140
+Water.
+
+106
+00:08:24,640 --> 00:08:27,140
+Her tribes gather strength from the moon.
+
+107
+00:08:27,141 --> 00:08:31,140
+And flow with the tides.
+
+108
+00:08:32,140 --> 00:08:33,140
+Earth.
+
+109
+00:08:33,141 --> 00:08:36,140
+A kingdom of unshakable will.
+
+110
+00:08:36,141 --> 00:08:38,140
+Reliable and strong.
+
+111
+00:08:38,141 --> 00:08:43,140
+Fire.
+
+112
+00:08:43,141 --> 00:08:46,140
+A nation capable of great destruction.
+
+113
+00:08:46,141 --> 00:08:51,140
+But also... of great warmth.
+
+114
+00:08:51,141 --> 00:08:54,140
+Air.
+
+115
+00:08:54,141 --> 00:08:57,140
+Peaceful nomads with
+the power of a hurricane.
+
+116
+00:08:57,141 --> 00:09:00,140
+But the spirit of a gentle breeze.
+
+117
+00:09:03,140 --> 00:09:07,084
+For generations, the
+Avatar, the one master of
+
+118
+00:09:07,096 --> 00:09:11,140
+all four elements, kept
+the nations in balance.
+
+119
+00:09:11,141 --> 00:09:17,140
+But when that responsibility
+fell to me as a child, I ran away.
+
+120
+00:09:17,514 --> 00:09:20,140
+I was caught in a deadly storm.
+
+121
+00:09:20,141 --> 00:09:23,128
+But my Avatar spirit
+preserved me in a sphere
+
+122
+00:09:23,140 --> 00:09:26,140
+of energy where I stayed
+for a hundred years.
+
+123
+00:09:27,140 --> 00:09:30,304
+I woke to discover that
+the balance preserved
+
+124
+00:09:30,316 --> 00:09:33,140
+by the Avatar had
+been destroyed by war.
+
+125
+00:09:33,141 --> 00:09:36,140
+The air nomads were gone.
+
+126
+00:09:36,141 --> 00:09:38,140
+All but one.
+
+127
+00:09:39,140 --> 00:09:40,140
+me.
+
+128
+00:09:40,141 --> 00:09:44,140
+I could no longer run from
+my responsibility as the Avatar.
+
+129
+00:09:44,141 --> 00:09:47,140
+I found allies from every nation.
+
+130
+00:09:47,141 --> 00:09:49,140
+Benders.
+
+131
+00:09:49,141 --> 00:09:51,140
+And non-benders.
+
+132
+00:09:51,141 --> 00:09:54,140
+Katara taught me how to water bend.
+
+133
+00:09:54,141 --> 00:09:57,140
+Toph trained me in the
+ways of the Earthbenders.
+
+134
+00:09:58,140 --> 00:10:03,140
+Zuko, once my worst enemy,
+became my firebending teacher.
+
+135
+00:10:03,141 --> 00:10:08,140
+Sokka showed me that bravery is the
+most important part of being a leader.
+
+136
+00:10:08,141 --> 00:10:11,140
+We became a family.
+
+137
+00:10:11,141 --> 00:10:16,140
+And together, we ended
+the Hundred Year War.
+
+138
+00:10:17,839 --> 00:10:22,140
+Then, we began the hard
+work of rebuilding the world.
+
+139
+00:10:29,140 --> 00:10:37,140
+For so long, the nation stood apart, alone.
+
+140
+00:10:37,141 --> 00:10:39,140
+And we all suffered as a result.
+
+141
+00:10:40,389 --> 00:10:45,140
+But here, on this ancient site, we created
+a place where all people are welcome.
+
+142
+00:10:45,141 --> 00:10:48,140
+Bender and non-bender alike.
+
+143
+00:10:48,689 --> 00:10:51,140
+Working together in
+peace to build the future.
+
+144
+00:10:51,339 --> 00:10:57,140
+Though there are still those who
+would seek to divide us, we remain united.
+
+145
+00:10:59,140 --> 00:11:03,335
+As a council representative, I am
+honored to be here today, celebrating
+
+146
+00:11:03,347 --> 00:11:07,140
+the anniversary of Republic City
+and the opening of Unity Tower.
+
+147
+00:11:07,539 --> 00:11:09,140
+A symbol for all people.
+
+148
+00:11:09,141 --> 00:11:17,140
+Look!
+
+149
+00:11:17,141 --> 00:11:20,140
+It's the Avatar!
+
+150
+00:11:20,141 --> 00:11:24,140
+Let's hurry!
+
+151
+00:11:28,140 --> 00:11:29,140
+Oh.
+
+152
+00:11:29,589 --> 00:11:33,140
+Momo!
+
+153
+00:11:33,339 --> 00:11:37,140
+Appa!
+
+154
+00:11:37,141 --> 00:11:39,140
+I missed you too, old friend.
+
+155
+00:11:41,339 --> 00:11:42,140
+Aang!
+
+156
+00:11:42,141 --> 00:11:43,140
+Katara!
+
+157
+00:11:43,141 --> 00:11:49,140
+You're hurt.
+
+158
+00:11:58,239 --> 00:11:59,140
+Take a deep breath.
+
+159
+00:11:59,141 --> 00:12:04,140
+And... Exhale.
+
+160
+00:12:05,139 --> 00:12:07,140
+I've heard the Deneid
+are growing in numbers,
+
+161
+00:12:07,389 --> 00:12:09,140
+but they've never done anything like this.
+
+162
+00:12:09,141 --> 00:12:10,140
+Attacking the Avatar?
+
+163
+00:12:10,141 --> 00:12:11,140
+Yeah.
+
+164
+00:12:11,141 --> 00:12:14,140
+They were incredible fighters.
+
+165
+00:12:14,639 --> 00:12:16,140
+Even without bending.
+
+166
+00:12:16,489 --> 00:12:18,140
+Oops!
+
+167
+00:12:18,141 --> 00:12:19,140
+Ow!
+
+168
+00:12:19,141 --> 00:12:20,140
+Breathe through it.
+
+169
+00:12:20,141 --> 00:12:21,140
+Be honest.
+
+170
+00:12:21,141 --> 00:12:22,140
+You're enjoying this.
+
+171
+00:12:22,141 --> 00:12:24,140
+Aang, this is serious.
+
+172
+00:12:24,789 --> 00:12:29,140
+Whatever this map they took was, if they
+were willing to kill the Avatar to get it,
+
+173
+00:12:29,539 --> 00:12:31,140
+what else are they willing to do?
+
+174
+00:12:31,141 --> 00:12:32,140
+I don't know.
+
+175
+00:12:32,141 --> 00:12:35,140
+I'm worried about you.
+
+176
+00:12:36,089 --> 00:12:38,140
+You're spending more and
+more time at the Air Temple.
+
+177
+00:12:38,141 --> 00:12:39,141
+Alone.
+
+178
+00:12:39,239 --> 00:12:44,140
+It's... how I hold
+on to my past.
+
+179
+00:12:45,839 --> 00:12:48,140
+I know how hard this is for you.
+
+180
+00:12:52,289 --> 00:12:54,140
+When I was attacked,
+
+181
+00:12:54,739 --> 00:12:58,140
+all I could think about
+was that... this could be it.
+
+182
+00:13:00,539 --> 00:13:02,140
+I'm the last Airbender.
+
+183
+00:13:02,140 --> 00:13:05,140
+If I die,
+
+184
+00:13:06,689 --> 00:13:08,140
+my culture dies with me.
+
+185
+00:13:11,140 --> 00:13:12,165
+You may be the last Airbender.
+
+186
+00:13:12,189 --> 00:13:13,140
+You may be the last Airbender.
+
+187
+00:13:13,141 --> 00:13:14,140
+But you're not alone.
+
+188
+00:13:14,141 --> 00:13:15,140
+You're not alone.
+
+189
+00:13:15,141 --> 00:13:17,140
+Aang,
+
+190
+00:13:17,439 --> 00:13:19,140
+none of this would exist without you.
+
+191
+00:13:21,039 --> 00:13:24,140
+You made the city possible
+with your heart and your mind.
+
+192
+00:13:24,141 --> 00:13:27,140
+Because of you,
+
+193
+00:13:28,114 --> 00:13:29,140
+all of the nations live here.
+
+194
+00:13:29,141 --> 00:13:30,140
+Together.
+
+195
+00:13:30,141 --> 00:13:31,140
+Together.
+
+196
+00:13:31,141 --> 00:13:34,140
+All except mine.
+
+197
+00:13:38,140 --> 00:13:46,140
+I know.
+
+198
+00:13:47,789 --> 00:13:49,669
+But the people here
+still need your protection.
+
+199
+00:13:50,140 --> 00:13:51,140
+You're an Airbender.
+
+200
+00:13:52,889 --> 00:13:54,140
+But you're also the Avatar.
+
+201
+00:13:54,141 --> 00:13:57,140
+You're right.
+
+202
+00:13:59,589 --> 00:14:02,141
+Whoever this Sonam person
+is, I need to find out more.
+
+203
+00:14:20,140 --> 00:14:21,140
+Aang.
+
+204
+00:14:21,141 --> 00:14:22,140
+Avatar Roku.
+
+205
+00:14:22,141 --> 00:14:23,140
+It is good to see you again.
+
+206
+00:14:23,141 --> 00:14:24,140
+How can I help you?
+
+207
+00:14:24,141 --> 00:14:27,140
+In your lifetime, did you ever hear of
+an ancient Airbender named Sonam?
+
+208
+00:14:27,141 --> 00:14:29,140
+I have not.
+
+209
+00:14:29,141 --> 00:14:30,415
+But you have many past lives to call upon.
+
+210
+00:14:30,439 --> 00:14:34,140
+Perhaps one further back in
+the Avatar Cycle can help you.
+
+211
+00:14:34,140 --> 00:14:36,140
+Thank you, Avatar.
+
+212
+00:14:36,141 --> 00:14:37,140
+Roku.
+
+213
+00:14:37,140 --> 00:14:37,140
+I'm sorry.
+
+214
+00:14:37,141 --> 00:14:38,140
+I've never heard her say.
+
+215
+00:14:38,141 --> 00:14:39,140
+Perhaps earlier.
+
+216
+00:14:39,140 --> 00:14:41,140
+Not here.
+
+217
+00:14:41,141 --> 00:14:48,140
+We're back in the Avatar Cycle.
+
+218
+00:14:48,141 --> 00:15:07,581
+We're back in the back of the Cycle.
+
+219
+00:15:08,989 --> 00:15:11,140
+Um, hello?
+
+220
+00:15:12,089 --> 00:15:13,140
+Is there anyone here?
+
+221
+00:15:14,539 --> 00:15:15,539
+Hello?
+
+222
+00:15:18,140 --> 00:15:26,140
+Who calls upon Avatar Sion's
+vast wealth of knowledge?
+
+223
+00:15:26,814 --> 00:15:28,140
+Oh, hello.
+
+224
+00:15:28,639 --> 00:15:31,140
+You look like an Avatar from
+a time quite distant from mine.
+
+225
+00:15:31,140 --> 00:15:34,140
+Please, please, tell me about your era.
+
+226
+00:15:34,141 --> 00:15:36,140
+What are people wearing?
+
+227
+00:15:36,289 --> 00:15:37,140
+Are sandals still a thing?
+
+228
+00:15:37,141 --> 00:15:39,140
+Uh, yes.
+
+229
+00:15:39,239 --> 00:15:40,140
+Oh, why?
+
+230
+00:15:40,239 --> 00:15:47,140
+Why, after so many years, open toes,
+seeing someone else's crusty cuticles?
+
+231
+00:15:47,141 --> 00:15:48,140
+Disgusting!
+
+232
+00:15:48,141 --> 00:15:49,141
+Right.
+
+233
+00:15:49,189 --> 00:15:52,140
+Anyway, I have come through your guidance.
+
+234
+00:15:52,141 --> 00:15:53,141
+You see, I was attacked.
+
+235
+00:15:53,239 --> 00:15:55,140
+It was not me, okay?
+
+236
+00:15:55,141 --> 00:15:56,141
+It wasn't me.
+
+237
+00:15:56,189 --> 00:15:57,189
+I know that.
+
+238
+00:15:57,614 --> 00:16:00,140
+I think it might have something to
+do with an airbender named Sonam.
+
+239
+00:16:00,141 --> 00:16:01,141
+Hmm.
+
+240
+00:16:01,289 --> 00:16:02,140
+Sonam.
+
+241
+00:16:02,141 --> 00:16:04,140
+It sounds familiar.
+
+242
+00:16:04,141 --> 00:16:05,141
+Sonam.
+
+243
+00:16:05,439 --> 00:16:07,140
+Where have I heard that name before?
+
+244
+00:16:07,141 --> 00:16:08,140
+Aha!
+
+245
+00:16:08,141 --> 00:16:10,066
+Sonam was the youngest
+daughter of the owner of
+
+246
+00:16:10,078 --> 00:16:12,140
+the possum chicken shop
+at the corner marketplace.
+
+247
+00:16:12,141 --> 00:16:13,141
+Wait.
+
+248
+00:16:13,189 --> 00:16:15,140
+That was my ex, Soniam.
+
+249
+00:16:15,439 --> 00:16:18,140
+If only she didn't have
+those humongous toenails.
+
+250
+00:16:18,339 --> 00:16:20,140
+Ugh, disgusting.
+
+251
+00:16:20,141 --> 00:16:21,141
+This is going nowhere.
+
+252
+00:16:21,189 --> 00:16:26,140
+Sonam?
+
+253
+00:16:26,141 --> 00:16:27,140
+Well, thank you for your time.
+
+254
+00:16:27,141 --> 00:16:28,140
+I must continue my search.
+
+255
+00:16:28,141 --> 00:16:29,140
+Oh!
+
+256
+00:16:29,141 --> 00:16:30,140
+Sonam!
+
+257
+00:16:30,141 --> 00:16:33,140
+You're asking about the
+legend of the lost Avatar.
+
+258
+00:16:33,141 --> 00:16:36,140
+Sonam was an Avatar?
+
+259
+00:16:36,141 --> 00:16:37,140
+Indeed she was!
+
+260
+00:16:37,141 --> 00:16:42,140
+She was the Avatar in the
+golden age of airbenders.
+
+261
+00:16:43,140 --> 00:16:47,296
+Legend said she had a staff
+that could channel the vast energy
+
+262
+00:16:47,308 --> 00:16:51,140
+of the spirit world, granting
+its keeper unlimited power.
+
+263
+00:16:51,141 --> 00:16:54,140
+Is-is that even possible?
+
+264
+00:16:54,141 --> 00:16:57,140
+Eh, we'll never know for sure.
+
+265
+00:16:57,164 --> 00:17:00,140
+Many Avatars have tried to
+communicate with her, but they couldn't.
+
+266
+00:17:00,789 --> 00:17:05,140
+She disappeared so completely
+that it was as if she never existed.
+
+267
+00:17:06,189 --> 00:17:08,140
+And perhaps it's better that way.
+
+268
+00:17:08,339 --> 00:17:12,140
+Maybe such a staff was too
+dangerous for anyone to possess.
+
+269
+00:17:12,889 --> 00:17:14,140
+Even the Avatar.
+
+270
+00:17:14,141 --> 00:17:17,140
+But-but that's exactly
+why I need to find it.
+
+271
+00:17:17,539 --> 00:17:19,215
+The people who attacked
+me discovered a map.
+
+272
+00:17:19,239 --> 00:17:22,140
+It must lead to the staff.
+
+273
+00:17:22,141 --> 00:17:23,140
+Avatar Shion.
+
+274
+00:17:23,141 --> 00:17:24,141
+Please.
+
+275
+00:17:24,389 --> 00:17:26,140
+You have to tell me where it is.
+
+276
+00:17:28,889 --> 00:17:34,140
+The legend says that Sonam disappeared
+with her staff on the peak of Mount Baihu.
+
+277
+00:17:34,141 --> 00:17:38,140
+Katara.
+
+278
+00:17:38,389 --> 00:17:40,140
+I'm sorry to leave so suddenly.
+
+279
+00:17:40,314 --> 00:17:42,140
+But I found out what the denier after.
+
+280
+00:17:43,339 --> 00:17:45,140
+Sonam had a staff of immense power.
+
+281
+00:17:45,141 --> 00:17:48,140
+And in their hands, it could
+be a devastating weapon.
+
+282
+00:17:48,141 --> 00:17:50,140
+They have a head start.
+
+283
+00:17:50,239 --> 00:17:52,140
+There's no time to waste.
+
+284
+00:17:52,141 --> 00:17:55,140
+You take Appa and Momo and
+gather up the rest of the team.
+
+285
+00:17:55,141 --> 00:17:57,140
+We're gonna need some help.
+
+286
+00:18:04,140 --> 00:18:08,390
+Next on the agenda, a Fire Nation
+naval vessel came into conflict
+
+287
+00:18:08,402 --> 00:18:12,140
+with an extremist group of
+non-benders called the Denied.
+
+288
+00:18:12,141 --> 00:18:14,140
+They've been robbing
+ancient sites- Your Majesty!
+
+289
+00:18:14,140 --> 00:18:14,140
+Your Majesty!
+
+290
+00:18:14,141 --> 00:18:15,141
+Your Majesty!
+
+291
+00:18:15,489 --> 00:18:17,140
+An urgent message has
+arrived from Republic City!
+
+292
+00:18:17,141 --> 00:18:18,140
+How impudent!
+
+293
+00:18:18,141 --> 00:18:21,141
+Can't you see Fire Lord
+Zuko's- Chamberlain.
+
+294
+00:18:23,289 --> 00:18:25,103
+There's only one person
+who can send a message
+
+295
+00:18:25,115 --> 00:18:27,140
+urgent enough to interrupt
+the Fire Lord's council.
+
+296
+00:18:27,141 --> 00:18:28,140
+Is it from the Avatar?
+
+297
+00:18:28,141 --> 00:18:29,140
+Yes, my lord.
+
+298
+00:18:29,141 --> 00:18:30,140
+Read it to me.
+
+299
+00:18:30,141 --> 00:18:31,141
+Yes, my lord.
+
+300
+00:18:32,639 --> 00:18:37,140
+What are you doing?
+
+301
+00:18:37,141 --> 00:18:38,141
+Read it quickly.
+
+302
+00:18:38,639 --> 00:18:40,140
+Yes, Gwen Chamberlain.
+
+303
+00:18:40,189 --> 00:18:45,140
+Flame Hill Hartman, how's
+ruling the Fire Nation?
+
+304
+00:18:45,539 --> 00:18:51,140
+I hope the boring Chamberlain you mentioned
+in your letters isn't still annoying you.
+
+305
+00:18:51,141 --> 00:18:55,140
+Anywho, to cut to the
+chase, I need your help.
+
+306
+00:18:55,189 --> 00:18:57,140
+Can you please come immediately?
+
+307
+00:18:57,264 --> 00:19:01,140
+Oh, and don't forget to
+bring some firecracker buns.
+
+308
+00:19:01,140 --> 00:19:06,140
+Allow me to present Sokka Cycle.
+
+309
+00:19:06,141 --> 00:19:10,140
+Flames launch you into the sky where
+you can drop water bombs on your enemies.
+
+310
+00:19:10,539 --> 00:19:13,140
+Then skis pop out to
+help you stick the landing.
+
+311
+00:19:13,239 --> 00:19:15,140
+Pretty great, right?
+
+312
+00:19:15,141 --> 00:19:16,141
+Eh, boring.
+
+313
+00:19:16,189 --> 00:19:18,316
+Why would you need a sled
+when you can just waterbend?
+
+314
+00:19:18,340 --> 00:19:19,140
+Oh, oh, oh!
+
+315
+00:19:19,141 --> 00:19:20,140
+Like me, like me!
+
+316
+00:19:20,141 --> 00:19:24,140
+Keep in mind, there are still plenty
+of folks like me who can't bend.
+
+317
+00:19:24,165 --> 00:19:27,140
+Why would Avatar Aang
+partner with a non-bender?
+
+318
+00:19:27,339 --> 00:19:29,140
+Why? I'll tell you why.
+
+319
+00:19:29,141 --> 00:19:31,140
+I saved him from the iceberg.
+
+320
+00:19:31,141 --> 00:19:35,140
+My boomerang flew by his side while I
+carried away enemies with my trusty blade.
+
+321
+00:19:35,141 --> 00:19:38,140
+I even took down the whole
+Fire Nation airship armada.
+
+322
+00:19:40,140 --> 00:19:43,140
+And on top of all that, I
+was more popular than him.
+
+323
+00:19:43,141 --> 00:19:46,140
+You're such a liar, Sokka.
+
+324
+00:19:46,141 --> 00:19:50,140
+It's from the Avatar.
+
+325
+00:19:50,141 --> 00:19:51,140
+Wow!
+
+326
+00:19:51,141 --> 00:19:52,141
+Really?
+
+327
+00:19:52,389 --> 00:19:54,140
+Oh, so now you think I'm cool?
+
+328
+00:19:54,141 --> 00:19:57,140
+All right, metalbenders.
+
+329
+00:19:57,141 --> 00:20:01,140
+Let's see if any of you tenderfoots
+can at least make me use my hands.
+
+330
+00:20:01,141 --> 00:20:03,140
+my hands.
+
+331
+00:20:31,700 --> 00:20:39,700
+I'm still the greatest
+Earthbender in the world!
+
+332
+00:20:39,949 --> 00:20:41,320
+And I'm bored.
+
+333
+00:20:41,321 --> 00:20:43,820
+Master Toph, there's a bird on your head.
+
+334
+00:20:43,821 --> 00:20:44,820
+And?
+
+335
+00:20:44,821 --> 00:20:46,360
+It looks like it has a message.
+
+336
+00:20:46,361 --> 00:20:47,361
+Reed.
+
+337
+00:20:48,209 --> 00:20:49,540
+Uh, it's from Avatar Aang.
+
+338
+00:20:49,541 --> 00:20:50,540
+He needs your help.
+
+339
+00:20:50,541 --> 00:20:53,639
+It's the deni-- The
+deni-- Where is he?
+
+340
+00:20:53,739 --> 00:20:54,739
+Mount Bayou.
+
+341
+00:21:01,140 --> 00:21:02,140
+Oh, my God.
+
+342
+00:21:31,140 --> 00:21:47,140
+No.
+
+343
+00:21:47,141 --> 00:21:50,140
+I love that hat.
+
+344
+00:22:06,140 --> 00:23:08,140
+Oh, my God.
+
+345
+00:23:42,340 --> 00:23:50,340
+Sonam?
+
+346
+00:23:50,341 --> 00:23:56,960
+Could that be you?
+
+347
+00:24:28,120 --> 00:24:36,120
+I'm not going to die.
+
+348
+00:24:55,019 --> 00:25:01,820
+Who are you?
+
+349
+00:25:02,119 --> 00:26:01,820
+Huh?
+
+350
+00:26:23,800 --> 00:28:31,780
+I don't know.
+
+351
+00:28:31,929 --> 00:28:33,435
+Did you come off to get yourself killed?
+
+352
+00:28:33,459 --> 00:28:35,219
+I thought you were
+here looking for a staff.
+
+353
+00:28:35,939 --> 00:28:36,939
+Who's this guy?
+
+354
+00:28:44,189 --> 00:28:45,189
+An airbender.
+
+355
+00:29:06,429 --> 00:29:08,380
+How did he hold up an entire mountain?
+
+356
+00:29:09,029 --> 00:29:11,880
+His chi is strong, like
+nothing I've ever felt.
+
+357
+00:29:13,579 --> 00:29:17,980
+Hey, Avatar, you think this guy beat
+your record for longest frozen airbender?
+
+358
+00:29:18,469 --> 00:29:21,080
+Yeah, how long do you
+think he was in that ice?
+
+359
+00:29:21,629 --> 00:29:22,629
+I don't know.
+
+360
+00:29:23,239 --> 00:29:25,100
+His tattoos look ancient.
+
+361
+00:29:26,099 --> 00:29:27,640
+He's been in there a long time.
+
+362
+00:29:28,339 --> 00:29:29,440
+He smells good for an old guy.
+
+363
+00:29:29,441 --> 00:29:29,900
+Ew.
+
+364
+00:29:30,180 --> 00:29:30,720
+What?
+
+365
+00:29:30,721 --> 00:29:32,460
+My senses tell me this
+guy is pretty attractive.
+
+366
+00:29:32,461 --> 00:29:32,860
+Tom!
+
+367
+00:29:32,959 --> 00:29:33,780
+Someone else confirm.
+
+368
+00:29:33,781 --> 00:29:34,540
+This is serious.
+
+369
+00:29:34,541 --> 00:29:35,820
+What does attractive even mean?
+
+370
+00:29:35,821 --> 00:29:37,160
+Just give me a straight confirmation.
+
+371
+00:29:37,160 --> 00:29:38,220
+Is he attractive?
+
+372
+00:29:38,221 --> 00:29:39,340
+He's very attractive.
+
+373
+00:29:39,341 --> 00:29:40,341
+Huh?
+
+374
+00:29:41,360 --> 00:29:41,760
+What?
+
+375
+00:29:41,761 --> 00:29:42,880
+He is.
+
+376
+00:29:42,880 --> 00:29:42,880
+He is.
+
+377
+00:29:43,479 --> 00:29:44,400
+It's all in the bone structure.
+
+378
+00:29:44,401 --> 00:29:45,240
+No.
+
+379
+00:29:45,241 --> 00:29:46,241
+No.
+
+380
+00:29:48,669 --> 00:29:51,060
+Whoa, whoa, whoa.
+
+381
+00:29:51,061 --> 00:29:51,720
+Hey.
+
+382
+00:29:51,820 --> 00:29:52,580
+Easy.
+
+383
+00:29:52,581 --> 00:29:53,760
+You're safe.
+
+384
+00:29:53,761 --> 00:29:57,060
+Earthbender!
+
+385
+00:29:57,280 --> 00:29:58,880
+No, no, no, we're all friends here.
+
+386
+00:29:58,930 --> 00:29:59,930
+It's okay.
+
+387
+00:30:00,599 --> 00:30:02,480
+Someone woke up on the
+wrong side of the mountain.
+
+388
+00:30:02,481 --> 00:30:04,620
+Where is she?
+
+389
+00:30:06,619 --> 00:30:07,820
+Where is Avatar Sonam?
+
+390
+00:30:08,769 --> 00:30:09,560
+You knew Sonam?
+
+391
+00:30:09,561 --> 00:30:11,900
+Who are you?
+
+392
+00:30:13,649 --> 00:30:17,540
+I don't know how to explain it, but
+you've been asleep for a long time.
+
+393
+00:30:19,089 --> 00:30:20,180
+I'm the Avatar now.
+
+394
+00:30:20,181 --> 00:30:21,440
+I'm Aang.
+
+395
+00:30:23,339 --> 00:30:27,540
+If you're the Avatar,
+then... Sonam.
+
+396
+00:30:30,749 --> 00:30:33,658
+Well, Sonam might be
+long gone, but on the
+
+397
+00:30:33,670 --> 00:30:36,800
+bright side, you woke
+up at the perfect time.
+
+398
+00:30:37,149 --> 00:30:39,480
+Everyone will be amazed
+to see another airbender.
+
+399
+00:30:39,779 --> 00:30:41,460
+Aang's not the last one anymore.
+
+400
+00:30:43,409 --> 00:30:45,140
+What do you mean, last?
+
+401
+00:30:49,989 --> 00:30:50,989
+The air nomads.
+
+402
+00:30:52,209 --> 00:30:53,209
+They've been wiped out.
+
+403
+00:30:54,840 --> 00:30:55,840
+There's only me.
+
+404
+00:30:55,841 --> 00:30:58,600
+No.
+
+405
+00:31:00,249 --> 00:31:00,900
+Sonam's staff.
+
+406
+00:31:00,901 --> 00:31:02,500
+Do you have it?
+
+407
+00:31:03,699 --> 00:31:04,540
+It's our only hope now.
+
+408
+00:31:04,541 --> 00:31:06,260
+What do you mean?
+
+409
+00:31:07,109 --> 00:31:08,149
+I thought it was a weapon.
+
+410
+00:31:09,949 --> 00:31:10,960
+The staff is no weapon.
+
+411
+00:31:12,309 --> 00:31:13,309
+It is a gift.
+
+412
+00:31:13,889 --> 00:31:20,520
+With it, Sonam was able to channel
+the vast power of the spirit world.
+
+413
+00:31:21,619 --> 00:31:24,720
+It was this power that
+allowed Jurana to flourish.
+
+414
+00:31:25,060 --> 00:31:27,480
+The greatest city in the world.
+
+415
+00:31:29,060 --> 00:31:32,905
+An air nomad utopia where
+Sonam presided over a golden
+
+416
+00:31:32,917 --> 00:31:37,060
+age of balance and where I
+devoted my life to serving her.
+
+417
+00:31:38,380 --> 00:31:42,521
+In return, she raised me
+up and used her staff to give
+
+418
+00:31:42,533 --> 00:31:46,380
+me, a lowly non-bender,
+the power to bend the air.
+
+419
+00:31:47,679 --> 00:31:50,140
+I was the first, but I
+would not be the last.
+
+420
+00:31:50,141 --> 00:31:54,079
+She filled the skies with
+airbenders, and we flew
+
+421
+00:31:54,091 --> 00:31:57,800
+by her side, spreading
+peace across the world.
+
+422
+00:32:07,039 --> 00:32:08,640
+Aang, are you okay?
+
+423
+00:32:08,641 --> 00:32:13,000
+Sonam used the staff to
+give people airbending.
+
+424
+00:32:14,499 --> 00:32:19,720
+If we found it, I could bring
+airbending back to the world.
+
+425
+00:32:20,569 --> 00:32:21,880
+This is incredible!
+
+426
+00:32:21,881 --> 00:32:24,400
+There haven't been airbenders
+for over a hundred years!
+
+427
+00:32:24,649 --> 00:32:27,760
+This is everything you ever wanted, Aang.
+
+428
+00:32:29,859 --> 00:32:33,480
+We could heal the greatest atrocity
+my nation committed in the war.
+
+429
+00:32:34,829 --> 00:32:37,140
+This could be the final
+step to rebuilding the world.
+
+430
+00:32:37,989 --> 00:32:39,500
+Not if the Denied get there first.
+
+431
+00:32:39,999 --> 00:32:40,999
+They have the map.
+
+432
+00:32:42,319 --> 00:32:43,319
+Who are the Denied?
+
+433
+00:32:43,649 --> 00:32:45,160
+A group of violent non-benders.
+
+434
+00:32:46,009 --> 00:32:49,860
+They... They must be after the
+staff to give themselves airbending.
+
+435
+00:32:50,459 --> 00:32:51,659
+Then there's no time to waste.
+
+436
+00:32:52,219 --> 00:32:53,619
+There's only one place it could be.
+
+437
+00:32:54,209 --> 00:32:55,209
+Ready your bison.
+
+438
+00:32:55,389 --> 00:32:57,800
+We'll need to travel
+across the endless ocean.
+
+439
+00:32:58,249 --> 00:32:59,489
+On the other side of the world?
+
+440
+00:33:00,119 --> 00:33:01,319
+But there's nothing out there.
+
+441
+00:33:01,459 --> 00:33:02,140
+There's an island.
+
+442
+00:33:02,141 --> 00:33:04,400
+The journey will not be easy.
+
+443
+00:33:04,974 --> 00:33:06,220
+But we can make it.
+
+444
+00:33:07,494 --> 00:33:08,494
+Then let's get going.
+
+445
+00:33:09,189 --> 00:33:12,280
+The skies are no place for a water child.
+
+446
+00:33:13,140 --> 00:33:20,100
+I know you just woke up after thousands
+of years, but we do these things together.
+
+447
+00:33:20,101 --> 00:33:21,101
+Trust me.
+
+448
+00:33:21,719 --> 00:33:22,719
+We're stronger this way.
+
+449
+00:33:23,039 --> 00:33:24,240
+Welcome to Team Avatar.
+
+450
+00:33:24,241 --> 00:33:25,900
+What's your name?
+
+451
+00:33:25,901 --> 00:33:27,500
+Taga.
+
+452
+00:33:27,501 --> 00:33:29,800
+My name is Taga.
+
+453
+00:33:34,440 --> 00:33:42,440
+Just think of it as a big metal airbison.
+
+454
+00:33:45,560 --> 00:33:53,560
+We will travel ancient
+paths through the sky.
+
+455
+00:33:54,069 --> 00:33:57,567
+Ones that our people
+learned by following the great
+
+456
+00:33:57,579 --> 00:34:01,020
+airbison herds that long
+ago taught us airbending.
+
+457
+00:34:01,021 --> 00:34:04,080
+Air currents known only to us.
+
+458
+00:34:04,779 --> 00:34:07,340
+Encircling the great sphere of existence.
+
+459
+00:34:07,341 --> 00:34:10,199
+Allowing us to travel where we wish.
+
+460
+00:34:10,200 --> 00:34:12,320
+Giving us our name.
+
+461
+00:34:12,321 --> 00:34:14,780
+The Air Nomads.
+
+462
+00:34:14,781 --> 00:34:31,739
+Allowing us to travel where we wish.
+
+463
+00:34:31,740 --> 00:34:32,600
+Allowing us to travel.
+
+464
+00:34:32,601 --> 00:34:35,600
+Allowing us to travel where we wish.
+
+465
+00:34:35,601 --> 00:34:59,600
+Allowing us to travel.
+
+466
+00:34:59,601 --> 00:35:00,600
+We wish.
+
+467
+00:35:00,601 --> 00:35:01,600
+Uh, no!
+
+468
+00:35:01,601 --> 00:35:02,600
+No!
+
+469
+00:35:02,601 --> 00:35:04,600
+He was frozen for 5,000 years.
+
+470
+00:35:04,700 --> 00:35:05,600
+Okay?
+
+471
+00:35:05,601 --> 00:35:06,600
+You were frozen for what?
+
+472
+00:35:06,601 --> 00:35:07,601
+A hundred?
+
+473
+00:35:07,775 --> 00:35:08,600
+Okay?
+
+474
+00:35:08,601 --> 00:35:09,600
+That's nothing.
+
+475
+00:35:09,601 --> 00:35:11,601
+Your brain is... fresh.
+
+476
+00:35:11,900 --> 00:35:13,600
+Maybe he is a little old-fashioned.
+
+477
+00:35:13,601 --> 00:35:14,601
+But look at him.
+
+478
+00:35:15,150 --> 00:35:16,600
+He's so in tune with his element.
+
+479
+00:35:16,601 --> 00:35:19,600
+He can travel across the entire ocean.
+
+480
+00:35:19,601 --> 00:35:20,600
+With no map.
+
+481
+00:35:20,601 --> 00:35:21,600
+No instruments.
+
+482
+00:35:21,601 --> 00:35:26,600
+There's so much I can learn from him.
+
+483
+00:35:33,600 --> 00:35:41,600
+I'd give anything to be able
+to see my air bison again.
+
+484
+00:35:41,601 --> 00:35:48,600
+And now... To see
+only one remains.
+
+485
+00:35:53,250 --> 00:35:54,650
+You said our people were wiped out.
+
+486
+00:35:55,750 --> 00:35:56,600
+Yet you survived.
+
+487
+00:35:56,601 --> 00:35:57,600
+How?
+
+488
+00:35:57,601 --> 00:36:02,600
+I had just found out I was the Avatar.
+
+489
+00:36:02,601 --> 00:36:05,601
+But... The responsibility...
+
+490
+00:36:06,800 --> 00:36:07,800
+It was too much.
+
+491
+00:36:09,450 --> 00:36:10,600
+So I ran away.
+
+492
+00:36:10,601 --> 00:36:14,600
+While I was gone... The
+Fire Nation attacked.
+
+493
+00:36:16,600 --> 00:36:18,600
+They were looking for me.
+
+494
+00:36:21,600 --> 00:36:25,600
+If... If I'd just been
+there... Sonam would say...
+
+495
+00:36:27,000 --> 00:36:28,600
+Air Nomads are formed from the mist.
+
+496
+00:36:30,250 --> 00:36:31,810
+We walk the world for a moment in time.
+
+497
+00:36:33,150 --> 00:36:35,600
+Then we return to the eternal wind.
+
+498
+00:36:35,601 --> 00:36:38,600
+Monkiazzo taught me that.
+
+499
+00:36:38,650 --> 00:36:41,600
+We carry the same weight.
+
+500
+00:36:41,601 --> 00:36:44,600
+A grief no one else could
+possibly comprehend.
+
+501
+00:36:46,000 --> 00:36:47,600
+But you and I can heal the past.
+
+502
+00:36:47,800 --> 00:36:51,600
+Let me show you how
+powerful our element can be.
+
+503
+00:36:51,850 --> 00:36:53,600
+When airbenders work together.
+
+504
+00:36:54,000 --> 00:36:59,600
+What are you doing?
+
+505
+00:36:59,601 --> 00:37:01,600
+This is how Sonam taught me.
+
+506
+00:37:01,601 --> 00:37:04,600
+Feel the energy that tethers us.
+
+507
+00:37:08,600 --> 00:37:11,600
+The bond between us.
+
+508
+00:37:11,601 --> 00:37:13,600
+Can you feel it?
+
+509
+00:37:13,601 --> 00:37:14,600
+Use it!
+
+510
+00:37:14,601 --> 00:37:15,600
+This is amazing!
+
+511
+00:37:15,601 --> 00:37:17,600
+Yes!
+
+512
+00:37:17,601 --> 00:37:22,600
+Woohoo!
+
+513
+00:37:22,601 --> 00:37:24,600
+Oh yeah!
+
+514
+00:37:24,601 --> 00:37:25,600
+Human boomerang!
+
+515
+00:37:25,601 --> 00:37:26,600
+He's actually flying.
+
+516
+00:37:26,601 --> 00:37:28,600
+So are we.
+
+517
+00:37:28,601 --> 00:37:29,600
+Whoa!
+
+518
+00:37:29,601 --> 00:37:30,600
+That's my best friend!
+
+519
+00:37:30,601 --> 00:37:31,600
+That's my best friend!
+
+520
+00:37:31,601 --> 00:37:32,600
+Now you throw me!
+
+521
+00:37:32,601 --> 00:37:33,601
+Now you throw me!
+
+522
+00:37:55,580 --> 00:38:03,580
+I had no idea that you were going to die.
+
+523
+00:38:03,581 --> 00:38:05,980
+This is only the beginning.
+
+524
+00:38:07,040 --> 00:38:15,040
+I can't believe it.
+
+525
+00:38:16,240 --> 00:38:17,980
+Airbenders will fill the sky again.
+
+526
+00:38:18,630 --> 00:38:20,420
+We have been given a great gift.
+
+527
+00:38:21,420 --> 00:38:22,740
+The chance to redeem ourselves.
+
+528
+00:38:23,840 --> 00:38:26,040
+You were destined to find
+me on that mountain, Aang.
+
+529
+00:38:28,690 --> 00:38:29,700
+How did you end up there?
+
+530
+00:38:34,410 --> 00:38:35,890
+The Earthbenders had attacked Tirana.
+
+531
+00:38:37,210 --> 00:38:39,620
+Sonim and I fought
+fearlessly, side by side.
+
+532
+00:38:40,570 --> 00:38:41,930
+We drove them back to Mount Baihu.
+
+533
+00:38:42,880 --> 00:38:44,120
+And that's the last I remember.
+
+534
+00:38:46,740 --> 00:38:47,980
+She must have saved your life.
+
+535
+00:38:48,880 --> 00:38:51,060
+Only an Avatar could
+have put you in that sphere.
+
+536
+00:38:55,060 --> 00:38:57,580
+Aang, can I ask you something?
+
+537
+00:38:58,080 --> 00:38:59,080
+Of course.
+
+538
+00:38:59,820 --> 00:39:02,977
+If the Fire Nation destroyed
+the Air Nomads, how
+
+539
+00:39:02,989 --> 00:39:05,960
+can you suffer the
+presence of the Fire Lord?
+
+540
+00:39:09,260 --> 00:39:10,840
+Zuko is a friend and an ally.
+
+541
+00:39:11,840 --> 00:39:14,320
+He turned against his own
+father to help me end the war.
+
+542
+00:39:15,310 --> 00:39:17,480
+Yet he wears the crown himself now.
+
+543
+00:39:18,630 --> 00:39:21,160
+Fire by its nature burns, Aang.
+
+544
+00:39:22,310 --> 00:39:25,420
+Our kind have always suffered at
+the hands of the other elements.
+
+545
+00:39:27,270 --> 00:39:28,680
+That's why we built Republic City.
+
+546
+00:39:29,780 --> 00:39:33,280
+To show the world that if we listen
+to each other, we can all live together.
+
+547
+00:39:33,281 --> 00:39:34,420
+In peace.
+
+548
+00:39:36,250 --> 00:39:39,840
+And once we bring back
+Airbenders, it'll be complete.
+
+549
+00:39:43,790 --> 00:39:47,800
+When everyone stuck to their own,
+the whole world was nearly torn apart.
+
+550
+00:39:49,100 --> 00:39:54,700
+And besides, Katara, Sokka,
+Zuko, Toph, they're my family now.
+
+551
+00:39:56,480 --> 00:39:58,680
+I want to live in a world
+where we can all be together.
+
+552
+00:40:00,910 --> 00:40:02,820
+You remind me so much of Sonom.
+
+553
+00:40:06,870 --> 00:40:08,680
+It's the Avatar.
+
+554
+00:40:08,681 --> 00:40:11,440
+And this time he's got
+his friends with him.
+
+555
+00:40:11,890 --> 00:40:13,160
+That's the Fire Lord's airship.
+
+556
+00:40:13,610 --> 00:40:14,560
+How'd they get ahead of us?
+
+557
+00:40:14,561 --> 00:40:16,040
+They don't even have the map.
+
+558
+00:40:16,290 --> 00:40:18,500
+We can't risk him
+getting to the staff first.
+
+559
+00:40:18,501 --> 00:40:19,380
+Kill him.
+
+560
+00:40:19,381 --> 00:40:20,700
+But he spared our lives.
+
+561
+00:40:20,701 --> 00:40:24,940
+And how many Countless were killed in
+the hundred years waiting for his return?
+
+562
+00:40:25,100 --> 00:40:27,720
+Where was he when
+your family was wiped out?
+
+563
+00:40:27,721 --> 00:40:31,420
+If we want anything to change,
+we need what the Benders have.
+
+564
+00:40:31,421 --> 00:40:32,421
+Power.
+
+565
+00:40:33,240 --> 00:40:41,240
+Fire!
+
+566
+00:40:41,241 --> 00:40:49,080
+It's the Denied!
+
+567
+00:40:49,081 --> 00:40:53,860
+Oh, we are definitely under attack!
+
+568
+00:40:55,100 --> 00:40:57,040
+Turn them up to his friends!
+
+569
+00:41:03,760 --> 00:41:11,760
+Is he crushing the ship?
+
+570
+00:41:11,761 --> 00:41:14,360
+Targa?
+
+571
+00:41:14,361 --> 00:41:16,660
+Targa, stop!
+
+572
+00:41:34,920 --> 00:41:42,920
+We're here.
+
+573
+00:41:42,921 --> 00:41:43,120
+We're here.
+
+574
+00:41:43,121 --> 00:41:46,960
+The Immortal Storm.
+
+575
+00:41:46,961 --> 00:41:48,660
+Oh, no.
+
+576
+00:41:48,661 --> 00:41:56,600
+There has to be another way around.
+
+577
+00:41:56,601 --> 00:41:57,120
+No.
+
+578
+00:41:57,121 --> 00:41:59,500
+Together, you and I can
+clear a path for the ship.
+
+579
+00:41:59,501 --> 00:42:00,880
+But we have to go now.
+
+580
+00:42:00,881 --> 00:42:03,860
+Aang, trust me.
+
+581
+00:42:03,861 --> 00:42:09,540
+Maybe now is a good time to turn back.
+
+582
+00:42:09,541 --> 00:42:11,480
+I don't think that's an option anymore.
+
+583
+00:42:11,481 --> 00:42:13,180
+Where are they going?
+
+584
+00:42:14,920 --> 00:42:22,920
+The engine's out.
+
+585
+00:42:22,921 --> 00:42:24,240
+We're losing air pressure.
+
+586
+00:42:30,240 --> 00:42:31,740
+Targa, come with me.
+
+587
+00:42:31,741 --> 00:42:32,420
+What about me?
+
+588
+00:42:32,421 --> 00:42:33,180
+Take the wheel.
+
+589
+00:42:33,181 --> 00:42:33,820
+What?
+
+590
+00:42:33,821 --> 00:42:36,540
+I've only ever crashed
+Fire Nation airships.
+
+591
+00:42:36,541 --> 00:42:39,020
+Okay, let's see.
+
+592
+00:42:39,021 --> 00:42:39,660
+Here's our rudder.
+
+593
+00:42:39,661 --> 00:42:40,440
+This is the elevator.
+
+594
+00:42:40,441 --> 00:42:41,260
+There's our ballast.
+
+595
+00:42:41,261 --> 00:42:43,760
+And there's the giant tornado
+that's going to kill us all.
+
+596
+00:42:47,300 --> 00:42:48,420
+Follow my lead.
+
+597
+00:42:52,860 --> 00:43:00,860
+Work with me.
+
+598
+00:43:00,861 --> 00:43:02,380
+Just like I showed you.
+
+599
+00:43:02,381 --> 00:43:04,080
+We can heart it.
+
+600
+00:43:14,460 --> 00:43:16,120
+Yes, that's it, Aang.
+
+601
+00:43:16,121 --> 00:43:17,121
+Keep going.
+
+602
+00:43:22,400 --> 00:43:30,400
+Got it.
+
+603
+00:43:30,401 --> 00:43:34,740
+Zuko!
+
+604
+00:43:34,741 --> 00:43:35,780
+Zuko!
+
+605
+00:43:35,781 --> 00:43:37,960
+Aang and Targa are destroying tornadoes.
+
+606
+00:43:37,961 --> 00:43:39,020
+But there's too many!
+
+607
+00:43:39,021 --> 00:43:40,300
+But they're everywhere!
+
+608
+00:43:40,301 --> 00:43:41,760
+Just steer the ship.
+
+609
+00:43:41,761 --> 00:43:42,760
+Don't lose Aang.
+
+610
+00:43:42,761 --> 00:43:44,060
+It's not that easy.
+
+611
+00:43:44,061 --> 00:43:46,080
+Especially when everything is sideways.
+
+612
+00:43:46,081 --> 00:43:48,120
+Okay, left!
+
+613
+00:43:50,140 --> 00:43:58,140
+I did it!
+
+614
+00:43:58,141 --> 00:43:59,860
+Right!
+
+615
+00:44:01,260 --> 00:44:09,260
+Oh no!
+
+616
+00:44:09,261 --> 00:44:10,360
+We're falling behind!
+
+617
+00:44:10,361 --> 00:44:13,040
+I'm losing sight of them!
+
+618
+00:44:13,420 --> 00:44:14,380
+We have to go back!
+
+619
+00:44:14,381 --> 00:44:15,860
+Trust in your friends.
+
+620
+00:44:15,861 --> 00:44:18,100
+They won't make it if
+we don't clear a path.
+
+621
+00:44:24,280 --> 00:44:32,280
+Zuko!
+
+622
+00:44:32,281 --> 00:44:33,900
+We're going to crash into the sea!
+
+623
+00:44:33,901 --> 00:44:36,520
+When I give you the signal,
+pull the lever next to the wheel.
+
+624
+00:44:36,980 --> 00:44:42,900
+We're going to crash!
+
+625
+00:44:42,901 --> 00:44:44,260
+Katara?
+
+626
+00:44:44,320 --> 00:47:05,681
+We're going to crash into the sea!
+
+627
+00:47:14,320 --> 00:47:15,320
+We made it through!
+
+628
+00:47:15,321 --> 00:47:16,321
+Thank you, Taga!
+
+629
+00:47:17,120 --> 00:47:18,320
+It was you, Aang!
+
+630
+00:47:18,321 --> 00:47:19,361
+We're here because of you!
+
+631
+00:47:19,970 --> 00:47:21,410
+Yeah, we're having a good time, too!
+
+632
+00:47:21,495 --> 00:47:24,320
+You could have told us we were
+flying into the Immortal Storm!
+
+633
+00:47:24,321 --> 00:47:26,320
+I know it was dangerous,
+but we had to risk it!
+
+634
+00:47:26,370 --> 00:47:27,370
+We?
+
+635
+00:47:27,720 --> 00:47:30,320
+I don't remember when
+we took a vote on that!
+
+636
+00:47:30,321 --> 00:47:31,320
+There wasn't time!
+
+637
+00:47:31,321 --> 00:47:32,320
+I had to make a call!
+
+638
+00:47:32,321 --> 00:47:34,320
+Friends, please, don't blame Aang!
+
+639
+00:47:34,321 --> 00:47:35,321
+This is all my fault!
+
+640
+00:47:36,320 --> 00:47:37,560
+I knew this would be difficult!
+
+641
+00:47:38,920 --> 00:47:40,320
+But Aang believed in
+your strength as a team!
+
+642
+00:47:40,321 --> 00:47:43,320
+And I'm honored to be a part of it!
+
+643
+00:47:48,570 --> 00:47:50,320
+I forgive you, Taga!
+
+644
+00:47:50,470 --> 00:47:52,320
+Everyone!
+
+645
+00:47:52,321 --> 00:47:53,320
+Look!
+
+646
+00:47:53,321 --> 00:47:55,320
+These islands!
+
+647
+00:47:56,420 --> 00:47:57,420
+They were...
+
+648
+00:47:57,670 --> 00:47:59,320
+Lion Turtles!
+
+649
+00:47:59,321 --> 00:48:01,320
+Whoa!
+
+650
+00:48:01,321 --> 00:48:04,320
+It's beautiful!
+
+651
+00:48:07,070 --> 00:48:08,320
+Long before my time,
+
+652
+00:48:09,020 --> 00:48:12,320
+the Lion Turtles granted the
+gift of bending to humans.
+
+653
+00:48:13,120 --> 00:48:15,320
+These are their final resting grounds.
+
+654
+00:48:16,220 --> 00:48:18,320
+This is where Sonam
+came to learn their ways.
+
+655
+00:48:18,445 --> 00:48:22,320
+I am certain that she left her staff here.
+
+656
+00:48:22,770 --> 00:48:24,320
+Where should we start looking?
+
+657
+00:48:24,321 --> 00:48:27,320
+Aang, you must connect with her.
+
+658
+00:48:27,321 --> 00:48:31,320
+But... No one can
+connect with Sona.
+
+659
+00:48:31,321 --> 00:48:35,320
+The spiritual power of the Lion
+Turtles is still concentrated here.
+
+660
+00:48:36,070 --> 00:48:37,320
+Let it guide you.
+
+661
+00:48:37,321 --> 00:48:38,361
+We'll set out immediately.
+
+662
+00:48:38,495 --> 00:48:42,320
+Actually, Taga, we could
+really use your help here.
+
+663
+00:48:42,321 --> 00:48:45,320
+If the Denied are close
+behind, we need to be ready.
+
+664
+00:48:45,321 --> 00:48:48,320
+Yeah, and we're gonna need more
+than Toph's metal bending to fix the...
+
+665
+00:48:49,470 --> 00:48:51,320
+My bending got us through that, Storm.
+
+666
+00:48:51,321 --> 00:48:52,320
+What did you do?
+
+667
+00:48:52,321 --> 00:48:53,320
+Steered with his feet.
+
+668
+00:48:53,321 --> 00:48:54,320
+Repairs can wait.
+
+669
+00:48:54,321 --> 00:48:55,321
+Aang needs me.
+
+670
+00:48:55,520 --> 00:48:58,320
+Taga, please.
+
+671
+00:48:59,220 --> 00:49:00,320
+Stay and help my friends.
+
+672
+00:49:01,170 --> 00:49:02,320
+I'll be okay on my own.
+
+673
+00:49:03,420 --> 00:49:04,420
+As you wish.
+
+674
+00:49:05,220 --> 00:49:07,320
+We will begin repairs for our voyage home.
+
+675
+00:49:09,620 --> 00:49:10,620
+Everyone?
+
+676
+00:49:11,195 --> 00:49:13,320
+I know I've asked a lot
+of you on this journey.
+
+677
+00:49:14,070 --> 00:49:17,320
+But we're about to accomplish
+something that will change the world.
+
+678
+00:50:01,320 --> 00:50:27,320
+Let it guide you.
+
+679
+00:50:27,321 --> 00:50:28,320
+Sona?
+
+680
+00:50:28,321 --> 00:50:29,321
+No.
+
+681
+00:50:41,400 --> 00:50:49,400
+Ah, this is turning out
+to be a nice little vacation.
+
+682
+00:50:49,401 --> 00:50:54,060
+Aside from all the people trying
+to kill us, and the tornadoes...
+
+683
+00:50:54,061 --> 00:50:56,280
+Um, we're supposed to be fixing the ship?
+
+684
+00:50:56,980 --> 00:50:58,020
+You're doing great, buddy.
+
+685
+00:50:59,260 --> 00:51:00,120
+Has anyone seen Taga?
+
+686
+00:51:00,121 --> 00:51:03,340
+Yes, we've all seen Taga. He's so gorgeous.
+
+687
+00:51:03,640 --> 00:51:04,720
+Jeez, I get it.
+
+688
+00:51:05,570 --> 00:51:08,180
+Oh, I see what you mean.
+He wandered off that way.
+
+689
+00:51:08,181 --> 00:51:10,720
+No, maybe that way?
+
+690
+00:51:40,890 --> 00:51:47,340
+Taga! Taga! Where are you going?
+
+691
+00:51:48,515 --> 00:51:49,720
+Aang needs to be protected.
+
+692
+00:51:49,721 --> 00:51:51,220
+I agree.
+
+693
+00:51:54,470 --> 00:51:57,854
+I know my ways may
+seem unusual to you, but
+
+694
+00:51:57,866 --> 00:52:01,420
+I assure you, everything
+I do, I do for Aang.
+
+695
+00:52:01,920 --> 00:52:04,120
+For Aang? Or for the staff?
+
+696
+00:52:05,930 --> 00:52:10,560
+You have no idea all that we've lost.
+You've never known a world with airbenders.
+
+697
+00:52:11,460 --> 00:52:14,897
+I know Aang. He may
+be the last of his kind,
+
+698
+00:52:14,909 --> 00:52:18,280
+but he's the reason
+this world knows peace.
+
+699
+00:52:18,355 --> 00:52:25,800
+His values as an air nomad
+have brought balance to chaos.
+
+700
+00:52:32,210 --> 00:52:36,200
+It's because of Aang that the water
+tribes, Earth Kingdom and Fire Nation now
+
+701
+00:52:36,212 --> 00:52:40,060
+work together, striving for harmony,
+a peace we once thought unattainable.
+
+702
+00:52:40,220 --> 00:52:48,220
+You speak of peace. There will never be
+peace among the elements. There never was.
+
+703
+00:52:48,520 --> 00:52:51,740
+Your precious Republic
+City is built on lies.
+
+704
+00:52:51,741 --> 00:52:55,740
+It's built on hope. Do you have hope, Taga?
+
+705
+00:52:56,000 --> 00:53:01,120
+Saving my people requires more
+than just hope. It requires sacrifice.
+
+706
+00:53:01,121 --> 00:53:05,220
+I saw you try to crush the Danides
+airships. You were ready to kill them.
+
+707
+00:53:08,000 --> 00:53:14,600
+I know what kind of airbender Aang
+is, but what kind of airbender are you?
+
+708
+00:53:42,020 --> 00:53:44,816
+Aang did well getting us here.
+
+709
+00:53:44,828 --> 00:53:50,020
+There is great strength in
+him, but weakness as well.
+
+710
+00:53:50,195 --> 00:53:51,100
+Weakness?
+
+711
+00:53:51,101 --> 00:53:53,220
+Yes. You.
+
+712
+00:54:08,000 --> 00:54:11,380
+What the hog monkey?
+
+713
+00:54:38,000 --> 00:55:09,000
+No!
+
+714
+00:55:38,000 --> 00:55:39,000
+Tata!
+
+715
+00:56:02,150 --> 00:56:06,000
+Brother...
+
+716
+00:56:09,250 --> 00:56:11,000
+Taga, it's real.
+
+717
+00:56:11,001 --> 00:56:18,000
+We can finally bring back airbending.
+
+718
+00:56:19,100 --> 00:56:23,000
+Let's go tell the others.
+
+719
+00:56:23,001 --> 00:56:26,000
+We can do this. Me and you.
+
+720
+00:56:27,000 --> 00:56:29,000
+I can't do this without my friends.
+
+721
+00:56:29,400 --> 00:56:34,000
+Earth killed my people. Fire killed yours.
+
+722
+00:56:34,001 --> 00:56:38,000
+The staff is the only way we
+can create a new air empire.
+
+723
+00:56:38,400 --> 00:56:41,000
+One capable of defending itself.
+
+724
+00:56:41,001 --> 00:56:42,001
+No.
+
+725
+00:56:42,100 --> 00:56:44,000
+We can build a new future, Taka.
+
+726
+00:56:44,225 --> 00:56:46,000
+But it has to be for everyone.
+
+727
+00:56:46,150 --> 00:56:48,000
+The staff doesn't belong to everyone.
+
+728
+00:56:48,325 --> 00:56:50,000
+It belongs to us.
+
+729
+00:56:50,001 --> 00:56:51,000
+What... what have you done?
+
+730
+00:56:51,001 --> 00:56:55,000
+As long as they were around, you'd
+always put them ahead of our people.
+
+731
+00:56:55,850 --> 00:56:57,000
+Don't you see?
+
+732
+00:56:57,001 --> 00:56:59,000
+This is how we redeem ourselves.
+
+733
+00:56:59,001 --> 00:57:01,000
+It doesn't matter that you ran them.
+
+734
+00:57:01,001 --> 00:57:03,000
+As long as you stand with me now.
+
+735
+00:57:03,001 --> 00:57:04,000
+Now.
+
+736
+00:57:04,001 --> 00:57:05,000
+Aang!
+
+737
+00:57:05,001 --> 00:57:06,000
+Listen to me!
+
+738
+00:57:06,001 --> 00:57:07,000
+Katara!
+
+739
+00:57:07,001 --> 00:57:08,001
+This is the only way!
+
+740
+00:57:16,000 --> 00:57:24,000
+You're a traitor to your own.
+
+741
+00:57:24,001 --> 00:57:25,000
+Just like Sona!
+
+742
+00:57:25,001 --> 00:57:26,001
+Just like Sona!
+
+743
+00:57:54,000 --> 00:57:55,000
+No!
+
+744
+00:57:55,001 --> 00:57:56,001
+No!
+
+745
+00:57:57,000 --> 00:58:05,000
+I wanted to do this with you by my side.
+
+746
+00:58:05,001 --> 00:58:11,000
+But if I must build a new
+air empire alone... So be it.
+
+747
+00:58:11,001 --> 00:58:12,001
+So be it.
+
+748
+00:58:14,000 --> 00:58:22,000
+There's no way in!
+
+749
+00:58:22,001 --> 00:58:23,000
+We have to turn back!
+
+750
+00:58:23,001 --> 00:58:24,000
+No!
+
+751
+00:58:24,001 --> 00:58:26,000
+We keep trying to push through!
+
+752
+00:58:39,000 --> 00:58:41,000
+So new staff!
+
+753
+00:58:41,001 --> 00:58:42,000
+Denied!
+
+754
+00:58:42,001 --> 00:58:45,000
+The Avatar is dead!
+
+755
+00:58:45,001 --> 00:58:50,000
+If you wish to build a new world where
+you have the power... I can give it to you!
+
+756
+00:59:05,300 --> 00:59:06,000
+Appa!
+
+757
+00:59:06,001 --> 00:59:12,000
+Katara!
+
+758
+00:59:13,250 --> 00:59:14,250
+They're gone!
+
+759
+00:59:15,100 --> 00:59:16,100
+It's all my fault!
+
+760
+00:59:17,275 --> 00:59:19,000
+It's always been my fault!
+
+761
+00:59:19,650 --> 00:59:21,000
+Ever since I ran away!
+
+762
+00:59:23,350 --> 00:59:29,000
+No Avatar has ever fallen into such
+shame as to join me here in my sorrow.
+
+763
+00:59:31,400 --> 00:59:33,000
+Why do you grieve so, friend?
+
+764
+00:59:33,700 --> 00:59:35,000
+Avatar Sonum?
+
+765
+00:59:35,001 --> 00:59:36,000
+Taga murdered my friends.
+
+766
+00:59:36,001 --> 00:59:37,000
+And now he has a staff.
+
+767
+00:59:37,001 --> 00:59:38,000
+Taga!
+
+768
+00:59:38,001 --> 00:59:41,000
+No!
+
+769
+00:59:41,000 --> 00:59:42,000
+I... I stopped him!
+
+770
+00:59:42,001 --> 00:59:43,000
+I hit the staff!
+
+771
+00:59:43,001 --> 00:59:44,000
+What have you done?
+
+772
+00:59:44,001 --> 00:59:45,000
+What have you done?
+
+773
+00:59:45,000 --> 00:59:45,000
+You're the one who gave him airbending!
+
+774
+00:59:45,000 --> 00:59:45,000
+How could you give power to a monster?!
+
+775
+00:59:45,000 --> 00:59:45,000
+The Taga I gave bending
+to was a different man.
+
+776
+00:59:45,000 --> 00:59:45,000
+It was a different time.
+
+777
+00:59:45,001 --> 00:59:46,000
+The airbenders were the
+peacekeepers of the Four Elements.
+
+778
+00:59:46,001 --> 00:59:47,126
+We used our power to mediate
+all conflict with non-violence.
+
+779
+00:59:47,150 --> 00:59:49,000
+But we were the fewest in numbers.
+
+780
+00:59:49,001 --> 00:59:50,076
+We were the fewest in numbers.
+
+781
+00:59:50,100 --> 00:59:52,001
+For many years, we existed in a
+beautiful balance of great power.
+
+782
+00:59:52,025 --> 00:59:54,000
+We used our power to mediate
+all conflict with non-violence.
+
+783
+00:59:54,001 --> 00:59:55,000
+But we were the fewest in numbers.
+
+784
+00:59:55,001 --> 00:59:56,126
+For many years, we existed in a
+beautiful balance of great prosperity.
+
+785
+00:59:56,150 --> 00:59:57,000
+But the world began to shift.
+
+786
+00:59:57,001 --> 00:59:58,000
+The earthbenders from the ground.
+
+787
+00:59:58,001 --> 01:00:01,000
+Why did you give power to a monster?!
+
+788
+01:00:01,001 --> 01:00:02,000
+The Taga I gave bending
+to was a different man.
+
+789
+01:00:02,001 --> 01:06:33,481
+Why did you give power to a monster?!
+
+790
+01:06:44,000 --> 01:06:45,000
+What did you give power to a monster?!
+
+791
+01:06:45,001 --> 01:07:04,481
+Why did you give power to a monster?!
+
+792
+01:07:14,000 --> 01:07:16,000
+Did you just come from
+that temple in the sky?!
+
+793
+01:07:16,001 --> 01:07:18,000
+I certainly did!
+
+794
+01:07:18,001 --> 01:07:20,000
+It was my favorite hidey hole!
+
+795
+01:07:20,001 --> 01:07:23,000
+Until that dark yucky energy
+started corrupting this whole face!
+
+796
+01:07:23,200 --> 01:07:25,000
+Please!
+
+797
+01:07:25,001 --> 01:07:27,000
+We need your help getting up there!
+
+798
+01:07:27,001 --> 01:07:29,000
+It's my duty to stop this!
+
+799
+01:07:29,225 --> 01:07:31,000
+I'm the Avatar!
+
+800
+01:07:31,250 --> 01:07:33,000
+Oooh!
+
+801
+01:07:33,001 --> 01:07:35,000
+The Avatar!
+
+802
+01:07:35,125 --> 01:07:37,000
+Let me have a squeeze at you!
+
+803
+01:07:37,001 --> 01:07:38,000
+Okay!
+
+804
+01:07:38,001 --> 01:07:39,000
+Now with this eye!
+
+805
+01:07:39,001 --> 01:07:40,000
+And this eye!
+
+806
+01:07:40,001 --> 01:07:41,000
+And this eye!
+
+807
+01:07:41,001 --> 01:07:42,000
+Oh, don't forget this eye!
+
+808
+01:07:42,001 --> 01:07:43,000
+Can we hurry enough?!
+
+809
+01:07:43,001 --> 01:07:44,000
+Let me squeeze!
+
+810
+01:07:44,001 --> 01:07:45,000
+Sniff check!
+
+811
+01:07:45,001 --> 01:07:50,000
+Oh, that's Avatar material right there!
+
+812
+01:07:50,001 --> 01:07:51,000
+Yes, it is!
+
+813
+01:07:51,001 --> 01:07:52,000
+Oooh!
+
+814
+01:07:52,001 --> 01:07:53,000
+Yes, yes, yes, yes, yes!
+
+815
+01:07:53,001 --> 01:07:58,000
+It appears the universe has brought us
+together for a very important mission!
+
+816
+01:07:58,001 --> 01:08:00,000
+Huh?
+
+817
+01:08:00,001 --> 01:08:01,000
+To flee!
+
+818
+01:08:01,001 --> 01:08:03,000
+To be alive!
+
+819
+01:08:03,001 --> 01:08:04,000
+Wait!
+
+820
+01:08:04,001 --> 01:08:05,000
+Come back!
+
+821
+01:08:05,001 --> 01:08:06,000
+We're going to go away!
+
+822
+01:08:06,001 --> 01:08:07,000
+Stop!
+
+823
+01:08:07,001 --> 01:08:08,000
+Please!
+
+824
+01:08:08,001 --> 01:08:09,000
+Great Spirit!
+
+825
+01:08:09,001 --> 01:08:10,000
+Both of our worlds are in danger!
+
+826
+01:08:10,001 --> 01:08:11,000
+No, no, no, no, no, no!
+
+827
+01:08:11,001 --> 01:08:13,000
+I am not going back up there!
+
+828
+01:08:14,000 --> 01:08:22,000
+Hmm, well when you put it like
+that, it does make more sense!
+
+829
+01:08:22,025 --> 01:08:27,000
+Upon reflection, I've decided I shall
+help you and your humany friends!
+
+830
+01:08:27,001 --> 01:08:28,000
+What did he say?
+
+831
+01:08:28,001 --> 01:08:29,000
+Nice work, Momo!
+
+832
+01:08:29,001 --> 01:08:30,000
+Alright!
+
+833
+01:08:30,001 --> 01:08:31,000
+In you go!
+
+834
+01:08:31,001 --> 01:08:38,000
+By the way, no eating anything you find
+in my teeth, as I'm saving that for later!
+
+835
+01:08:38,001 --> 01:08:39,000
+Ready!
+
+836
+01:08:39,000 --> 01:08:39,000
+Ready!
+
+837
+01:08:39,001 --> 01:08:40,000
+Set!
+
+838
+01:08:40,001 --> 01:08:41,000
+Get steady and rent!
+
+839
+01:08:41,001 --> 01:08:44,000
+The one and the two and
+the you know what to do!
+
+840
+01:08:44,001 --> 01:08:45,000
+Bluff!
+
+841
+01:08:45,001 --> 01:08:54,000
+I know we haven't known each
+other very long, but... I love you!
+
+842
+01:08:54,001 --> 01:08:56,000
+You don't have to say it back!
+
+843
+01:08:56,001 --> 01:08:57,000
+Hey!
+
+844
+01:08:57,001 --> 01:08:58,000
+You got your hair back!
+
+845
+01:08:58,001 --> 01:08:59,000
+Why are my eyes teary?
+
+846
+01:08:59,001 --> 01:09:00,000
+Was I crying?
+
+847
+01:09:00,001 --> 01:09:01,000
+No way!
+
+848
+01:09:01,001 --> 01:09:02,000
+Look!
+
+849
+01:09:02,001 --> 01:09:03,000
+What?
+
+850
+01:09:03,001 --> 01:09:04,000
+What is it?
+
+851
+01:09:04,001 --> 01:09:05,000
+It's Republic City!
+
+852
+01:09:05,001 --> 01:09:06,000
+We can't let him destroy
+everything we built!
+
+853
+01:09:06,000 --> 01:09:06,000
+We won't!
+
+854
+01:09:06,001 --> 01:09:07,000
+We can't let him destroy
+everything we built!
+
+855
+01:09:07,001 --> 01:09:08,000
+We won't!
+
+856
+01:09:08,001 --> 01:09:09,000
+We can't let him destroy
+everything we built!
+
+857
+01:09:09,001 --> 01:09:10,001
+We won't!
+
+858
+01:09:10,100 --> 01:09:23,000
+We can't let him destroy
+everything we built!
+
+859
+01:09:23,001 --> 01:09:25,000
+Boomerang!
+
+860
+01:09:53,000 --> 01:09:57,000
+Boomerang!
+
+861
+01:09:57,001 --> 01:09:59,000
+Give me the staff, Targa!
+
+862
+01:09:59,001 --> 01:10:01,000
+I see I underestimated you, Avatar.
+
+863
+01:10:01,001 --> 01:10:04,000
+Your friends are stronger than I thought.
+
+864
+01:10:04,001 --> 01:10:06,000
+But you're too late.
+
+865
+01:10:07,000 --> 01:10:15,000
+They're denied.
+
+866
+01:10:15,100 --> 01:10:18,000
+You see, I did what you wanted, Aang.
+
+867
+01:10:18,001 --> 01:10:21,000
+I returned airbending to the world.
+
+868
+01:10:23,000 --> 01:10:24,000
+What's the plan?
+
+869
+01:10:24,001 --> 01:10:25,000
+We'll deal with the denied.
+
+870
+01:10:25,001 --> 01:10:27,000
+You have to get the staff.
+
+871
+01:10:27,600 --> 01:10:30,000
+I will rebuild Jurana on
+the ruins of our enemies.
+
+872
+01:10:30,001 --> 01:10:32,000
+Just as they did on ours.
+
+873
+01:10:32,001 --> 01:10:35,000
+A new air empire will rise.
+
+874
+01:10:35,001 --> 01:10:37,000
+Kill them all.
+
+875
+01:10:53,000 --> 01:10:57,000
+We have to get these people out of here.
+
+876
+01:10:57,001 --> 01:10:58,000
+Get out of here!
+
+877
+01:10:58,001 --> 01:11:08,000
+Help me!
+
+878
+01:11:08,001 --> 01:11:10,000
+Oh, yeah!
+
+879
+01:11:10,001 --> 01:11:11,001
+Targa!
+
+880
+01:11:11,050 --> 01:11:13,000
+Give it to me!
+
+881
+01:11:13,001 --> 01:11:14,000
+This isn't the way!
+
+882
+01:11:14,001 --> 01:11:15,000
+We can use the staff to bring back balance!
+
+883
+01:11:15,001 --> 01:11:16,000
+Peace!
+
+884
+01:11:16,001 --> 01:11:19,000
+You care so much about your
+ideals that you'd let your people die!
+
+885
+01:11:19,001 --> 01:11:22,000
+I will do anything to
+make sure they survive!
+
+886
+01:11:30,000 --> 01:11:38,000
+I will do anything to
+make sure they survive!
+
+887
+01:11:38,001 --> 01:12:00,241
+I will do anything to kill you!
+
+888
+01:12:08,000 --> 01:12:24,000
+I will kill you!
+
+889
+01:12:24,001 --> 01:12:25,001
+Don't do this!
+
+890
+01:12:25,200 --> 01:12:26,000
+You have the power now!
+
+891
+01:12:26,001 --> 01:12:28,000
+You can decide how to use it!
+
+892
+01:12:28,001 --> 01:12:29,000
+I'm not like you!
+
+893
+01:12:29,001 --> 01:12:31,000
+The world hasn't been good to me!
+
+894
+01:12:31,001 --> 01:12:33,000
+The world is what we make it!
+
+895
+01:12:33,001 --> 01:12:34,001
+Get away from her!
+
+896
+01:12:38,000 --> 01:12:39,000
+Run!
+
+897
+01:12:39,001 --> 01:12:40,001
+Run!
+
+898
+01:12:59,000 --> 01:13:07,000
+Taga!
+
+899
+01:13:07,001 --> 01:13:08,000
+Stop!
+
+900
+01:13:08,001 --> 01:13:09,000
+You betrayed me!
+
+901
+01:13:09,001 --> 01:13:10,000
+You betrayed our culture!
+
+902
+01:13:10,001 --> 01:13:11,000
+I gave you every chance to see the truth!
+
+903
+01:13:11,001 --> 01:13:13,000
+Shouldn't you be in the Fire Nation?!
+
+904
+01:13:13,001 --> 01:13:15,000
+I'm fighting for the peace of all nations!
+
+905
+01:13:15,001 --> 01:13:16,000
+Big talk from someone who sits at
+a throne built on a century of war!
+
+906
+01:13:16,001 --> 01:13:22,000
+Oh!
+
+907
+01:13:22,001 --> 01:13:25,700
+Shouldn't you be in the Fire Nation?
+
+908
+01:13:25,701 --> 01:13:30,000
+I'm fighting for the peace of all nations.
+
+909
+01:13:30,001 --> 01:13:38,000
+Big talk from someone who sits at
+a throne built on a century of war!
+
+910
+01:13:57,000 --> 01:14:05,000
+I'm still the greatest
+Earthbender in the world!
+
+911
+01:14:22,000 --> 01:14:28,000
+Oh no.
+
+912
+01:14:28,001 --> 01:14:30,000
+I'm out of water!
+
+913
+01:14:30,001 --> 01:14:34,000
+We gotcha!
+
+914
+01:14:34,001 --> 01:14:37,000
+And there's no Avatar here to save you.
+
+915
+01:14:37,001 --> 01:14:41,000
+Suck a cycle!
+
+916
+01:14:41,001 --> 01:14:49,000
+Let's see if your fancy new bending can
+beat some good old non-bending know-how.
+
+917
+01:14:52,000 --> 01:14:54,000
+Oh no!
+
+918
+01:14:54,001 --> 01:14:58,000
+Bombs away!
+
+919
+01:14:58,001 --> 01:15:06,000
+You just got denied!
+
+920
+01:15:08,000 --> 01:15:16,000
+Let's go!
+
+921
+01:15:16,001 --> 01:15:17,081
+Good luck saving your city!
+
+922
+01:15:22,000 --> 01:15:27,000
+We have to save as many people as we can!
+
+923
+01:15:27,001 --> 01:15:29,000
+We have to save as many people as we can!
+
+924
+01:15:29,001 --> 01:15:46,000
+Oh no!
+
+925
+01:15:46,001 --> 01:15:48,000
+I know your pain!
+
+926
+01:15:48,001 --> 01:15:49,000
+I know what you've been through!
+
+927
+01:15:49,001 --> 01:15:51,000
+You don't know!
+
+928
+01:15:51,050 --> 01:15:57,000
+I watched as all of my brothers
+and sisters were slaughtered!
+
+929
+01:15:57,001 --> 01:16:01,000
+And the Fire Nation burned
+the Air Nomads to ash!
+
+930
+01:16:01,001 --> 01:16:03,000
+Where were you?
+
+931
+01:16:03,001 --> 01:16:05,000
+You ran!
+
+932
+01:16:06,000 --> 01:16:07,000
+Ah!
+
+933
+01:16:07,001 --> 01:16:08,001
+Ah!
+
+934
+01:16:19,000 --> 01:16:27,000
+Chaga!
+
+935
+01:16:37,000 --> 01:16:38,000
+No!
+
+936
+01:16:57,000 --> 01:17:05,000
+The full power of the spirit
+world flows through me!
+
+937
+01:17:06,000 --> 01:17:08,000
+This is what strength looks like!
+
+938
+01:17:10,000 --> 01:17:18,000
+This is what strength looks like!
+
+939
+01:17:36,000 --> 01:18:27,001
+No!
+
+940
+01:18:48,980 --> 01:19:56,700
+Oh, my God.
+
+941
+01:20:14,120 --> 01:20:22,120
+We could have been brothers.
+
+942
+01:20:22,121 --> 01:20:24,580
+We could have done this together.
+
+943
+01:20:24,581 --> 01:20:27,280
+It didn't have to end like this.
+
+944
+01:20:27,281 --> 01:20:33,100
+It's Aang.
+
+945
+01:20:33,101 --> 01:20:34,120
+He's got the staff.
+
+946
+01:20:34,121 --> 01:20:34,700
+Yeah.
+
+947
+01:20:34,701 --> 01:20:36,740
+Kick his butt, Mega Aang.
+
+948
+01:20:36,840 --> 01:20:38,300
+No, something's wrong.
+
+949
+01:20:38,301 --> 01:20:40,260
+The power is corrupting him.
+
+950
+01:20:58,550 --> 01:21:02,380
+I dreamt of bringing the Air Nomads
+back to the world as peacekeepers.
+
+951
+01:21:02,381 --> 01:21:07,280
+They could have been a beacon of light
+for the world to follow, but you ruined it.
+
+952
+01:21:07,281 --> 01:21:09,680
+You twisted my dream into a nightmare.
+
+953
+01:21:10,600 --> 01:21:14,080
+Finally, you have the
+power the Air Nomads need.
+
+954
+01:21:14,081 --> 01:21:16,700
+Maybe there is hope for you after all.
+
+955
+01:21:20,160 --> 01:21:28,160
+Do it.
+
+956
+01:21:28,161 --> 01:21:29,960
+Use the staff.
+
+957
+01:21:29,961 --> 01:21:32,920
+Show me you have the
+strength to bring our people back.
+
+958
+01:21:32,921 --> 01:21:35,100
+Do it.
+
+959
+01:21:35,101 --> 01:21:42,100
+No! No! No! No! No! No! No! No!
+
+960
+01:22:22,150 --> 01:22:26,162
+Aang. You will do so many great things
+as the avatar. But you must be prepared to
+
+961
+01:22:26,174 --> 01:22:30,100
+do what frightens you the most. Your
+people, your home, we are always with you.
+
+962
+01:22:35,100 --> 01:22:38,100
+Aang. No!
+
+963
+01:22:39,100 --> 01:22:47,100
+No!
+
+964
+01:23:07,100 --> 01:23:15,100
+Aang!
+
+965
+01:23:15,101 --> 01:23:20,100
+No! My power!
+
+966
+01:23:32,550 --> 01:23:38,100
+Aang. No! No! No! No! No! No!
+
+967
+01:23:39,400 --> 01:23:47,100
+You fool! Why? Why did you break it?
+We could have fixed everything!
+
+968
+01:23:47,101 --> 01:23:53,100
+We can't erase the pain of the past.
+We couldn't save them.
+
+969
+01:23:53,101 --> 01:23:57,100
+But it's our duty to protect our people!
+
+970
+01:23:57,101 --> 01:24:01,100
+Not at the cost of betraying
+everything they stood for.
+
+971
+01:24:01,101 --> 01:24:02,100
+No!
+
+972
+01:24:02,101 --> 01:24:04,100
+It's time to let go.
+
+973
+01:24:04,101 --> 01:24:07,100
+You have to forgive yourself.
+
+974
+01:24:10,300 --> 01:24:12,100
+I have to forgive myself too.
+
+975
+01:24:21,400 --> 01:24:24,100
+Air nomads are formed from the mist.
+
+976
+01:24:24,250 --> 01:24:32,100
+We walk the world for a moment in time.
+
+977
+01:24:33,750 --> 01:24:38,100
+Then we return to the eternal wind.
+
+978
+01:24:51,100 --> 01:24:52,100
+Aang!
+
+979
+01:24:52,101 --> 01:24:56,100
+Aang!
+
+980
+01:24:56,101 --> 01:25:01,100
+Hey, Katara.
+
+981
+01:25:01,101 --> 01:25:02,101
+Hey, Aang.
+
+982
+01:25:02,150 --> 01:25:06,100
+Seriously?
+
+983
+01:25:06,850 --> 01:25:08,100
+You do realize you're falling, right?
+
+984
+01:25:08,101 --> 01:25:10,694
+Hey, if you ever get
+tired of relying on alcohol,
+
+985
+01:25:10,706 --> 01:25:13,100
+I could hook you up
+with one of these babies.
+
+986
+01:25:18,100 --> 01:25:20,100
+I'll give you the best friend discount!
+
+987
+01:25:35,125 --> 01:25:36,100
+I don't know if
+airbending will ever return.
+
+988
+01:25:36,101 --> 01:25:42,100
+But I know now that the true power of
+the air nomads was never their bending.
+
+989
+01:25:43,100 --> 01:25:44,100
+It was their values.
+
+990
+01:25:44,101 --> 01:25:47,100
+And that's a power I can pass on to others.
+
+991
+01:25:47,250 --> 01:25:53,100
+Avatar Aang, you are the true
+embodiment of the air nomads.
+
+992
+01:25:53,200 --> 01:25:57,100
+Thank you for giving up
+the power that I could not.
+
+993
+01:25:57,101 --> 01:26:01,100
+You give me hope for
+the future of our culture.
+
+994
+01:26:02,100 --> 01:26:03,100
+And that's all right.
+
+995
+01:26:09,100 --> 01:26:17,100
+It's amazing, isn't it?
+
+996
+01:26:17,101 --> 01:26:21,100
+The first new air temple in centuries.
+
+997
+01:26:21,101 --> 01:26:24,100
+Republic City is finally complete.
+
+998
+01:26:28,100 --> 01:26:30,100
+A city for all nations.
+
+999
+01:26:30,101 --> 01:26:32,100
+Just like you promised.
+
+1000
+01:26:32,101 --> 01:26:35,100
+I never could have done
+this without you, Katara.
+
+1001
+01:26:35,101 --> 01:26:38,100
+Hey everybody!
+
+1002
+01:26:38,101 --> 01:26:39,100
+Sorry I kept you all waiting.
+
+1003
+01:26:39,101 --> 01:26:41,100
+Are you ready for our big trip?
+
+1004
+01:26:41,101 --> 01:26:44,507
+As my new acolytes,
+you will be helping me
+
+1005
+01:26:44,519 --> 01:26:48,100
+preserve our culture
+for future generations.
+
+1006
+01:26:49,100 --> 01:26:53,100
+So, who wants to search for artifacts
+at an ancient abandoned temple?
+
+1007
+01:26:53,175 --> 01:26:54,100
+Yay.
+
+1008
+01:26:54,101 --> 01:26:58,100
+I'm only going to make sure you don't
+try to release another beefy old airbender.
+
+1009
+01:26:58,101 --> 01:27:01,100
+Yeah, I'm done with bad boys.
+
+1010
+01:27:14,100 --> 01:27:15,100
+Mr. Sodom told me about this place.
+
+1011
+01:27:15,101 --> 01:27:19,100
+So, it's very possible that no one's
+been here in hundreds of years.
+
+1012
+01:27:19,200 --> 01:27:22,100
+Oh!
+
+1013
+01:27:22,101 --> 01:27:23,100
+Is this an Arbender relic?
+
+1014
+01:27:23,101 --> 01:27:25,100
+I think that's just a rock.
+
+1015
+01:27:25,101 --> 01:27:27,100
+But I love the enthusiasm.
+
+1016
+01:27:28,300 --> 01:27:30,100
+Aww!
+
+1017
+01:27:30,101 --> 01:27:32,100
+Ah!
+
+1018
+01:27:32,101 --> 01:27:34,100
+Keep your eyes open.
+
+1019
+01:27:34,101 --> 01:27:36,100
+They never know what
+we might discover here.
+
+1020
+01:27:36,225 --> 01:27:39,100
+Oh.
+
+1021
+01:27:44,100 --> 01:27:47,100
+I thought they were extinct.
+
+1022
+01:27:48,100 --> 01:27:56,100
+I can't believe it.
+
+1023
+01:27:56,101 --> 01:27:59,100
+The original airbenders.
+
+1024
+01:28:00,100 --> 01:28:08,100
+Oh, can I have one?
+
+1025
+01:28:09,100 --> 01:28:10,100
+Ha, ha, ha, ha!
+
+1026
+01:28:10,101 --> 01:28:11,100
+Apo!
+
+1027
+01:28:11,101 --> 01:28:12,101
+Yip, yip!
+
+1028
+01:28:39,100 --> 01:29:04,101
+Oh, can I have one?
+
+1029
+01:29:26,080 --> 01:31:08,100
+Oh, my God.
+
+1030
+01:31:30,080 --> 01:38:44,100
+Thank you.
