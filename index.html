@@ -1211,6 +1211,7 @@ const captionBox = document.getElementById('captionBox');
 let captionsOn   = false;
 let srtCues      = [];
 let lastCueText  = null;
+const CAPTION_OFFSET = 0; // Adjust if captions are early (+) or late (-)
 
 function parseSRT(text) {
   return text.replace(/\r/g, '').trim().split(/\n\n+/).reduce((cues, block) => {
@@ -1245,7 +1246,8 @@ function hideCaption() {
 
 function renderCaption() {
   if (!captionsOn || !srtCues.length) { hideCaption(); return; }
-  const cue = srtCues.find(c => vid.currentTime >= c.start && vid.currentTime <= c.end);
+  const t = vid.currentTime - CAPTION_OFFSET;
+  const cue = srtCues.find(c => t >= c.start && t <= c.end);
   const text = cue?.text ?? null;
   if (text === lastCueText) return;
   lastCueText = text;
