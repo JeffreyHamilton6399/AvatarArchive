@@ -152,13 +152,13 @@
     .hub-card {
       position: relative;
       display: flex; flex-direction: column;
-      border-radius: 20px; overflow: hidden;
-      background: linear-gradient(160deg,rgba(10,17,28,.97) 0%,rgba(5,9,18,.99) 100%);
-      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 18px; overflow: hidden;
+      background: linear-gradient(160deg,rgba(10,17,28,.95) 0%,rgba(6,11,20,.98) 100%);
+      border: 1px solid var(--border);
       text-decoration: none; color: inherit;
-      transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease, border-color .35s ease;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, border-color .35s ease;
     }
-    .hub-card:hover { transform: translateY(-8px) scale(1.01); }
+    .hub-card:hover { transform: translateY(-7px); }
 
     .hub-card.atla  { --accent:var(--blue);  --accent-rgb:77,184,255;   }
     .hub-card.korra { --accent:var(--earth); --accent-rgb:106,191,105;  }
@@ -167,8 +167,8 @@
     .hub-card.liveactionshow  { --accent:#e53935;      --accent-rgb:229,57,53;    }
     .hub-card.books           { --accent:#a87ccc;      --accent-rgb:168,124,204;  }
     .hub-card:hover {
-      box-shadow: 0 20px 60px rgba(var(--accent-rgb),.22), 0 0 0 1px rgba(var(--accent-rgb),.38), 0 0 90px rgba(var(--accent-rgb),.06);
-      border-color: rgba(var(--accent-rgb),.44);
+      box-shadow: 0 16px 55px rgba(var(--accent-rgb),.2), 0 0 0 1px rgba(var(--accent-rgb),.32);
+      border-color: rgba(var(--accent-rgb),.38);
     }
 
     /* Poster */
@@ -181,19 +181,20 @@
     .card-poster-bg {
       position: absolute; inset: 0;
       background-size: cover; background-position: center;
-      filter: brightness(.46) saturate(1.25);
-      transition: filter .45s ease, transform .5s ease;
+      filter: brightness(.5) saturate(1.2);
+      transition: filter .4s ease, transform .45s ease;
     }
-    .hub-card:hover .card-poster-bg { filter: brightness(.76) saturate(1.6); transform: scale(1.07); }
+    .hub-card:hover .card-poster-bg { filter: brightness(.72) saturate(1.5); transform: scale(1.06); }
     .card-poster-overlay {
       position: absolute; inset: 0;
-      background: linear-gradient(to bottom,rgba(4,7,13,.08) 0%,transparent 28%,rgba(4,7,13,.45) 62%,rgba(4,7,13,.9) 100%);
+      background: linear-gradient(to bottom,rgba(4,7,13,.1) 0%,rgba(4,7,13,.05) 25%,rgba(4,7,13,.5) 65%,rgba(4,7,13,.88) 100%);
     }
+
 
     /* Body */
     .card-body {
       position: relative; z-index: 2;
-      padding: 1.5rem 1.6rem 1.8rem;
+      padding: 1.4rem 1.5rem 1.7rem;
       flex: 1; display: flex; flex-direction: column; gap: .45rem;
     }
     .card-label {
@@ -442,38 +443,35 @@
       position: fixed; bottom: 14px; left: 18px; z-index: 50;
       display: inline-flex; align-items: center; gap: 7px;
       font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
-      color: rgba(107,138,171,.65); background: rgba(4,7,13,.6);
+      color: rgba(107,138,171,.65); background: rgba(4,7,13,.65);
       border: 1px solid rgba(255,255,255,.1); border-radius: 30px;
       padding: .42em 1em; cursor: pointer;
-      transition: color .25s, opacity .25s, border-color .25s, background .25s; opacity: .75;
+      transition: color .25s, border-color .25s, background .25s; opacity: .8;
     }
-    #ambientBtn:hover { color: var(--gold); opacity: 1; border-color: rgba(201,168,76,.35); background: rgba(201,168,76,.06); }
-    #ambientBtn.active { color: var(--gold); opacity: 1; border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.08); }
+    #ambientBtn:hover { color: var(--gold); border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.07); opacity: 1; }
+    #ambientBtn.active { color: var(--gold); border-color: rgba(201,168,76,.45); background: rgba(201,168,76,.09); opacity: 1; }
     .ambient-wave { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
-    .ambient-wave span {
-      display: block; width: 2px; background: currentColor; border-radius: 2px;
-      transform-origin: bottom;
-    }
+    .ambient-wave span { display: block; width: 2px; background: currentColor; border-radius: 2px; transform-origin: bottom; }
     #ambientBtn.active .ambient-wave span { animation: waveBar .7s ease-in-out infinite alternate; }
     #ambientBtn.active .ambient-wave span:nth-child(2) { animation-delay: .12s; }
     #ambientBtn.active .ambient-wave span:nth-child(3) { animation-delay: .24s; }
     #ambientBtn.active .ambient-wave span:nth-child(4) { animation-delay: .36s; }
     @keyframes waveBar { from { height: 3px; } to { height: 11px; } }
 
-    /* ── Autoplay nudge ── */
-    #audioNudge {
-      position: fixed; bottom: 52px; left: 14px; z-index: 50;
-      display: flex; align-items: center; gap: 7px;
-      background: rgba(8,14,26,.9); border: 1px solid rgba(201,168,76,.3);
-      border-radius: 30px; padding: .4em 1em; cursor: pointer;
+    /* ── Sound-unlock nudge (shown when autoplay is blocked) ── */
+    #soundNudge {
+      position: fixed; bottom: 52px; left: 14px; z-index: 51;
+      display: inline-flex; align-items: center; gap: 8px;
       font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .18em; text-transform: uppercase;
-      color: var(--gold); backdrop-filter: blur(16px);
-      opacity: 0; transform: translateY(6px);
+      color: var(--gold); background: rgba(6,10,20,.92);
+      border: 1px solid rgba(201,168,76,.35); border-radius: 30px;
+      padding: .45em 1.1em; cursor: pointer; backdrop-filter: blur(18px);
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      opacity: 0; transform: translateY(8px); pointer-events: none;
       transition: opacity .4s ease, transform .4s ease;
-      pointer-events: none;
     }
-    #audioNudge.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
-    #audioNudge:hover { background: rgba(201,168,76,.1); }
+    #soundNudge.show { opacity: 1; transform: translateY(0); pointer-events: all; }
+    #soundNudge:hover { background: rgba(201,168,76,.12); border-color: rgba(201,168,76,.65); }
   </style>
 </head>
 <body>
@@ -725,10 +723,10 @@
   Ambient
 </button>
 
-<!-- Autoplay nudge (shown when browser blocks autoplay) -->
-<div id="audioNudge" title="Enable ambient sound">
-  <svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px;flex-shrink:0"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-  Tap to enable sound
+<!-- Shown when browser blocks autoplay -->
+<div id="soundNudge" title="Click to enable ambient sound">
+  <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+  Enable Sound
 </div>
 
 <!-- Download App button -->
@@ -759,72 +757,153 @@
 
 <script>
 /* ══════════════════════════════════════════
+   AUDIO ENGINE
+   Chrome on GitHub Pages requires AudioContext.resume() to be called
+   synchronously inside a user-gesture handler. Once that's done the
+   context stays unlocked for the entire session — every subsequent
+   audio.play() (even inside setTimeout) will succeed.
+══════════════════════════════════════════ */
+const introAudio   = document.getElementById('introAudio');
+const ambientAudio = document.getElementById('ambientAudio');
+const ambientBtn   = document.getElementById('ambientBtn');
+const soundNudge   = document.getElementById('soundNudge');
+
+let audioCtx         = null;   // Web Audio context — unlocked on first gesture
+let ambientPlaying   = false;
+let ambientFadeTimer = null;
+let nudgeTimer       = null;
+const savedMuted     = localStorage.getItem('avatarhub_ambient_off') === '1';
+
+/* Create / resume the AudioContext — must be called inside a click handler */
+function unlockAudioContext() {
+  if (audioCtx) { audioCtx.resume(); return; }
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtx.resume();
+  } catch(e) {}
+}
+
+function ambientFadeIn() {
+  if (ambientPlaying) return;
+  clearInterval(ambientFadeTimer);
+  ambientAudio.volume = 0;
+  ambientAudio.play().then(() => {
+    ambientPlaying = true;
+    ambientBtn.classList.add('active');
+    hideSoundNudge();
+    localStorage.setItem('avatarhub_ambient_off', '0');
+    ambientFadeTimer = setInterval(() => {
+      ambientAudio.volume = Math.min(0.55, ambientAudio.volume + 0.015);
+      if (ambientAudio.volume >= 0.55) clearInterval(ambientFadeTimer);
+    }, 60);
+  }).catch(() => {
+    /* Still blocked — show the nudge pill so user has a clear way to enable */
+    if (!savedMuted) showSoundNudge();
+  });
+}
+
+function ambientFadeOut() {
+  clearInterval(ambientFadeTimer);
+  ambientFadeTimer = setInterval(() => {
+    ambientAudio.volume = Math.max(0, ambientAudio.volume - 0.04);
+    if (ambientAudio.volume <= 0) { clearInterval(ambientFadeTimer); ambientAudio.pause(); ambientPlaying = false; }
+  }, 60);
+  ambientBtn.classList.remove('active');
+  hideSoundNudge();
+  localStorage.setItem('avatarhub_ambient_off', '1');
+}
+
+function showSoundNudge() {
+  clearTimeout(nudgeTimer);
+  nudgeTimer = setTimeout(() => { if (soundNudge) soundNudge.classList.add('show'); }, 1000);
+}
+function hideSoundNudge() {
+  clearTimeout(nudgeTimer);
+  if (soundNudge) soundNudge.classList.remove('show');
+}
+
+/* Play intro then crossfade to ambient */
+function startAudioSequence() {
+  if (!introAudio) { if (!savedMuted) ambientFadeIn(); return; }
+  introAudio.volume = 1;
+  introAudio.play().then(() => {
+    introAudio.addEventListener('ended', () => {
+      if (!savedMuted) ambientFadeIn();
+    }, { once: true });
+    /* Fallback: start ambient 5 s after intro begins (covers short intros) */
+    setTimeout(() => { if (!savedMuted && !ambientPlaying) ambientFadeIn(); }, 5000);
+  }).catch(() => {
+    /* Intro blocked — try ambient directly (context already unlocked) */
+    if (!savedMuted) ambientFadeIn();
+  });
+}
+
+ambientBtn.addEventListener('click', () => {
+  unlockAudioContext();          // ensure context is live on this gesture too
+  ambientPlaying ? ambientFadeOut() : ambientFadeIn();
+});
+if (soundNudge) soundNudge.addEventListener('click', () => {
+  unlockAudioContext();
+  hideSoundNudge();
+  if (!ambientPlaying) ambientFadeIn();
+});
+
+/* ══════════════════════════════════════════
    WORLD MAP SPLASH  →  FOUR ELEMENTS OVERLAY
 ══════════════════════════════════════════ */
-const mapSplash  = document.getElementById('mapSplash');
-const overlay    = document.getElementById('introOverlay');
+const mapSplash = document.getElementById('mapSplash');
+const overlay   = document.getElementById('introOverlay');
 let mapDone = false, overlayDone = false;
-let userClickedMap = false, userClickedOverlay = false;
 
-// Animate map in on first paint
 requestAnimationFrame(() => setTimeout(() => mapSplash.classList.add('map-in'), 60));
 
 function dismissMap(fromUser) {
   if (mapDone) return; mapDone = true;
-  if (fromUser) userClickedMap = true;
   mapSplash.classList.add('fade-out');
   setTimeout(() => {
     mapSplash.style.display = 'none';
     requestAnimationFrame(() => setTimeout(() => overlay.classList.add('symbols-in'), 60));
   }, 800);
 }
-/* ── Audio unlock helper ──
-   Browsers only allow audio.play() from within a synchronous user-gesture
-   handler. We store a reference and fire it immediately on first click.      */
-const _introAudio   = document.getElementById('introAudio');
-const _ambientAudio = document.getElementById('ambientAudio');
-let   _audioStarted = false;
 
-function _startAudioOnGesture() {
-  if (_audioStarted) return;
-  _audioStarted = true;
-  if (!_introAudio) { setTimeout(() => { if (window._startAmbient) window._startAmbient(); }, 800); return; }
-  // Play intro directly — still inside the gesture call-stack
-  _introAudio.volume = 1;
-  const p = _introAudio.play();
-  if (p) {
-    p.then(() => {
-      _introAudio.addEventListener('ended', () => { if (window._startAmbient) window._startAmbient(); }, { once: true });
-      setTimeout(() => { if (window._startAmbient) window._startAmbient(); }, 5000); // fallback
-    }).catch(() => {
-      setTimeout(() => { if (window._startAmbient) window._startAmbient(); }, 800);
-    });
-  }
-}
-
-mapSplash.addEventListener('click', () => { _startAudioOnGesture(); dismissMap(true); }, { once: true });
-mapSplash.addEventListener('keydown', e => { if(e.code==='Space'||e.code==='Enter') { _startAudioOnGesture(); dismissMap(true); } });
-mapSplash.setAttribute('tabindex','0');
-setTimeout(() => dismissMap(false), 3800); // auto-advance after 3.8s
-
-/* ── Four Elements overlay ── */
-function dismissOverlay(fromUser) {
+function dismissOverlay() {
   if (overlayDone) return; overlayDone = true;
-  if (fromUser) userClickedOverlay = true;
   overlay.classList.add('fade-out');
   setTimeout(() => {
     overlay.style.display = 'none';
     document.body.classList.add('page-ready');
-    // If user clicked the overlay (not auto-dismiss), try ambient now as a fallback
-    if (fromUser && window._startAmbient) setTimeout(() => window._startAmbient(), 400);
   }, 650);
 }
-overlay.addEventListener('click', () => { _startAudioOnGesture(); dismissOverlay(true); }, { once: true });
-overlay.addEventListener('keydown', e => { if(e.code==='Space'||e.code==='Enter') { _startAudioOnGesture(); dismissOverlay(true); } });
-overlay.setAttribute('tabindex','0');
-// Auto-dismiss 2.8s after map is gone
-mapSplash.addEventListener('click', () => setTimeout(() => dismissOverlay(false), 2800), { once: true });
-setTimeout(() => dismissOverlay(false), 3800 + 2800); // fallback absolute timer
+
+/* User clicks map → unlock audio context RIGHT HERE in the gesture handler,
+   then kick off the intro → ambient sequence once the overlay clears.        */
+mapSplash.addEventListener('click', () => {
+  unlockAudioContext();          // ← synchronous, inside click = always allowed
+  dismissMap(true);
+  setTimeout(() => { dismissOverlay(); startAudioSequence(); }, 1600);
+}, { once: true });
+mapSplash.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'Enter') {
+    unlockAudioContext(); dismissMap(true);
+    setTimeout(() => { dismissOverlay(); startAudioSequence(); }, 1600);
+  }
+});
+mapSplash.setAttribute('tabindex', '0');
+
+/* User clicks the elements overlay directly */
+overlay.addEventListener('click', () => {
+  unlockAudioContext();
+  dismissOverlay();
+  startAudioSequence();
+}, { once: true });
+overlay.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'Enter') { unlockAudioContext(); dismissOverlay(); startAudioSequence(); }
+});
+overlay.setAttribute('tabindex', '0');
+
+/* Auto-advance timers (no gesture = no audio, but page still transitions) */
+setTimeout(() => dismissMap(false), 3800);
+setTimeout(() => { dismissOverlay(); if (!savedMuted && !ambientPlaying) showSoundNudge(); }, 3800 + 2800);
 
 /* ══════════════════════════════════════════
    GLOBAL SEARCH
@@ -885,58 +964,6 @@ searchInput.addEventListener('input', () => runSearch(searchInput.value));
 searchInput.addEventListener('keydown', e => { if (e.key === 'Escape') { searchInput.value=''; searchResults.classList.remove('open'); } });
 document.addEventListener('click', e => { if (!e.target.closest('.search-bar-wrap')) searchResults.classList.remove('open'); });
 searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runSearch(searchInput.value); });
-
-/* ══════════════════════════════════════════
-   AMBIENT SOUND  (audio file + fade)
-══════════════════════════════════════════ */
-(function(){
-  const btn   = document.getElementById('ambientBtn');
-  const audio = document.getElementById('ambientAudio');
-  const nudge = document.getElementById('audioNudge');
-  let playing = false, fadeTimer = null;
-  let nudgeTimer = null;
-
-  // Restore saved mute preference (default: play after intro)
-  const savedMuted = localStorage.getItem('avatarhub_ambient_off') === '1';
-
-  function hideNudge() { if (nudge) { nudge.classList.remove('visible'); clearTimeout(nudgeTimer); } }
-
-  function fadeIn(){
-    if (playing) return;
-    clearInterval(fadeTimer);
-    audio.volume = 0;
-    audio.play().then(() => {
-      playing = true;
-      btn.classList.add('active');
-      hideNudge();
-      localStorage.setItem('avatarhub_ambient_off','0');
-      fadeTimer = setInterval(() => {
-        audio.volume = Math.min(0.55, audio.volume + 0.015);
-        if (audio.volume >= 0.55) clearInterval(fadeTimer);
-      }, 60);
-    }).catch(() => {
-      // Autoplay blocked — show nudge after a short delay
-      if (nudge && !savedMuted) {
-        nudgeTimer = setTimeout(() => nudge.classList.add('visible'), 1200);
-      }
-    });
-  }
-  function fadeOut(){
-    clearInterval(fadeTimer);
-    fadeTimer = setInterval(()=>{ audio.volume=Math.max(0,audio.volume-0.04); if(audio.volume<=0){clearInterval(fadeTimer);audio.pause();playing=false;} },60);
-    btn.classList.remove('active');
-    hideNudge();
-    localStorage.setItem('avatarhub_ambient_off','1');
-  }
-
-  // Called by _startAudioOnGesture after intro ends
-  window._startAmbient = function(){
-    if (!savedMuted && !playing) fadeIn();
-  };
-
-  btn.addEventListener('click', () => { playing ? fadeOut() : fadeIn(); });
-  if (nudge) nudge.addEventListener('click', () => { hideNudge(); fadeIn(); });
-})();
 
 /* ══════════════════════════════════════════
    AMBIENT PARTICLES (unchanged)
