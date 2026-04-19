@@ -347,28 +347,7 @@
     .ep-watched-check svg{width:9px;height:9px;fill:#6abf69;}
     .ep-card.watched .ep-watched-check{display:flex;}
 
-    /* ── Resume toast ── */
-    #resumeToast {
-      position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-8px);
-      background:rgba(8,14,26,.96);border:1px solid rgba(255,255,255,.12);
-      border-radius:12px;padding:.8rem 1.4rem;
-      font-family:'Philosopher',serif;font-size:.9rem;color:var(--white);
-      display:flex;align-items:center;gap:.9rem;
-      z-index:50;opacity:0;pointer-events:none;
-      transition:opacity .3s ease,transform .3s ease;
-      box-shadow:0 8px 32px rgba(0,0,0,.5);
-    }
-    #resumeToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-    #resumeToastBtn {
-      font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;
-      color:#000;background:var(--blue);border:none;border-radius:6px;
-      padding:.4em .9em;cursor:pointer;white-space:nowrap;
-    }
-    #resumeDismiss {
-      font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.15em;text-transform:uppercase;
-      color:var(--muted);background:none;border:none;cursor:pointer;padding:0;
-    }
-    #resumeDismiss:hover{color:var(--white);}
+
 
     /* Watermark */
     .jeffrey-watermark{position:fixed;bottom:14px;right:18px;z-index:50;display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(107,138,171,.45);transition:color .2s,opacity .2s;opacity:.6;}
@@ -399,18 +378,7 @@
       <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       Hub
     </a>
-<div style="display:flex;gap:.6rem;align-items:center;">
-      <a href="movie.html" class="movie-link">
-        <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
-        2026 Film
-      </a>
-      <a href="liveaction.html" class="movie-link" style="color:var(--fire);border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.06);" onmouseover="this.style.background='rgba(249,115,22,.14)';this.style.borderColor='rgba(249,115,22,.7)';this.style.color='#fff'" onmouseout="this.style.background='rgba(249,115,22,.06)';this.style.borderColor='rgba(249,115,22,.4)';this.style.color='var(--fire)'">
-        liveactionmovie
-      </a>
-      <a href="liveshow.html" class="movie-link" style="color:#e53935;border-color:rgba(229,57,53,.4);background:rgba(229,57,53,.06);" onmouseover="this.style.background='rgba(229,57,53,.14)';this.style.borderColor='rgba(229,57,53,.7)';this.style.color='#fff'" onmouseout="this.style.background='rgba(229,57,53,.06)';this.style.borderColor='rgba(229,57,53,.4)';this.style.color='#e53935'">
-        liveactionshow
-      </a>
-    </div>
+<span class="header-tag">4 Books · 52 Episodes</span>
   </header>
 
   <section class="hero">
@@ -647,12 +615,6 @@
 </div>
 
 
-<!-- Resume last episode toast -->
-<div id="resumeToast">
-  <span id="resumeToastText">Resume watching?</span>
-  <button id="resumeToastBtn">Resume</button>
-  <button id="resumeDismiss">Not now</button>
-</div>
 <!-- Keyboard shortcuts cheat sheet -->
 <div id="shortcutsModal">
   <div class="shortcuts-box">
@@ -979,7 +941,7 @@ renderEpisodes(1);
 })();
 
 /* ══════════════════════════════════════════
-   AUTO-RESUME — offer to continue last ep
+   AUTO-PREVIEW — load last-watched ep into player on page load (no autoplay)
 ══════════════════════════════════════════ */
 (function(){
   function findLastEp(){
@@ -988,33 +950,33 @@ renderEpisodes(1);
       bData.episodes.forEach((_,i)=>{
         const b=bData.book, n=i+1;
         const t=parseFloat(localStorage.getItem(`koraepisodes_b${b}_e${n}`)||0);
-        if(t>5&&t>bestTime){ bestTime=t; best={book:b,num:n,title:bData.episodes[i]}; }
+        if(t>5&&t>bestTime){ bestTime=t; best={book:b,num:n,title:bData.episodes[i],time:t}; }
       });
     });
     return best;
   }
 
-  const toast     = document.getElementById('resumeToast');
-  const toastText = document.getElementById('resumeToastText');
-  const toastBtn  = document.getElementById('resumeToastBtn');
-  const dismissBtn= document.getElementById('resumeDismiss');
-  let toastTimer  = null;
-
-  function showResumeToast(ep){
-    toastText.textContent = `Resume "${ep.title}"`;
-    toast.classList.add('show');
-    toastBtn.onclick = ()=>{ hideToast(); loadEpisode(ep.book,ep.num); };
-    toastTimer = setTimeout(hideToast, 7000);
-  }
-  function hideToast(){ toast.classList.remove('show'); clearTimeout(toastTimer); }
-  dismissBtn.addEventListener('click', hideToast);
-
-  // Fire after page-ready animation settles
   document.body.addEventListener('animationend', function onReady(e){
     if(e.target.classList.contains('anim-player')){
       document.body.removeEventListener('animationend',onReady);
       const ep=findLastEp();
-      if(ep) setTimeout(()=>showResumeToast(ep), 600);
+      if(ep){
+        currentEp={book:ep.book,num:ep.num,title:ep.title};
+        vid.src=epUrl(ep.book,ep.num)+'#t=0.001'; vid.load();
+        vid.addEventListener('loadedmetadata',function restorePreview(){
+          if(ep.time>5&&ep.time<vid.duration-10) vid.currentTime=ep.time;
+          vid.removeEventListener('loadedmetadata',restorePreview);
+        },{once:true});
+        document.getElementById('npTitle').textContent=ep.title;
+        document.getElementById('npEp').textContent=`Book ${ep.book}, Ep ${ep.num}`;
+        document.getElementById('nowPlayingBar').style.opacity='1';
+        if(currentBook!==ep.book){ selectBook(ep.book); } else { renderEpisodes(ep.book); }
+        setTimeout(()=>{
+          const card=epGrid&&epGrid.querySelector(`.ep-card[data-b="${ep.book}"][data-ep="${ep.num}"]`);
+          if(card) card.classList.add('playing');
+        },100);
+        fetch(subUrl(ep.book,ep.num)).then(r=>r.ok?r.text():Promise.reject()).then(t=>{srtCues=parseSRT(t);}).catch(()=>{});
+      }
     }
   });
 
