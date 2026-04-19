@@ -295,6 +295,81 @@
     .about-fact-value{font-family:'Philosopher',serif;font-size:.88rem;color:var(--white);line-height:1.5;}
     @media(max-width:768px){.info-panel{flex-direction:column;}.info-divider{display:none;}.about-section{flex-direction:column;}}
 
+
+    /* ── Keyboard shortcuts modal ── */
+    #shortcutsModal {
+      position:fixed;inset:0;z-index:400;
+      background:rgba(4,7,13,.88);backdrop-filter:blur(10px);
+      display:none;align-items:center;justify-content:center;
+    }
+    #shortcutsModal.open{display:flex;}
+    .shortcuts-box {
+      background:rgba(8,14,26,.98);border:1px solid rgba(255,255,255,.1);
+      border-radius:16px;padding:2rem 2.2rem;max-width:380px;width:90%;
+      box-shadow:0 20px 64px rgba(0,0,0,.7);
+    }
+    .shortcuts-title {
+      font-family:'Cinzel Decorative',serif;font-size:.9rem;letter-spacing:.08em;
+      color:var(--gold);margin-bottom:1.4rem;text-align:center;
+    }
+    .shortcuts-grid{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.4rem;}
+    .sk-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+    .sk-key {
+      font-family:'Cinzel',serif;font-size:.46rem;letter-spacing:.12em;
+      color:var(--white);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+      border-radius:5px;padding:.3em .7em;white-space:nowrap;min-width:60px;text-align:center;
+    }
+    .sk-desc{font-family:'Philosopher',serif;font-size:.84rem;color:var(--muted);}
+    .shortcuts-close {
+      width:100%;font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--muted);background:none;border:1px solid var(--dim);border-radius:30px;
+      padding:.6em 1em;cursor:pointer;transition:color .2s,border-color .2s;
+    }
+    .shortcuts-close:hover{color:var(--white);border-color:rgba(255,255,255,.3);}
+
+    /* ── Episode card progress bar & watched state ── */
+    .ep-card{position:relative;}
+    .ep-prog-bar {
+      position:absolute;bottom:0;left:0;right:0;height:2px;
+      background:rgba(255,255,255,.07);border-radius:0 0 10px 10px;overflow:hidden;
+    }
+    .ep-prog-fill{height:100%;border-radius:0 0 10px 10px;transition:width .3s;}
+    .ep-card[data-b="1"] .ep-prog-fill{background:var(--water);}
+    .ep-card[data-b="2"] .ep-prog-fill{background:var(--earth);}
+    .ep-card[data-b="3"] .ep-prog-fill{background:var(--fire);}
+    .ep-card[data-b="4"] .ep-prog-fill{background:var(--air);}
+    .ep-watched-check {
+      position:absolute;top:.5rem;right:.5rem;
+      width:16px;height:16px;border-radius:50%;
+      display:none;align-items:center;justify-content:center;
+      background:rgba(106,191,105,.2);border:1px solid rgba(106,191,105,.5);
+    }
+    .ep-watched-check svg{width:9px;height:9px;fill:#6abf69;}
+    .ep-card.watched .ep-watched-check{display:flex;}
+
+    /* ── Resume toast ── */
+    #resumeToast {
+      position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-8px);
+      background:rgba(8,14,26,.96);border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;padding:.8rem 1.4rem;
+      font-family:'Philosopher',serif;font-size:.9rem;color:var(--white);
+      display:flex;align-items:center;gap:.9rem;
+      z-index:50;opacity:0;pointer-events:none;
+      transition:opacity .3s ease,transform .3s ease;
+      box-shadow:0 8px 32px rgba(0,0,0,.5);
+    }
+    #resumeToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    #resumeToastBtn {
+      font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;
+      color:#000;background:var(--blue);border:none;border-radius:6px;
+      padding:.4em .9em;cursor:pointer;white-space:nowrap;
+    }
+    #resumeDismiss {
+      font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.15em;text-transform:uppercase;
+      color:var(--muted);background:none;border:none;cursor:pointer;padding:0;
+    }
+    #resumeDismiss:hover{color:var(--white);}
+
     /* Watermark */
     .jeffrey-watermark{position:fixed;bottom:14px;right:18px;z-index:50;display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(107,138,171,.45);transition:color .2s,opacity .2s;opacity:.6;}
     .jeffrey-watermark:hover{color:rgba(240,244,255,.7);opacity:1;}
@@ -566,6 +641,31 @@
   <footer style="height:2rem"></footer>
 </div>
 
+
+<!-- Resume last episode toast -->
+<div id="resumeToast">
+  <span id="resumeToastText">Resume watching?</span>
+  <button id="resumeToastBtn">Resume</button>
+  <button id="resumeDismiss">Not now</button>
+</div>
+<!-- Keyboard shortcuts cheat sheet -->
+<div id="shortcutsModal">
+  <div class="shortcuts-box">
+    <div class="shortcuts-title">Keyboard Shortcuts</div>
+    <div class="shortcuts-grid">
+      <div class="sk-row"><span class="sk-key">Space / K</span><span class="sk-desc">Play / Pause</span></div>
+      <div class="sk-row"><span class="sk-key">← →</span><span class="sk-desc">Seek ±5 seconds</span></div>
+      <div class="sk-row"><span class="sk-key">↑ ↓</span><span class="sk-desc">Volume ±10%</span></div>
+      <div class="sk-row"><span class="sk-key">M</span><span class="sk-desc">Mute / Unmute</span></div>
+      <div class="sk-row"><span class="sk-key">F</span><span class="sk-desc">Toggle Fullscreen</span></div>
+      <div class="sk-row"><span class="sk-key">C</span><span class="sk-desc">Toggle Captions</span></div>
+      <div class="sk-row"><span class="sk-key">N</span><span class="sk-desc">Next Episode</span></div>
+      <div class="sk-row"><span class="sk-key">?</span><span class="sk-desc">Show this guide</span></div>
+    </div>
+    <button class="shortcuts-close" id="shortcutsClose">Close</button>
+  </div>
+</div>
+
 <a class="jeffrey-watermark" href="https://www.youtube.com/@Jeffrey_Creates" target="_blank" rel="noopener">
   <svg viewBox="0 0 24 24" style="width:9px;height:9px;fill:#ff1c1c;flex-shrink:0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
   Jeffrey Creates
@@ -589,7 +689,7 @@ const BOOKS = [
     episodes:['The Awakening','The Headband','The Painted Lady',"Sokka's Master",'The Beach','The Avatar and the Firelord','The Runaway','The Puppetmaster','Nightmares and Daydreams','The Day of Black Sun, Part 1','The Day of Black Sun, Part 2','The Western Air Temple','The Firebending Masters','The Boiling Rock, Part 1','The Boiling Rock, Part 2','The Southern Raiders','The Ember Island Players',"Sozin's Comet, Part 1: The Phoenix King","Sozin's Comet, Part 2: The Old Masters","Sozin's Comet, Part 3: Into the Inferno","Sozin's Comet, Part 4: Avatar Aang"] }
 ];
 
-function epUrl(b,n){ return `${GH}/${BOOKS[b-1].tag}/S${b}E${n}.mkv`; }
+// epUrl defined below in renderEpisodes block
 function subUrl(b,n){ return `s${b}e${String(n).padStart(2,'0')}.srt`; }
 function getNext(b,n){ const bd=BOOKS[b-1]; if(n<bd.episodes.length) return{book:b,num:n+1,title:bd.episodes[n]}; if(b<3) return{book:b+1,num:1,title:BOOKS[b].episodes[0]}; return null; }
 
@@ -608,7 +708,7 @@ const vid=document.getElementById('mainVideo'),shell=document.getElementById('pl
 let idleTimer;
 function resetIdle(){ shell.classList.remove('idle'); clearTimeout(idleTimer); if(!vid.paused) idleTimer=setTimeout(()=>shell.classList.add('idle'),1250); }
 document.addEventListener('mousemove',resetIdle); document.addEventListener('keydown',resetIdle); document.addEventListener('touchstart',resetIdle,{passive:true});
-document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT')return; switch(e.code){ case'Space':case'KeyK':e.preventDefault();togglePlay();break;case'ArrowRight':e.preventDefault();if(isFinite(vid.duration))vid.currentTime=Math.min(vid.duration,vid.currentTime+5);showOSD('+5s');break;case'ArrowLeft':e.preventDefault();vid.currentTime=Math.max(0,vid.currentTime-5);showOSD('−5s');break;case'ArrowUp':e.preventDefault();vid.volume=Math.min(1,vid.volume+.1);vid.muted=false;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'ArrowDown':e.preventDefault();vid.volume=Math.max(0,vid.volume-.1);vid.muted=vid.volume===0;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'KeyM':vid.muted=!vid.muted;volSlider.value=vid.muted?0:(vid.volume||1);updateVolUI();showOSD(vid.muted?'Muted':'Sound On');break;case'KeyF':e.preventDefault();toggleFullscreen();showOSD('Fullscreen');break;} });
+document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT')return; switch(e.code){ case'Space':case'KeyK':e.preventDefault();togglePlay();break;case'ArrowRight':e.preventDefault();if(isFinite(vid.duration))vid.currentTime=Math.min(vid.duration,vid.currentTime+5);showOSD('+5s');break;case'ArrowLeft':e.preventDefault();vid.currentTime=Math.max(0,vid.currentTime-5);showOSD('−5s');break;case'ArrowUp':e.preventDefault();vid.volume=Math.min(1,vid.volume+.1);vid.muted=false;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'ArrowDown':e.preventDefault();vid.volume=Math.max(0,vid.volume-.1);vid.muted=vid.volume===0;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'KeyM':vid.muted=!vid.muted;volSlider.value=vid.muted?0:(vid.volume||1);updateVolUI();showOSD(vid.muted?'Muted':'Sound On');break;case'KeyF':e.preventDefault();toggleFullscreen();showOSD('Fullscreen');break;case'KeyC':ccBtn&&ccBtn.click();break;case'KeyN':{ const nxt=currentEp&&getNext(currentEp.book,currentEp.num);if(nxt)loadEpisode(nxt.book,nxt.num);break;}case'Slash':if(e.shiftKey){e.preventDefault();document.getElementById('shortcutsModal').classList.toggle('open');}break;} });
 let tapTimer=null,tapCount=0,lastTapX=0;
 clickArea.addEventListener('touchend',e=>{
   e.preventDefault();resetIdle();
@@ -661,7 +761,18 @@ updateShimmer();
 vid.addEventListener('loadedmetadata',()=>{ durEl.textContent=fmt(vid.duration); });
 vid.addEventListener('timeupdate',()=>{ if(isSeeking)return; const pct=(vid.currentTime/vid.duration)*100||0; progFill.style.width=pct+'%';progThumb.style.left=pct+'%';curEl.textContent=fmt(vid.currentTime);
   if(vid.buffered.length){const bp=(vid.buffered.end(vid.buffered.length-1)/vid.duration)*100||0;progBuf.style.width=bp+'%';}
-  if(currentEp) localStorage.setItem(`atlaepisodes_b${currentEp.book}_e${currentEp.num}`,vid.currentTime);
+  if(currentEp){
+    localStorage.setItem(`atlaepisodes_b${currentEp.book}_e${currentEp.num}`,vid.currentTime);
+    // Mark watched at 90%+ completion
+    if(isFinite(vid.duration)&&vid.duration>0&&vid.currentTime/vid.duration>=0.9){
+      const wKey=`atlaepisodes_watched_b${currentEp.book}_e${currentEp.num}`;
+      if(localStorage.getItem(wKey)!=='1'){
+        localStorage.setItem(wKey,'1');
+        const wCard=epGrid&&epGrid.querySelector(`.ep-card[data-b="${currentEp.book}"][data-ep="${currentEp.num}"]`);
+        if(wCard) wCard.classList.add('watched');
+      }
+    }
+  }
   handleSkipIntro();handleNextPanel(); });
 vid.addEventListener('ended',()=>{ updateShimmer(); if(currentEp)showNextPanel(true); });
 let isSeeking=false;
@@ -780,21 +891,32 @@ function setPill(b) {
 }
 
 /* Render episode grid for a book */
+function epUrl(b,n){
+  if(b===2&&(n===12||n===13)) return `${GH}/${BOOKS[b-1].tag}/S2E12E13.mkv`;
+  return `${GH}/${BOOKS[b-1].tag}/S${b}E${n}.mkv`;
+}
 function renderEpisodes(b) {
   const bData = BOOKS[b - 1];
   epGrid.innerHTML = '';
   bData.episodes.forEach((title, i) => {
     const epNum = i + 1;
+    const saved = parseFloat(localStorage.getItem(`atlaepisodes_b${b}_e${epNum}`) || 0);
+    const watched = localStorage.getItem(`atlaepisodes_watched_b${b}_e${epNum}`) === '1';
+    const progPct = saved > 5 ? Math.min(95, saved / 22 * 100) : 0; // rough estimate ~22min eps
+    const isDoubleA = b===2 && epNum===12, isDoubleB = b===2 && epNum===13;
+    const epLabel = (isDoubleA||isDoubleB) ? 'S2E12–13' : `S${b}E${epNum}`;
     const card = document.createElement('div');
-    card.className = 'ep-card';
-    card.dataset.b = b;
-    card.dataset.ep = epNum;
+    card.className = 'ep-card' + (watched?' watched':'');
+    card.dataset.b = b; card.dataset.ep = epNum;
     card.style.animationDelay = (i * 0.02) + 's';
-    card.innerHTML = `<div class="ep-card-top"><span class="ep-num">S${b}E${epNum}</span><div class="ep-now-dot"></div></div><div class="ep-title-text">${title}</div>`;
+    card.innerHTML = `
+      <div class="ep-card-top"><span class="ep-num">${epLabel}</span><div class="ep-now-dot"></div></div>
+      <div class="ep-title-text">${title}</div>
+      <div class="ep-prog-bar"><div class="ep-prog-fill" style="width:${progPct}%"></div></div>
+      <div class="ep-watched-check"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>`;
     card.addEventListener('click', () => loadEpisode(b, epNum));
     epGrid.appendChild(card);
   });
-  // Re-highlight currently playing card if it's in this book
   if (currentEp && currentEp.book === b) {
     const card = epGrid.querySelector(`.ep-card[data-b="${b}"][data-ep="${currentEp.num}"]`);
     if (card) card.classList.add('playing');
@@ -853,6 +975,54 @@ renderEpisodes(1);
   pqMenu.addEventListener('click',e=>e.stopPropagation());
   applyPQ();
 })();
+
+/* ══════════════════════════════════════════
+   AUTO-RESUME — offer to continue last ep
+══════════════════════════════════════════ */
+(function(){
+  function findLastEp(){
+    let best=null, bestTime=0;
+    BOOKS.forEach(bData=>{
+      bData.episodes.forEach((_,i)=>{
+        const b=bData.book, n=i+1;
+        const t=parseFloat(localStorage.getItem(`atlaepisodes_b${b}_e${n}`)||0);
+        if(t>5&&t>bestTime){ bestTime=t; best={book:b,num:n,title:bData.episodes[i]}; }
+      });
+    });
+    return best;
+  }
+
+  const toast     = document.getElementById('resumeToast');
+  const toastText = document.getElementById('resumeToastText');
+  const toastBtn  = document.getElementById('resumeToastBtn');
+  const dismissBtn= document.getElementById('resumeDismiss');
+  let toastTimer  = null;
+
+  function showResumeToast(ep){
+    toastText.textContent = `Resume "${ep.title}"`;
+    toast.classList.add('show');
+    toastBtn.onclick = ()=>{ hideToast(); loadEpisode(ep.book,ep.num); };
+    toastTimer = setTimeout(hideToast, 7000);
+  }
+  function hideToast(){ toast.classList.remove('show'); clearTimeout(toastTimer); }
+  dismissBtn.addEventListener('click', hideToast);
+
+  // Fire after page-ready animation settles
+  document.body.addEventListener('animationend', function onReady(e){
+    if(e.target.classList.contains('anim-player')){
+      document.body.removeEventListener('animationend',onReady);
+      const ep=findLastEp();
+      if(ep) setTimeout(()=>showResumeToast(ep), 600);
+    }
+  });
+
+  // Shortcuts modal
+  const sModal = document.getElementById('shortcutsModal');
+  const sClose = document.getElementById('shortcutsClose');
+  sClose.addEventListener('click',()=>sModal.classList.remove('open'));
+  sModal.addEventListener('click',e=>{ if(e.target===sModal) sModal.classList.remove('open'); });
+})();
+
 </script>
 </body>
 </html>
