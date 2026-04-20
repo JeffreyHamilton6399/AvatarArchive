@@ -58,45 +58,6 @@
       background: linear-gradient(to bottom,rgba(4,7,13,.6) 0%,transparent 30%,transparent 70%,rgba(4,7,13,.75) 100%);
     }
 
-    /* ── Intro overlay ── */
-    #introOverlay {
-      position: fixed; inset: 0; z-index: 100;
-      background: rgba(4,7,13,.72); backdrop-filter: blur(2px);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3rem;
-      cursor: pointer;
-    }
-    #introOverlay.fade-out { animation: overlayOut .65s ease forwards; pointer-events: none; }
-    .intro-tagline {
-      font-family: 'Philosopher', serif; font-size: clamp(.6rem,1.6vw,.8rem);
-      font-style: italic; letter-spacing: .5em; text-transform: uppercase;
-      color: rgba(200,180,120,.55); opacity: 0; transition: opacity .6s ease .15s;
-    }
-    #introOverlay.symbols-in .intro-tagline { opacity: 1; }
-    .symbols-grid {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      gap: clamp(2rem,5vw,5rem); align-items: center; justify-items: center;
-    }
-    @media(max-width:600px){ .symbols-grid{ grid-template-columns:repeat(2,1fr); gap:2rem; } }
-    .sym-item {
-      display: flex; flex-direction: column; align-items: center; gap: .9rem;
-      opacity: 0; transform: scale(.78);
-      transition: opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1);
-    }
-    #introOverlay.symbols-in .sym-item { opacity:1; transform:scale(1); }
-    .sym-img  { width:clamp(64px,8vw,100px); height:clamp(64px,8vw,100px); object-fit:contain; }
-    .sym-item.air   .sym-img { animation:pulseGlowAir   2.6s ease-in-out infinite 0s;   }
-    .sym-item.water .sym-img { animation:pulseGlowWater 2.6s ease-in-out infinite .4s;  }
-    .sym-item.earth .sym-img { animation:pulseGlowEarth 2.6s ease-in-out infinite .8s;  }
-    .sym-item.fire  .sym-img { animation:pulseGlowFire  2.6s ease-in-out infinite 1.2s; }
-    .sym-label {
-      font-family: 'Philosopher', serif; font-size: clamp(.55rem,1.3vw,.7rem);
-      letter-spacing: .3em; text-transform: uppercase;
-    }
-    .sym-item.air   .sym-label { color:var(--air);   }
-    .sym-item.water .sym-label { color:var(--water); }
-    .sym-item.earth .sym-label { color:var(--earth); }
-    .sym-item.fire  .sym-label { color:var(--fire);  }
-
     /* ── Page ── */
     .page {
       position: relative; z-index: 1;
@@ -484,28 +445,7 @@
   <p class="map-hint">Tap anywhere to enter</p>
 </div>
 
-<!-- ── Intro overlay ── -->
-<div id="introOverlay" title="Click to enter">
-  <p class="intro-tagline">Four elements. One destiny.</p>
-  <div class="symbols-grid">
-    <div class="sym-item water">
-      <img src="images/water.png" alt="Water" class="sym-img">
-      <span class="sym-label">Water</span>
-    </div>
-    <div class="sym-item earth">
-      <img src="images/earth.png" alt="Earth" class="sym-img">
-      <span class="sym-label">Earth</span>
-    </div>
-    <div class="sym-item fire">
-      <img src="images/fire.png" alt="Fire" class="sym-img">
-      <span class="sym-label">Fire</span>
-    </div>
-    <div class="sym-item air">
-      <img src="images/air.png" alt="Air" class="sym-img">
-      <span class="sym-label">Air</span>
-    </div>
-  </div>
-</div>
+
 
 <!-- ── Background + particles ── -->
 <div class="bg-layer"></div>
@@ -849,61 +789,47 @@ if (soundNudge) soundNudge.addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════
-   WORLD MAP SPLASH  →  FOUR ELEMENTS OVERLAY
+   WORLD MAP SPLASH  →  MAIN PAGE
 ══════════════════════════════════════════ */
 const mapSplash = document.getElementById('mapSplash');
-const overlay   = document.getElementById('introOverlay');
-let mapDone = false, overlayDone = false;
+let mapDone = false;
 
+/* Animate map in on load */
 requestAnimationFrame(() => setTimeout(() => mapSplash.classList.add('map-in'), 60));
 
-function dismissMap(fromUser) {
+function dismissMap() {
   if (mapDone) return; mapDone = true;
   mapSplash.classList.add('fade-out');
   setTimeout(() => {
     mapSplash.style.display = 'none';
-    requestAnimationFrame(() => setTimeout(() => overlay.classList.add('symbols-in'), 60));
+    document.body.classList.add('page-ready');
   }, 800);
 }
 
-function dismissOverlay() {
-  if (overlayDone) return; overlayDone = true;
-  overlay.classList.add('fade-out');
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    document.body.classList.add('page-ready');
-  }, 650);
-}
-
-/* User clicks map → unlock audio context RIGHT HERE in the gesture handler,
-   then kick off the intro → ambient sequence once the overlay clears.        */
+/* Click → unlock audio synchronously (required by browsers), start audio,
+   then dismiss the splash */
 mapSplash.addEventListener('click', () => {
-  unlockAudioContext();          // ← synchronous, inside click = always allowed
-  dismissMap(true);
-  setTimeout(() => { dismissOverlay(); startAudioSequence(); }, 1600);
+  unlockAudioContext();   // must be synchronous inside the click gesture
+  startAudioSequence();   // safe now — AudioContext is unlocked
+  dismissMap();
 }, { once: true });
+
 mapSplash.addEventListener('keydown', e => {
   if (e.code === 'Space' || e.code === 'Enter') {
-    unlockAudioContext(); dismissMap(true);
-    setTimeout(() => { dismissOverlay(); startAudioSequence(); }, 1600);
+    unlockAudioContext();
+    startAudioSequence();
+    dismissMap();
   }
 });
 mapSplash.setAttribute('tabindex', '0');
 
-/* User clicks the elements overlay directly */
-overlay.addEventListener('click', () => {
-  unlockAudioContext();
-  dismissOverlay();
-  startAudioSequence();
-}, { once: true });
-overlay.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'Enter') { unlockAudioContext(); dismissOverlay(); startAudioSequence(); }
-});
-overlay.setAttribute('tabindex', '0');
-
-/* Auto-advance timers (no gesture = no audio, but page still transitions) */
-setTimeout(() => dismissMap(false), 3800);
-setTimeout(() => { dismissOverlay(); if (!savedMuted && !ambientPlaying) showSoundNudge(); }, 3800 + 2800);
+/* Auto-advance after 5 s if user doesn't click (no gesture = no audio) */
+setTimeout(() => {
+  if (!mapDone) {
+    dismissMap();
+    if (!savedMuted && !ambientPlaying) showSoundNudge();
+  }
+}, 5000);
 
 /* ══════════════════════════════════════════
    GLOBAL SEARCH
