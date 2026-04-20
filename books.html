@@ -169,6 +169,32 @@
     [data-reveal] { opacity:0; transform:translateY(32px); transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1); }
     [data-reveal].revealed { opacity:1; transform:translateY(0); }
 
+    /* ── Swipe / drag page-turn ── */
+    #pdfFrame { transform:translateX(0); transition:transform .38s cubic-bezier(.4,0,.2,1), opacity .38s ease; will-change:transform; }
+    #pdfFrame.dragging { transition:none; }
+    #pdfFrame.slide-exit-left  { transform:translateX(-105%); opacity:0; transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease; }
+    #pdfFrame.slide-exit-right { transform:translateX(105%);  opacity:0; transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .32s ease; }
+    #pdfFrame.slide-enter-left  { transform:translateX(105%);  opacity:0; transition:none; }
+    #pdfFrame.slide-enter-right { transform:translateX(-105%); opacity:0; transition:none; }
+    #pdfFrame.slide-settle { transform:translateX(0); opacity:1; transition:transform .34s cubic-bezier(.22,1,.36,1),opacity .3s ease; }
+
+    /* Edge nav zones */
+    .nav-edge { position:absolute; top:0; bottom:0; width:52px; z-index:22; display:none; align-items:center; justify-content:center; cursor:pointer; transition:background .2s; }
+    .nav-edge:hover .nav-edge-icon { opacity:.85; transform:translateX(0) scale(1.1); }
+    #pdfFrame[style*="block"] ~ .nav-edge,
+    .viewer-shell.has-book .nav-edge { display:flex; }
+    .nav-edge-left  { left:0;  background:linear-gradient(to right, rgba(10,17,28,.55) 0%, transparent 100%); }
+    .nav-edge-right { right:0; background:linear-gradient(to left,  rgba(10,17,28,.55) 0%, transparent 100%); }
+    .nav-edge-icon  { width:28px; height:28px; border-radius:50%; background:rgba(168,124,204,.18); border:1px solid rgba(168,124,204,.35); display:flex; align-items:center; justify-content:center; opacity:0; transform:translateX(-4px); transition:opacity .2s,transform .2s,background .2s; }
+    .nav-edge-right .nav-edge-icon { transform:translateX(4px); }
+    .nav-edge:active .nav-edge-icon { background:rgba(168,124,204,.38); }
+
+    /* Swipe indicator ripple */
+    @keyframes swipeHint { 0%{opacity:.7;transform:translateY(-50%) scale(.8)} 60%{opacity:.5;transform:translateY(-50%) scale(1.15)} 100%{opacity:0;transform:translateY(-50%) scale(1.3)} }
+    .swipe-ripple { position:absolute; top:50%; z-index:25; width:56px; height:56px; border-radius:50%; border:2px solid rgba(168,124,204,.7); pointer-events:none; animation:swipeHint .5s ease-out forwards; }
+    .swipe-ripple-left  { left:26px;  }
+    .swipe-ripple-right { right:26px; }
+
     .jeffrey-watermark { position:fixed; bottom:14px; right:18px; z-index:50; display:inline-flex; align-items:center; gap:5px; text-decoration:none; font-family:'Cinzel',serif; font-size:.42rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(107,138,171,.45); transition:color .2s,opacity .2s; opacity:.6; }
     .jeffrey-watermark:hover { color:rgba(240,244,255,.7); opacity:1; }
 
@@ -234,6 +260,13 @@
           <p class="placeholder-text">Select a book from the list below<br>to begin reading</p>
         </div>
         <iframe id="pdfFrame" style="display:none;" title="Book Viewer"></iframe>
+        <!-- Swipe edge zones (mouse users) -->
+        <div class="nav-edge nav-edge-left"  id="edgePrev" title="Previous book">
+          <div class="nav-edge-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="rgba(168,124,204,.9)"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg></div>
+        </div>
+        <div class="nav-edge nav-edge-right" id="edgeNext" title="Next book">
+          <div class="nav-edge-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="rgba(168,124,204,.9)"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>
+        </div>
         <div class="viewer-loading" id="viewerLoading">
           <div class="viewer-loading-spinner"></div>
           <span class="viewer-loading-text">Loading Book…</span>
@@ -420,6 +453,7 @@ const nrTitle     = document.getElementById('nrTitle');
 const nrSeries    = document.getElementById('nrSeries');
 const openPdfBtn  = document.getElementById('openPdfBtn');
 const loadingEl   = document.getElementById('viewerLoading');
+const viewerShell = document.getElementById('viewerShell');
 
 /* Build dropdown */
 document.body.appendChild(dropdown);
@@ -495,6 +529,7 @@ function loadBook(seriesIdx, bookIdx) {
   // Show loading spinner; hide when iframe content arrives
   if (loadingEl) loadingEl.classList.add('active');
   pdfFrame.onload = () => { if (loadingEl) loadingEl.classList.remove('active'); };
+  showEdgeZones();
 
   // Save last-read
   localStorage.setItem('avatarbooks_last', JSON.stringify({ seriesIdx, bookIdx }));
@@ -532,17 +567,131 @@ function selectSeries(idx) {
   renderBooks(idx);
 }
 
+/* ─── Page-turn navigation with slide animation ─── */
+function navigateBook(dir) {
+  if (currentBookIdx === null) return;
+  let ts = currentSeries, tb = currentBookIdx;
+  if (dir === 'next') {
+    const s = SERIES[ts];
+    if (tb < s.books.length - 1) tb++;
+    else if (ts < SERIES.length - 1) { ts++; tb = 0; }
+    else return;
+  } else {
+    if (tb > 0) tb--;
+    else if (ts > 0) { ts--; tb = SERIES[ts].books.length - 1; }
+    else return;
+  }
+  const isNext = dir === 'next';
+  // Slide current frame out
+  pdfFrame.classList.remove('dragging');
+  pdfFrame.style.transform = '';
+  pdfFrame.classList.add(isNext ? 'slide-exit-left' : 'slide-exit-right');
+  // Ripple feedback
+  spawnRipple(isNext ? 'right' : 'left');
+  setTimeout(() => {
+    loadBook(ts, tb);
+    pdfFrame.classList.remove('slide-exit-left','slide-exit-right');
+    pdfFrame.classList.add(isNext ? 'slide-enter-left' : 'slide-enter-right');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pdfFrame.classList.remove('slide-enter-left','slide-enter-right');
+      pdfFrame.classList.add('slide-settle');
+      pdfFrame.addEventListener('transitionend', () => pdfFrame.classList.remove('slide-settle'), { once:true });
+    }));
+  }, 320);
+}
+
+function spawnRipple(side) {
+  const r = document.createElement('div');
+  r.className = 'swipe-ripple swipe-ripple-' + side;
+  viewerShell.appendChild(r);
+  r.addEventListener('animationend', () => r.remove());
+}
+
 /* Prev / Next buttons */
-document.getElementById('prevBookBtn').addEventListener('click', () => {
-  if (currentBookIdx === null) return;
-  if (currentBookIdx > 0) { loadBook(currentSeries, currentBookIdx - 1); }
-  else if (currentSeries > 0) { const prev = currentSeries - 1; loadBook(prev, SERIES[prev].books.length - 1); }
+document.getElementById('prevBookBtn').addEventListener('click', () => navigateBook('prev'));
+document.getElementById('nextBookBtn').addEventListener('click', () => navigateBook('next'));
+
+/* Edge zone buttons */
+document.getElementById('edgePrev').addEventListener('click', () => navigateBook('prev'));
+document.getElementById('edgeNext').addEventListener('click', () => navigateBook('next'));
+
+/* Show edge zones once a book is loaded */
+function showEdgeZones() { viewerShell.classList.add('has-book'); }
+
+/* ─── Touch swipe (mobile / tablet) ─── */
+let tStartX = 0, tStartY = 0, tTracking = false, tHorizontal = null;
+const SWIPE_MIN = 55;
+
+viewerShell.addEventListener('touchstart', e => {
+  if (pdfFrame.style.display === 'none') return;
+  tStartX = e.touches[0].clientX;
+  tStartY = e.touches[0].clientY;
+  tTracking = true;
+  tHorizontal = null;
+  pdfFrame.classList.add('dragging');
+}, { passive: true });
+
+viewerShell.addEventListener('touchmove', e => {
+  if (!tTracking) return;
+  const dx = e.touches[0].clientX - tStartX;
+  const dy = e.touches[0].clientY - tStartY;
+  if (tHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+    tHorizontal = Math.abs(dx) >= Math.abs(dy);
+  }
+  if (tHorizontal) {
+    e.preventDefault();
+    const clamped = Math.max(-180, Math.min(180, dx));
+    pdfFrame.style.transform = `translateX(${clamped * 0.75}px)`;
+  }
+}, { passive: false });
+
+viewerShell.addEventListener('touchend', e => {
+  if (!tTracking) return;
+  tTracking = false;
+  const dx = e.changedTouches[0].clientX - tStartX;
+  const dy = e.changedTouches[0].clientY - tStartY;
+  pdfFrame.classList.remove('dragging');
+  if (tHorizontal && Math.abs(dx) > SWIPE_MIN) {
+    navigateBook(dx < 0 ? 'next' : 'prev');
+  } else {
+    pdfFrame.style.transform = '';
+  }
 });
-document.getElementById('nextBookBtn').addEventListener('click', () => {
-  if (currentBookIdx === null) return;
-  const s = SERIES[currentSeries];
-  if (currentBookIdx < s.books.length - 1) { loadBook(currentSeries, currentBookIdx + 1); }
-  else if (currentSeries < SERIES.length - 1) { loadBook(currentSeries + 1, 0); }
+
+/* ─── Mouse drag (desktop — full viewer drag) ─── */
+let mDown = false, mStartX = 0, mDragged = false;
+
+viewerShell.addEventListener('mousedown', e => {
+  if (pdfFrame.style.display === 'none') return;
+  // Only initiate on the shell itself or edge zones (not controls bar)
+  if (e.target.closest('.viewer-controls')) return;
+  mDown   = true;
+  mDragged = false;
+  mStartX = e.clientX;
+  pdfFrame.classList.add('dragging');
+  e.preventDefault();
+}, { passive: false });
+
+window.addEventListener('mousemove', e => {
+  if (!mDown) return;
+  const dx = e.clientX - mStartX;
+  if (Math.abs(dx) > 6) mDragged = true;
+  if (mDragged) {
+    const clamped = Math.max(-200, Math.min(200, dx));
+    pdfFrame.style.transform = `translateX(${clamped * 0.7}px)`;
+  }
+});
+
+window.addEventListener('mouseup', e => {
+  if (!mDown) return;
+  mDown = false;
+  pdfFrame.classList.remove('dragging');
+  const dx = e.clientX - mStartX;
+  if (mDragged && Math.abs(dx) > SWIPE_MIN) {
+    navigateBook(dx < 0 ? 'next' : 'prev');
+  } else {
+    pdfFrame.style.transform = '';
+  }
 });
 
 /* Init */
