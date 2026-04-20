@@ -127,6 +127,7 @@
     .hub-card.liveactionmovie { --accent:var(--fire);  --accent-rgb:249,115,22;   }
     .hub-card.liveactionshow  { --accent:#e53935;      --accent-rgb:229,57,53;    }
     .hub-card.books           { --accent:#a87ccc;      --accent-rgb:168,124,204;  }
+    .hub-card.games           { --accent:#3ddc84;      --accent-rgb:61,220,132;   }
     .hub-card:hover {
       box-shadow: 0 16px 55px rgba(var(--accent-rgb),.2), 0 0 0 1px rgba(var(--accent-rgb),.32);
       border-color: rgba(var(--accent-rgb),.38);
@@ -288,6 +289,7 @@
     .sr-dot.movie         { background: var(--gold); }
     .sr-dot.liveactionmovie { background: var(--fire); }
     .sr-dot.liveactionshow  { background: #e53935; }
+    .sr-dot.games           { background: #3ddc84; }
     .sr-info { flex: 1; min-width: 0; }
     .sr-title { font-family: 'Philosopher', serif; font-size: clamp(.8rem,1.5vw,.95rem); color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .sr-meta  { font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: .15rem; }
@@ -497,7 +499,7 @@
     <!-- Movie (2026 Animated) -->
     <a href="movie.html" class="hub-card movie">
       <div class="card-poster">
-        <div class="card-poster-bg" style="background-image:url('images/moviebg.png')"></div>
+        <div class="card-poster-bg" style="background-image:url('images/movie2026bg.png')"></div>
         <div class="card-poster-overlay"></div>
       </div>
       <div class="card-body">
@@ -564,9 +566,9 @@
     </a>
 
     <!-- Live Action Movie (2010) -->
-    <a href="liveaction.html" class="hub-card liveactionmovie">
+    <a href="movie2010.html" class="hub-card liveactionmovie">
       <div class="card-poster">
-        <div class="card-poster-bg" style="background-image:url('images/liveactionbg.png')"></div>
+        <div class="card-poster-bg" style="background-image:url('images/movie2010bg.png')"></div>
         <div class="card-poster-overlay"></div>
       </div>
       <div class="card-body">
@@ -607,6 +609,42 @@
       </div>
     </a>
 
+    <!-- ATLA Games -->
+    <div class="hub-card games">
+      <div class="card-poster">
+        <div class="card-poster-bg" style="background-image:url('images/gamesbg.png')"></div>
+        <div class="card-poster-overlay"></div>
+      </div>
+      <div class="card-body">
+        <span class="card-label">Games · Download</span>
+        <div class="card-title">ATLA Games</div>
+        <div class="card-sub">Avatar Games Collection</div>
+        <div class="card-meta">
+          <span class="card-tag">PC &amp; Mobile</span>
+          <span class="card-tag">Download</span>
+        </div>
+        <div class="card-divider"></div>
+        <div style="display:flex;flex-direction:column;gap:.55rem;margin-top:.6rem;">
+          <a href="https://store.steampowered.com/search/?term=avatar+last+airbender+generations" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:.55rem;text-decoration:none;color:var(--white);font-family:'Philosopher',serif;font-size:clamp(.75rem,1.3vw,.88rem);padding:.45em .7em;border-radius:10px;background:rgba(61,220,132,.07);border:1px solid rgba(61,220,132,.18);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(61,220,132,.14)';this.style.borderColor='rgba(61,220,132,.38)'" onmouseout="this.style.background='rgba(61,220,132,.07)';this.style.borderColor='rgba(61,220,132,.18)'">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0;opacity:.7"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+            Atla Generations
+          </a>
+          <a href="https://store.steampowered.com/search/?term=avatar+last+airbender+quest+for+balance" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:.55rem;text-decoration:none;color:var(--white);font-family:'Philosopher',serif;font-size:clamp(.75rem,1.3vw,.88rem);padding:.45em .7em;border-radius:10px;background:rgba(61,220,132,.07);border:1px solid rgba(61,220,132,.18);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(61,220,132,.14)';this.style.borderColor='rgba(61,220,132,.38)'" onmouseout="this.style.background='rgba(61,220,132,.07)';this.style.borderColor='rgba(61,220,132,.18)'">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0;opacity:.7"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+            Atla Quest for Balance
+          </a>
+          <a href="https://www.magpiegames.com/pages/avatar-legends" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:.55rem;text-decoration:none;color:var(--white);font-family:'Philosopher',serif;font-size:clamp(.75rem,1.3vw,.88rem);padding:.45em .7em;border-radius:10px;background:rgba(61,220,132,.07);border:1px solid rgba(61,220,132,.18);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(61,220,132,.14)';this.style.borderColor='rgba(61,220,132,.38)'" onmouseout="this.style.background='rgba(61,220,132,.07)';this.style.borderColor='rgba(61,220,132,.18)'">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0;opacity:.7"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+            Avatar Legends
+          </a>
+          <a href="https://store.steampowered.com/search/?term=avatar+ultra+lite" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:.55rem;text-decoration:none;color:var(--white);font-family:'Philosopher',serif;font-size:clamp(.75rem,1.3vw,.88rem);padding:.45em .7em;border-radius:10px;background:rgba(61,220,132,.07);border:1px solid rgba(61,220,132,.18);transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(61,220,132,.14)';this.style.borderColor='rgba(61,220,132,.38)'" onmouseout="this.style.background='rgba(61,220,132,.07)';this.style.borderColor='rgba(61,220,132,.18)'">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0;opacity:.7"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+            Ultra Lite
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Merch Section -->
@@ -622,8 +660,7 @@
     </div>
     <div class="merch-grid">
       <a href="https://avatarthelastairbenderstore.com/" target="_blank" rel="noopener" class="merch-card">
-        <div class="merch-img-wrap" style="background:linear-gradient(135deg,rgba(10,17,28,.9),rgba(4,7,13,.95));">
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:56px;height:56px;opacity:.75"><path d="M8 12h48l-5 30H13L8 12z" fill="none" stroke="rgba(201,168,76,.7)" stroke-width="2.5" stroke-linejoin="round"/><path d="M22 12c0-5.5 4.5-10 10-10s10 4.5 10 10" fill="none" stroke="rgba(201,168,76,.7)" stroke-width="2.5"/><circle cx="22" cy="48" r="4" fill="rgba(201,168,76,.7)"/><circle cx="42" cy="48" r="4" fill="rgba(201,168,76,.7)"/></svg>
+        <div class="merch-img-wrap" style="background:linear-gradient(135deg,rgba(10,17,28,.9),rgba(4,7,13,.95));background-image:url('images/storebg');background-size:cover;background-position:center;">
           <span class="merch-badge">Official</span>
         </div>
         <div class="merch-body">
@@ -856,9 +893,14 @@ const ALL_EPISODES = [
   // Animated Movie
   {title:'Aang, The Last Airbender', series:'movie', seriesLabel:'The Animated Film · 2026', ep:'Feature Film', href:'movie.html', cls:'movie'},
   // Live Action Movie
-  {title:'The Last Airbender', series:'liveactionmovie', seriesLabel:'Live Action Film · 2010', ep:'Feature Film', href:'liveaction.html', cls:'liveactionmovie'},
+  {title:'The Last Airbender', series:'liveactionmovie', seriesLabel:'Live Action Film · 2010', ep:'Feature Film', href:'movie2010.html', cls:'liveactionmovie'},
   // Live Action Show
   {title:'Avatar: The Last Airbender (Netflix)', series:'liveactionshow', seriesLabel:'Netflix Live Action · 2024', ep:'Season 1 & 2', href:'liveshow.html', cls:'liveactionshow'},
+  // Games
+  {title:'Atla Generations', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/search/?term=avatar+last+airbender+generations', cls:'games'},
+  {title:'Atla Quest for Balance', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/search/?term=avatar+last+airbender+quest+for+balance', cls:'games'},
+  {title:'Avatar Legends', series:'games', seriesLabel:'ATLA Games', ep:'Official Website', href:'https://www.magpiegames.com/pages/avatar-legends', cls:'games'},
+  {title:'Ultra Lite', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/search/?term=avatar+ultra+lite', cls:'games'},
 ];
 
 const searchInput   = document.getElementById('searchInput');
@@ -977,7 +1019,7 @@ searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runS
   if ('serviceWorker' in navigator) {
     const swCode = `
 const CACHE='avatar-hub-v2';
-const SHELL=['./index.html','./atla.html','./kora.html','./movie.html','./liveaction.html','./liveshow.html','./books.html'];
+const SHELL=['./index.html','./atla.html','./kora.html','./movie.html','./movie2010.html','./liveshow.html','./books.html'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL).catch(()=>{})));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
 self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./index.html'))));});
