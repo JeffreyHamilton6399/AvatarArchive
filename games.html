@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ATLA Games — Avatar Hub</title>
+  <meta name="theme-color" content="#04070d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ATLA Games">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="icon" type="image/jpeg" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cinzel+Decorative:wght@400;700;900&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --deep:   #04070d;
+      --panel:  #0a111c;
+      --blue:   #4db8ff;
+      --white:  #f0f4ff;
+      --muted:  #6b8aab;
+      --dim:    #2d3f56;
+      --border: rgba(255,255,255,0.06);
+      --gold:   #c9a84c;
+      --green:  #3ddc84;
+      --green-rgb: 61,220,132;
+      --air:    #f5c518;
+      --water:  #4db8ff;
+      --earth:  #6abf69;
+      --fire:   #f97316;
+    }
+
+    @keyframes slideUp    { from{opacity:0;transform:translateY(36px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes overlayOut { from{opacity:1} to{opacity:0} }
+    @keyframes pulseGreen { 0%,100%{filter:drop-shadow(0 0 5px #3ddc84)} 50%{filter:drop-shadow(0 0 18px #3ddc84)} }
+    @keyframes pulseGlowAir   { 0%,100%{filter:drop-shadow(0 0 5px #f5c518)} 50%{filter:drop-shadow(0 0 18px #f5c518)} }
+    @keyframes pulseGlowWater { 0%,100%{filter:drop-shadow(0 0 5px #4db8ff)} 50%{filter:drop-shadow(0 0 18px #4db8ff)} }
+    @keyframes pulseGlowEarth { 0%,100%{filter:drop-shadow(0 0 5px #6abf69)} 50%{filter:drop-shadow(0 0 18px #6abf69)} }
+    @keyframes pulseGlowFire  { 0%,100%{filter:drop-shadow(0 0 5px #f97316)} 50%{filter:drop-shadow(0 0 18px #f97316)} }
+    @keyframes cardIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shimmerBar { 0%{background-position:-200% center} 100%{background-position:200% center} }
+
+    body {
+      background: var(--deep);
+      color: var(--white);
+      font-family: 'Philosopher', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-layer {
+      position: fixed; inset: 0;
+      background-image: url('images/gamesbg.png');
+      background-size: cover; background-position: center top;
+      filter: blur(8px) brightness(0.18) saturate(1.5) hue-rotate(100deg);
+      transform: scale(1.04); z-index: 0;
+    }
+    .bg-layer::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom,rgba(4,7,13,.65) 0%,transparent 30%,transparent 65%,rgba(4,7,13,.8) 100%);
+    }
+
+    /* ── Intro overlay ── */
+    #introOverlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(4,7,13,.75); backdrop-filter: blur(2px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;
+      cursor: pointer;
+    }
+    #introOverlay.fade-out { animation: overlayOut .65s ease forwards; pointer-events: none; }
+    .intro-tagline {
+      font-family: 'Philosopher', serif; font-size: clamp(.6rem,1.6vw,.8rem);
+      font-style: italic; letter-spacing: .5em; text-transform: uppercase;
+      color: rgba(61,220,132,.6); opacity: 0; transition: opacity .6s ease .15s;
+    }
+    #introOverlay.symbols-in .intro-tagline { opacity: 1; }
+    .symbols-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: clamp(2rem,5vw,5rem); align-items: center; justify-items: center;
+    }
+    @media(max-width:600px){ .symbols-grid{ grid-template-columns:repeat(2,1fr); gap:2rem } }
+    .sym-item {
+      display: flex; flex-direction: column; align-items: center; gap: .9rem;
+      opacity: 0; transform: scale(.78);
+      transition: opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1);
+    }
+    #introOverlay.symbols-in .sym-item { opacity:1; transform:scale(1); }
+    .sym-img { width: clamp(64px,8vw,100px); height: clamp(64px,8vw,100px); object-fit: contain; }
+    .sym-item.air   .sym-img { animation: pulseGlowAir   2.6s ease-in-out infinite 0s; }
+    .sym-item.water .sym-img { animation: pulseGlowWater 2.6s ease-in-out infinite .4s; }
+    .sym-item.earth .sym-img { animation: pulseGlowEarth 2.6s ease-in-out infinite .8s; }
+    .sym-item.fire  .sym-img { animation: pulseGlowFire  2.6s ease-in-out infinite 1.2s; }
+    .sym-label { font-family:'Philosopher',serif; font-size:clamp(.55rem,1.3vw,.7rem); letter-spacing:.3em; text-transform:uppercase; }
+    .sym-item.air   .sym-label { color:var(--air); }
+    .sym-item.water .sym-label { color:var(--water); }
+    .sym-item.earth .sym-label { color:var(--earth); }
+    .sym-item.fire  .sym-label { color:var(--fire); }
+    .intro-hint {
+      font-family: 'Cinzel', serif; font-size: clamp(.38rem,.9vw,.48rem);
+      letter-spacing: .35em; text-transform: uppercase; color: rgba(61,220,132,.35);
+      opacity: 0; transition: opacity .6s ease 1.2s;
+    }
+    #introOverlay.symbols-in .intro-hint { opacity: 1; }
+
+    /* ── Page ── */
+    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .anim-header, .anim-hero, .anim-grid { opacity: 0; }
+    body.page-ready .anim-header { animation: slideUp .7s cubic-bezier(.22,1,.36,1) .05s both; }
+    body.page-ready .anim-hero   { animation: slideUp .8s cubic-bezier(.22,1,.36,1) .18s both; }
+    body.page-ready .anim-grid   { animation: slideUp .9s cubic-bezier(.22,1,.36,1) .32s both; }
+
+    /* ── Header ── */
+    header {
+      padding: 1.4rem clamp(1.5rem,5vw,4rem);
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .back-link {
+      font-family: 'Cinzel', serif; font-size: .52rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; border: 1px solid var(--dim);
+      padding: .4em 1.2em; border-radius: 30px;
+      transition: color .2s, border-color .2s;
+      display: flex; align-items: center; gap: .5em;
+    }
+    .back-link:hover { color: var(--green); border-color: rgba(61,220,132,.4); }
+    .header-tag {
+      font-family: 'Cinzel', serif; font-size: .55rem; letter-spacing: .35em;
+      text-transform: uppercase; color: var(--muted); border: 1px solid var(--dim);
+      padding: .4em 1.2em; border-radius: 30px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: clamp(3rem,6vh,5rem) 2rem clamp(1.5rem,3vh,2.5rem);
+    }
+    .hero-eyebrow {
+      font-family: 'Cinzel', serif; font-size: clamp(.44rem,1.1vw,.56rem);
+      letter-spacing: .45em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem;
+    }
+    .hero-main {
+      font-family: 'Cinzel Decorative', serif; font-weight: 900;
+      font-size: clamp(2.2rem,5vw,4rem); letter-spacing: .1em;
+      background: linear-gradient(135deg,#fff 0%,#a0ffcc 40%,#3ddc84 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: .4rem;
+    }
+    .hero-sub {
+      font-family: 'Philosopher', serif; font-style: italic;
+      font-size: clamp(.9rem,2.2vw,1.3rem); color: var(--muted); letter-spacing: .2em;
+    }
+    .hero-divider {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right,transparent,rgba(61,220,132,.5),transparent);
+      margin: 1.5rem auto 0;
+    }
+
+    /* ── Games grid ── */
+    .games-grid {
+      width: 100%; max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(2,1fr);
+      gap: clamp(1.2rem,2.5vw,2rem);
+      padding: clamp(2rem,4vh,3.5rem) clamp(1.5rem,5vw,4rem) clamp(4rem,8vh,7rem);
+    }
+    @media(max-width:640px) {
+      .games-grid { grid-template-columns: 1fr; padding-left: 1.2rem; padding-right: 1.2rem; }
+    }
+
+    /* ── Game card ── */
+    .game-card {
+      position: relative;
+      background: linear-gradient(160deg,rgba(10,17,28,.95) 0%,rgba(6,11,20,.98) 100%);
+      border: 1px solid rgba(61,220,132,.15);
+      border-radius: 18px; overflow: hidden;
+      display: flex; flex-direction: column;
+      opacity: 0;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, border-color .35s ease;
+    }
+    body.page-ready .game-card { animation: cardIn .7s cubic-bezier(.22,1,.36,1) both; }
+    body.page-ready .game-card:nth-child(1) { animation-delay: .38s; }
+    body.page-ready .game-card:nth-child(2) { animation-delay: .48s; }
+    body.page-ready .game-card:nth-child(3) { animation-delay: .58s; }
+    body.page-ready .game-card:nth-child(4) { animation-delay: .68s; }
+    .game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 55px rgba(61,220,132,.18), 0 0 0 1px rgba(61,220,132,.3);
+      border-color: rgba(61,220,132,.35);
+    }
+
+    /* Top accent bar */
+    .game-card::before {
+      content: ''; display: block; height: 3px;
+      background: linear-gradient(to right, rgba(61,220,132,.6), rgba(77,184,255,.3), transparent);
+    }
+
+    .game-body { padding: 1.6rem 1.8rem 1.8rem; flex: 1; display: flex; flex-direction: column; gap: .6rem; }
+
+    .game-platform {
+      font-family: 'Cinzel', serif; font-size: clamp(.36rem,.8vw,.46rem);
+      letter-spacing: .35em; text-transform: uppercase; color: var(--green);
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .game-platform svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    .game-title {
+      font-family: 'Cinzel Decorative', serif; font-weight: 700;
+      font-size: clamp(.95rem,1.8vw,1.2rem); color: var(--white);
+      letter-spacing: .04em; line-height: 1.3;
+    }
+
+    .game-desc {
+      font-family: 'Philosopher', serif; font-style: italic;
+      font-size: clamp(.78rem,1.3vw,.9rem); color: var(--muted);
+      line-height: 1.6; flex: 1;
+    }
+
+    .game-tags {
+      display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .3rem;
+    }
+    .game-tag {
+      font-family: 'Cinzel', serif; font-size: clamp(.34rem,.7vw,.42rem);
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--green); border: 1px solid rgba(61,220,132,.25);
+      padding: .22em .7em; border-radius: 20px; background: rgba(61,220,132,.05);
+    }
+
+    .game-divider {
+      height: 1px; background: linear-gradient(to right,rgba(61,220,132,.2),transparent);
+      margin-top: .8rem;
+    }
+
+    /* Big download button */
+    .download-btn {
+      display: flex; align-items: center; justify-content: center; gap: .7rem;
+      margin-top: 1.1rem;
+      padding: .85em 1.4em;
+      background: linear-gradient(135deg,rgba(61,220,132,.15),rgba(61,220,132,.08));
+      border: 1px solid rgba(61,220,132,.35);
+      border-radius: 12px;
+      color: var(--green); text-decoration: none;
+      font-family: 'Cinzel', serif; font-size: clamp(.44rem,.95vw,.56rem);
+      letter-spacing: .25em; text-transform: uppercase;
+      transition: background .25s, border-color .25s, color .25s, transform .2s;
+      position: relative; overflow: hidden;
+    }
+    .download-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(105deg,transparent 40%,rgba(255,255,255,.08) 50%,transparent 60%);
+      background-size: 200% 100%; opacity: 0;
+      transition: opacity .3s;
+    }
+    .download-btn:hover { background: linear-gradient(135deg,rgba(61,220,132,.28),rgba(61,220,132,.15)); border-color: rgba(61,220,132,.65); color: #fff; transform: scale(1.02); }
+    .download-btn:hover::after { opacity: 1; animation: shimmerBar .6s ease; }
+    .download-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* Steam icon */
+    .steam-badge {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-family: 'Cinzel', serif; font-size: clamp(.32rem,.65vw,.4rem);
+      letter-spacing: .15em; text-transform: uppercase;
+      color: rgba(61,220,132,.5); margin-top: .5rem;
+    }
+    .steam-badge svg { width: 10px; height: 10px; opacity: .6; }
+
+    /* ── Jeffrey watermark ── */
+    .jeffrey-watermark {
+      position: fixed; bottom: 14px; right: 18px; z-index: 50;
+      display: inline-flex; align-items: center; gap: 5px;
+      text-decoration: none; font-family: 'Cinzel', serif;
+      font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(107,138,171,.45); transition: color .2s, opacity .2s; opacity: .6;
+    }
+    .jeffrey-watermark:hover { color: rgba(240,244,255,.7); opacity: 1; }
+
+    /* ── Particles ── */
+    #particleCanvas { position:fixed;top:0;left:0;z-index:0;pointer-events:none;opacity:0.4;width:100%;height:100%; }
+
+    /* ── Mobile ── */
+    @media(max-width:640px) {
+      header { padding: 1.1rem 1.2rem; }
+      .hero { padding: 2.2rem 1.2rem 1.5rem; }
+      .game-body { padding: 1.3rem 1.4rem 1.5rem; }
+      .download-btn { padding: 1em 1.2em; font-size: .52rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Intro overlay ── -->
+<div id="introOverlay">
+  <p class="intro-tagline">The Avatar World</p>
+  <div class="symbols-grid">
+    <div class="sym-item air">   <img class="sym-img" src="images/air.png"   alt="Air">   <span class="sym-label">Air</span></div>
+    <div class="sym-item water"> <img class="sym-img" src="images/water.png" alt="Water"> <span class="sym-label">Water</span></div>
+    <div class="sym-item earth"> <img class="sym-img" src="images/earth.png" alt="Earth"> <span class="sym-label">Earth</span></div>
+    <div class="sym-item fire">  <img class="sym-img" src="images/fire.png"  alt="Fire">  <span class="sym-label">Fire</span></div>
+  </div>
+  <p class="intro-hint">Tap anywhere to enter</p>
+</div>
+
+<!-- ── Background + particles ── -->
+<div class="bg-layer"></div>
+<canvas id="particleCanvas"></canvas>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="anim-header">
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      Back to Hub
+    </a>
+    <span class="header-tag">Avatar Games</span>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero anim-hero">
+    <p class="hero-eyebrow">The Avatar Universe · Games</p>
+    <h1 class="hero-main">ATLA Games</h1>
+    <p class="hero-sub">Download &amp; Play</p>
+    <div class="hero-divider"></div>
+  </div>
+
+  <!-- Games grid -->
+  <div class="games-grid anim-grid">
+
+    <!-- Atla Generations -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93l-3.61 6.25h7.22L11.64 5.93zM4.5 18.07c1.11 0 2.01-.9 2.01-2.01S5.61 14.05 4.5 14.05 2.49 14.95 2.49 16.06s.9 2.01 2.01 2.01zm18.99-3.5c0 .67-.33 1.26-.83 1.62l-2.64 4.57c-.3.52-.86.84-1.46.84H5.94c-.6 0-1.16-.32-1.46-.84l-2.64-4.57A1.94 1.94 0 0 1 1 14.57c0-1.07.87-1.94 1.94-1.94h18.12c1.07 0 1.93.87 1.93 1.94z"/></svg>
+          Steam · PC &amp; Mobile
+        </div>
+        <div class="game-title">Atla Generations</div>
+        <div class="game-desc">An Avatar-era adventure spanning multiple generations of benders and warriors across the four nations.</div>
+        <div class="game-tags">
+          <span class="game-tag">RPG</span>
+          <span class="game-tag">Adventure</span>
+          <span class="game-tag">PC</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://store.steampowered.com/search/?term=avatar+last+airbender+generations" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+          Download on Steam
+        </a>
+      </div>
+    </div>
+
+    <!-- Atla Quest for Balance -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93l-3.61 6.25h7.22L11.64 5.93zM4.5 18.07c1.11 0 2.01-.9 2.01-2.01S5.61 14.05 4.5 14.05 2.49 14.95 2.49 16.06s.9 2.01 2.01 2.01zm18.99-3.5c0 .67-.33 1.26-.83 1.62l-2.64 4.57c-.3.52-.86.84-1.46.84H5.94c-.6 0-1.16-.32-1.46-.84l-2.64-4.57A1.94 1.94 0 0 1 1 14.57c0-1.07.87-1.94 1.94-1.94h18.12c1.07 0 1.93.87 1.93 1.94z"/></svg>
+          Steam · PC &amp; Console
+        </div>
+        <div class="game-title">Quest for Balance</div>
+        <div class="game-desc">Master all four elements as Aang in this action-platformer retelling the events of the original series.</div>
+        <div class="game-tags">
+          <span class="game-tag">Action</span>
+          <span class="game-tag">Platformer</span>
+          <span class="game-tag">PC</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://store.steampowered.com/search/?term=avatar+last+airbender+quest+for+balance" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+          Download on Steam
+        </a>
+      </div>
+    </div>
+
+    <!-- Avatar Legends TTRPG -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          Official Site · Tabletop RPG
+        </div>
+        <div class="game-title">Avatar Legends</div>
+        <div class="game-desc">The official Avatar tabletop roleplaying game by Magpie Games. Create your own bender and adventure through the four nations.</div>
+        <div class="game-tags">
+          <span class="game-tag">TTRPG</span>
+          <span class="game-tag">Tabletop</span>
+          <span class="game-tag">Official</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://www.magpiegames.com/pages/avatar-legends" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+          Visit Official Site
+        </a>
+      </div>
+    </div>
+
+    <!-- Ultra Lite -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93l-3.61 6.25h7.22L11.64 5.93zM4.5 18.07c1.11 0 2.01-.9 2.01-2.01S5.61 14.05 4.5 14.05 2.49 14.95 2.49 16.06s.9 2.01 2.01 2.01zm18.99-3.5c0 .67-.33 1.26-.83 1.62l-2.64 4.57c-.3.52-.86.84-1.46.84H5.94c-.6 0-1.16-.32-1.46-.84l-2.64-4.57A1.94 1.94 0 0 1 1 14.57c0-1.07.87-1.94 1.94-1.94h18.12c1.07 0 1.93.87 1.93 1.94z"/></svg>
+          Steam · Lightweight
+        </div>
+        <div class="game-title">Ultra Lite</div>
+        <div class="game-desc">A lightweight Avatar experience optimised for lower-end devices — fast to download, fast to play.</div>
+        <div class="game-tags">
+          <span class="game-tag">Casual</span>
+          <span class="game-tag">Lightweight</span>
+          <span class="game-tag">PC</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://store.steampowered.com/search/?term=avatar+ultra+lite" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+          Download on Steam
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Jeffrey Creates watermark -->
+<a class="jeffrey-watermark" href="https://www.youtube.com/@Jeffrey_Creates" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24" style="width:9px;height:9px;fill:#ff1c1c;flex-shrink:0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+  Jeffrey Creates
+</a>
+
+<script>
+/* ── Intro overlay ── */
+const introOverlay = document.getElementById('introOverlay');
+let introDone = false;
+requestAnimationFrame(() => setTimeout(() => introOverlay.classList.add('symbols-in'), 60));
+function dismissIntro() {
+  if (introDone) return; introDone = true;
+  introOverlay.classList.add('fade-out');
+  setTimeout(() => { introOverlay.style.display = 'none'; document.body.classList.add('page-ready'); }, 650);
+}
+introOverlay.addEventListener('click', dismissIntro, { once: true });
+introOverlay.addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'Enter') dismissIntro(); });
+introOverlay.setAttribute('tabindex', '0');
+setTimeout(() => { if (!introDone) dismissIntro(); }, 5000);
+
+/* ── Ambient particles ── */
+(function() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx    = canvas.getContext('2d');
+  const BASE   = 'images/';
+  const imgs   = ['air','water','earth','fire'].map(n => {
+    const img = new Image(); img.crossOrigin = 'anonymous'; img.src = BASE + n + '.png'; return img;
+  });
+  let W, H, particles = [];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  function rand(a,b){ return a + Math.random()*(b-a); }
+  function spawn() {
+    const img  = imgs[Math.floor(Math.random()*imgs.length)];
+    const type = Math.random()<.4 ? 'orbit' : (Math.random()<.5 ? 'wave' : 'drift');
+    const base = { img, x:rand(0,W), y:rand(0,H), alpha:rand(.04,.1), size:rand(10,22),
+                   rot:rand(0,Math.PI*2), vrot:rand(-.004,.004), type };
+    if (type==='orbit') return {...base, cx:rand(0,W), cy:rand(0,H), rx:rand(40,160), ry:rand(30,110),
+                                angle:rand(0,Math.PI*2), speed:rand(.002,.006)*(Math.random()<.5?1:-1)};
+    const angle=rand(0,Math.PI*2), sp=rand(.06,.22);
+    if (type==='wave') return {...base, vx:Math.cos(angle)*sp, vy:Math.sin(angle)*sp,
+                                wAmp:rand(.4,1.6), wFreq:rand(.008,.02), wOff:rand(0,Math.PI*2), t:0};
+    return {...base, vx:Math.cos(angle)*sp, vy:Math.sin(angle)*sp};
+  }
+  for (let i=0; i<80; i++) particles.push(spawn());
+  const pad = 60;
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    for (const p of particles) {
+      if (p.type==='orbit') {
+        p.angle += p.speed; p.x = p.cx + Math.cos(p.angle)*p.rx; p.y = p.cy + Math.sin(p.angle)*p.ry;
+      } else if (p.type==='wave') {
+        p.t++; p.x += p.vx + Math.sin(p.t*p.wFreq+p.wOff)*p.wAmp*.08; p.y += p.vy;
+      } else { p.x += p.vx; p.y += p.vy; }
+      p.rot += p.vrot;
+      if (p.type!=='orbit' && (p.x<-pad||p.x>W+pad||p.y<-pad||p.y>H+pad)) {
+        Object.assign(p, spawn()); p.x=rand(0,W); p.y=rand(0,H); continue;
+      }
+      if (!p.img.complete || !p.img.naturalWidth) continue;
+      ctx.save(); ctx.globalAlpha=p.alpha;
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.drawImage(p.img,-p.size/2,-p.size/2,p.size,p.size);
+      ctx.restore();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
