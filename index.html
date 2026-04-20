@@ -68,36 +68,105 @@
     body.theme-water    .search-input::placeholder,
     body.theme-earth    .search-input::placeholder { color: var(--dim); }
 
-    /* ── Theme toggle button ── */
-    #themeBtn {
-      position: fixed; bottom: 14px; left: 220px; z-index: 50;
-      display: inline-flex; align-items: center; gap: 6px;
+    /* ── Settings button + panel ── */
+    #settingsBtn {
+      position: fixed; bottom: 14px; left: 18px; z-index: 50;
+      width: 36px; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(4,7,13,.72); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 50%; cursor: pointer;
+      color: rgba(107,138,171,.65);
+      transition: color .25s, border-color .25s, background .25s, transform .3s; opacity: .78;
+    }
+    #settingsBtn:hover { color: var(--gold); border-color: rgba(201,168,76,.45); background: rgba(201,168,76,.07); opacity: 1; }
+    #settingsBtn.open { color: var(--gold); border-color: rgba(201,168,76,.55); background: rgba(201,168,76,.1); opacity: 1; transform: rotate(45deg); }
+    #settingsBtn svg { width: 15px; height: 15px; }
+
+    #settingsPanel {
+      position: fixed; bottom: 60px; left: 12px; z-index: 100;
+      background: rgba(7,12,22,.97); border: 1px solid rgba(201,168,76,.2);
+      border-radius: 18px; padding: 1.1rem 1rem; display: none; flex-direction: column; gap: 1.1rem;
+      backdrop-filter: blur(24px); box-shadow: 0 8px 40px rgba(0,0,0,.65); min-width: 200px;
+      transform-origin: bottom left;
+      animation: panelIn .2s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes panelIn { from{opacity:0;transform:scale(.93) translateY(6px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    #settingsPanel.open { display: flex; }
+
+    .sp-section-label {
+      font-family: 'Cinzel', serif; font-size: .38rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: .3rem;
+    }
+    .sp-section { display: flex; flex-direction: column; gap: .3rem; }
+    .sp-divider { height: 1px; background: rgba(255,255,255,.07); }
+
+    /* Ambient toggle row inside panel */
+    .sp-ambient-row {
+      display: flex; align-items: center; justify-content: space-between; gap: .8rem;
+      padding: .45em .5em; border-radius: 8px; cursor: pointer;
+      transition: background .15s;
+    }
+    .sp-ambient-row:hover { background: rgba(255,255,255,.05); }
+    .sp-ambient-label {
       font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
-      color: rgba(201,168,76,.6); background: none; border: 1px solid rgba(201,168,76,.25);
-      border-radius: 20px; padding: .35em 1em; cursor: pointer;
-      transition: color .25s, border-color .25s, background .25s; opacity: .75;
+      color: rgba(240,244,255,.7); display: flex; align-items: center; gap: .55rem;
     }
-    #themeBtn:hover { color: var(--gold); border-color: rgba(201,168,76,.65); background: rgba(201,168,76,.08); opacity: 1; }
-    /* Theme picker popup */
-    #themePicker {
-      position: fixed; bottom: 48px; left: 220px; z-index: 100;
-      background: rgba(8,13,24,.97); border: 1px solid rgba(201,168,76,.25);
-      border-radius: 14px; padding: .7rem .6rem; display: none; flex-direction: column; gap: .4rem;
-      backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,.6); min-width: 160px;
+    .ambient-wave { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+    .ambient-wave span { display: block; width: 2px; background: currentColor; border-radius: 2px; transform-origin: bottom; }
+    .sp-ambient-row.active .ambient-wave span { animation: waveBar .7s ease-in-out infinite alternate; }
+    .sp-ambient-row.active .sp-ambient-label { color: var(--gold); }
+    .sp-toggle {
+      width: 30px; height: 17px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15);
+      background: rgba(255,255,255,.08); position: relative; transition: background .2s, border-color .2s; flex-shrink: 0;
     }
-    #themePicker.open { display: flex; }
+    .sp-toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,.5);
+      transition: transform .2s, background .2s;
+    }
+    .sp-ambient-row.active .sp-toggle { background: rgba(201,168,76,.35); border-color: rgba(201,168,76,.55); }
+    .sp-ambient-row.active .sp-toggle::after { transform: translateX(13px); background: var(--gold); }
+    @keyframes waveBar { from { height: 3px; } to { height: 11px; } }
+
+    /* Theme options inside panel */
     .theme-opt {
-      font-family: 'Cinzel', serif; font-size: .44rem; letter-spacing: .2em; text-transform: uppercase;
+      font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
       color: rgba(240,244,255,.7); background: none; border: none; text-align: left;
-      padding: .45em .8em; border-radius: 8px; cursor: pointer;
+      padding: .4em .6em; border-radius: 8px; cursor: pointer;
       transition: background .15s, color .15s; display: flex; align-items: center; gap: .6rem;
     }
     .theme-opt:hover { background: rgba(255,255,255,.07); color: var(--white,#f0f4ff); }
     .theme-opt.active { color: var(--gold,#c9a84c); }
     .theme-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Install row inside panel */
+    .sp-install-row {
+      display: flex; align-items: center; gap: .6rem;
+      padding: .4em .5em; border-radius: 8px; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(240,244,255,.55); background: none; border: none; text-align: left; width: 100%;
+      transition: background .15s, color .15s;
+    }
+    .sp-install-row:hover { background: rgba(255,255,255,.06); color: rgba(240,244,255,.85); }
+
+    /* Sound nudge */
+    #soundNudge {
+      position: fixed; bottom: 60px; left: 14px; z-index: 51;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold); background: rgba(6,10,20,.92);
+      border: 1px solid rgba(201,168,76,.35); border-radius: 30px;
+      padding: .45em 1.1em; cursor: pointer; backdrop-filter: blur(18px);
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      opacity: 0; transform: translateY(8px); pointer-events: none;
+      transition: opacity .4s ease, transform .4s ease;
+    }
+    #soundNudge.show { opacity: 1; transform: translateY(0); pointer-events: all; }
+    #soundNudge:hover { background: rgba(201,168,76,.12); border-color: rgba(201,168,76,.65); }
+
     @media(max-width:640px) {
-      #themeBtn { left: auto; right: 18px; bottom: 52px; }
-      #themePicker { left: auto; right: 18px; bottom: 96px; }
+      #settingsBtn { left: 14px; bottom: 14px; }
+      #settingsPanel { left: 10px; bottom: 60px; }
     }
 
     @keyframes slideUp    { from{opacity:0;transform:translateY(36px)} to{opacity:1;transform:translateY(0)} }
@@ -440,17 +509,6 @@
     }
     .hub-card .card-cta.resume-cta { color: var(--gold); }
 
-    /* ── Install / Download App button ── */
-    #installBtn {
-      position: fixed; bottom: 14px; left: 110px; z-index: 50;
-      display: none; align-items: center; gap: 6px;
-      font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
-      color: rgba(201,168,76,.6); background: none; border: 1px solid rgba(201,168,76,.25);
-      border-radius: 20px; padding: .35em 1em; cursor: pointer;
-      transition: color .25s, border-color .25s, background .25s; opacity: .75;
-    }
-    #installBtn:hover { color: var(--gold); border-color: rgba(201,168,76,.65); background: rgba(201,168,76,.08); opacity: 1; }
-    #installBtn.visible { display: inline-flex; }
     #installModal {
       position: fixed; inset: 0; z-index: 300;
       background: rgba(4,7,13,.88); backdrop-filter: blur(8px);
@@ -481,40 +539,6 @@
     }
     .install-close:hover { color: var(--white); border-color: rgba(255,255,255,.3); }
 
-    /* ── Ambient sound toggle ── */
-    #ambientBtn {
-      position: fixed; bottom: 14px; left: 18px; z-index: 50;
-      display: inline-flex; align-items: center; gap: 7px;
-      font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
-      color: rgba(107,138,171,.65); background: rgba(4,7,13,.65);
-      border: 1px solid rgba(255,255,255,.1); border-radius: 30px;
-      padding: .42em 1em; cursor: pointer;
-      transition: color .25s, border-color .25s, background .25s; opacity: .8;
-    }
-    #ambientBtn:hover { color: var(--gold); border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.07); opacity: 1; }
-    #ambientBtn.active { color: var(--gold); border-color: rgba(201,168,76,.45); background: rgba(201,168,76,.09); opacity: 1; }
-    .ambient-wave { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
-    .ambient-wave span { display: block; width: 2px; background: currentColor; border-radius: 2px; transform-origin: bottom; }
-    #ambientBtn.active .ambient-wave span { animation: waveBar .7s ease-in-out infinite alternate; }
-    #ambientBtn.active .ambient-wave span:nth-child(2) { animation-delay: .12s; }
-    #ambientBtn.active .ambient-wave span:nth-child(3) { animation-delay: .24s; }
-    #ambientBtn.active .ambient-wave span:nth-child(4) { animation-delay: .36s; }
-    @keyframes waveBar { from { height: 3px; } to { height: 11px; } }
-
-    /* ── Sound-unlock nudge (shown when autoplay is blocked) ── */
-    #soundNudge {
-      position: fixed; bottom: 52px; left: 14px; z-index: 51;
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .18em; text-transform: uppercase;
-      color: var(--gold); background: rgba(6,10,20,.92);
-      border: 1px solid rgba(201,168,76,.35); border-radius: 30px;
-      padding: .45em 1.1em; cursor: pointer; backdrop-filter: blur(18px);
-      box-shadow: 0 4px 20px rgba(0,0,0,.5);
-      opacity: 0; transform: translateY(8px); pointer-events: none;
-      transition: opacity .4s ease, transform .4s ease;
-    }
-    #soundNudge.show { opacity: 1; transform: translateY(0); pointer-events: all; }
-    #soundNudge:hover { background: rgba(201,168,76,.12); border-color: rgba(201,168,76,.65); }
   </style>
 </head>
 <body>
@@ -576,28 +600,6 @@
       </div>
     </a>
 
-    <!-- Movie (2026 Animated) -->
-    <a href="movie.html" class="hub-card movie">
-      <div class="card-poster">
-        <div class="card-poster-bg" style="background-image:url('images/movie2026bg.png')"></div>
-        <div class="card-poster-overlay"></div>
-      </div>
-      <div class="card-body">
-        <span class="card-label">Animated Film · 2026</span>
-        <div class="card-title">Aang, The Last Airbender</div>
-        <div class="card-sub">Avatar: The Movie</div>
-        <div class="card-meta">
-          <span class="card-tag">Avatar Studios</span>
-          <span class="card-tag">Paramount+</span>
-        </div>
-        <div class="card-divider"></div>
-        <div class="card-cta">
-          Watch Now
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-      </div>
-    </a>
-
     <!-- Korra -->
     <a href="kora.html" class="hub-card korra">
       <div class="card-poster">
@@ -616,6 +618,50 @@
         </div>
         <div class="card-divider"></div>
         <div class="card-cta" id="korraCta">
+          Watch Now
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Live Action Show (Netflix 2024) -->
+    <a href="liveshow.html" class="hub-card liveactionshow">
+      <div class="card-poster">
+        <div class="card-poster-bg" style="background-image:url('images/liveshowbg.png')"></div>
+        <div class="card-poster-overlay"></div>
+      </div>
+      <div class="card-body">
+        <span class="card-label">Netflix Series · 2024</span>
+        <div class="card-title">The Last Airbender</div>
+        <div class="card-sub">Netflix Live Action Series</div>
+        <div class="card-meta">
+          <span class="card-tag">2 Seasons</span>
+          <span class="card-tag">Netflix · 2024</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-cta">
+          Watch Now
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Movie (2026 Animated) -->
+    <a href="movie.html" class="hub-card movie">
+      <div class="card-poster">
+        <div class="card-poster-bg" style="background-image:url('images/movie2026bg.png')"></div>
+        <div class="card-poster-overlay"></div>
+      </div>
+      <div class="card-body">
+        <span class="card-label">Animated Film · 2026</span>
+        <div class="card-title">Aang, The Last Airbender</div>
+        <div class="card-sub">Avatar: The Movie</div>
+        <div class="card-meta">
+          <span class="card-tag">Avatar Studios</span>
+          <span class="card-tag">Paramount+</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-cta">
           Watch Now
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </div>
@@ -658,28 +704,6 @@
         <div class="card-meta">
           <span class="card-tag">M. Night Shyamalan</span>
           <span class="card-tag">2010</span>
-        </div>
-        <div class="card-divider"></div>
-        <div class="card-cta">
-          Watch Now
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-      </div>
-    </a>
-
-    <!-- Live Action Show (Netflix 2024) -->
-    <a href="liveshow.html" class="hub-card liveactionshow">
-      <div class="card-poster">
-        <div class="card-poster-bg" style="background-image:url('images/liveshowbg.png')"></div>
-        <div class="card-poster-overlay"></div>
-      </div>
-      <div class="card-body">
-        <span class="card-label">Netflix Series · 2024</span>
-        <div class="card-title">The Last Airbender</div>
-        <div class="card-sub">Netflix Live Action Series</div>
-        <div class="card-meta">
-          <span class="card-tag">2 Seasons</span>
-          <span class="card-tag">Netflix · 2024</span>
         </div>
         <div class="card-divider"></div>
         <div class="card-cta">
@@ -751,32 +775,65 @@
 
 </div>
 
-<!-- Audio -->
+<!-- Ambient sound elements (hidden, managed via settings panel) -->
 <audio id="introAudio" src="audio/intro.mp3" preload="auto"></audio>
 <audio id="ambientAudio" src="audio/ambient.mp3" loop preload="auto"></audio>
 
-<!-- Ambient sound button -->
-<button id="ambientBtn" title="Toggle ambient sound">
-  <div class="ambient-wave">
-    <span style="height:5px"></span>
-    <span style="height:9px"></span>
-    <span style="height:7px"></span>
-    <span style="height:11px"></span>
-  </div>
-  Ambient
+<!-- Unified settings button -->
+<button id="settingsBtn" title="Settings">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
 </button>
+
+<!-- Settings panel -->
+<div id="settingsPanel">
+  <!-- Ambient sound -->
+  <div class="sp-section">
+    <div class="sp-section-label">Sound</div>
+    <div class="sp-ambient-row" id="ambientRow" title="Toggle ambient sound">
+      <div class="sp-ambient-label">
+        <div class="ambient-wave">
+          <span style="height:5px"></span>
+          <span style="height:9px"></span>
+          <span style="height:7px"></span>
+          <span style="height:11px"></span>
+        </div>
+        Ambient
+      </div>
+      <div class="sp-toggle"></div>
+    </div>
+  </div>
+  <div class="sp-divider"></div>
+  <!-- Theme -->
+  <div class="sp-section">
+    <div class="sp-section-label">Theme</div>
+    <button class="theme-opt active" data-theme="dark">
+      <span class="theme-swatch" style="background:#04070d;border:1px solid rgba(255,255,255,.2)"></span> Dark
+    </button>
+    <button class="theme-opt" data-theme="theme-parchment">
+      <span class="theme-swatch" style="background:#c9a84c"></span> Parchment
+    </button>
+    <button class="theme-opt" data-theme="theme-water">
+      <span class="theme-swatch" style="background:#4db8ff"></span> Water
+    </button>
+    <button class="theme-opt" data-theme="theme-earth">
+      <span class="theme-swatch" style="background:#6abf69"></span> Earth
+    </button>
+  </div>
+  <div class="sp-divider"></div>
+  <!-- Install -->
+  <div class="sp-section">
+    <button class="sp-install-row" id="installBtn" title="Download Avatar Hub App">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0;opacity:.6"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+      Download App
+    </button>
+  </div>
+</div>
 
 <!-- Shown when browser blocks autoplay -->
 <div id="soundNudge" title="Click to enable ambient sound">
   <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
   Enable Sound
 </div>
-
-<!-- Download App button -->
-<button id="installBtn" class="visible" title="Download Avatar Hub App">
-  <svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px;flex-shrink:0"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
-  Download App
-</button>
 
 <!-- Install instructions modal -->
 <div id="installModal">
@@ -798,34 +855,14 @@
   Jeffrey Creates
 </a>
 
-<!-- ── Theme Toggle ── -->
-<button id="themeBtn" title="Change theme">
-  <svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px;flex-shrink:0"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
-  Theme
-</button>
-<div id="themePicker">
-  <button class="theme-opt active" data-theme="dark">
-    <span class="theme-swatch" style="background:#04070d;border:1px solid rgba(255,255,255,.2)"></span> Dark
-  </button>
-  <button class="theme-opt" data-theme="theme-parchment">
-    <span class="theme-swatch" style="background:#c9a84c"></span> Parchment
-  </button>
-  <button class="theme-opt" data-theme="theme-water">
-    <span class="theme-swatch" style="background:#4db8ff"></span> Water
-  </button>
-  <button class="theme-opt" data-theme="theme-earth">
-    <span class="theme-swatch" style="background:#6abf69"></span> Earth
-  </button>
-</div>
-
 <script>
-/* ── Theme toggle ── */
+/* ── Settings panel + Theme toggle ── */
 (function(){
-  const btn    = document.getElementById('themeBtn');
-  const picker = document.getElementById('themePicker');
-  const opts   = picker.querySelectorAll('.theme-opt');
-  const THEMES = ['dark','theme-parchment','theme-water','theme-earth'];
-  const saved  = localStorage.getItem('avatarhub_theme') || 'dark';
+  const settingsBtn = document.getElementById('settingsBtn');
+  const panel       = document.getElementById('settingsPanel');
+  const opts        = panel.querySelectorAll('.theme-opt');
+  const THEMES      = ['dark','theme-parchment','theme-water','theme-earth'];
+  const saved       = localStorage.getItem('avatarhub_theme') || 'dark';
 
   function applyTheme(t) {
     THEMES.forEach(th => document.body.classList.remove(th));
@@ -835,9 +872,18 @@
   }
   applyTheme(saved);
 
-  btn.addEventListener('click', e => { e.stopPropagation(); picker.classList.toggle('open'); });
-  opts.forEach(o => o.addEventListener('click', () => { applyTheme(o.dataset.theme); picker.classList.remove('open'); }));
-  document.addEventListener('click', e => { if (!e.target.closest('#themeBtn') && !e.target.closest('#themePicker')) picker.classList.remove('open'); });
+  settingsBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    panel.classList.toggle('open');
+    settingsBtn.classList.toggle('open', panel.classList.contains('open'));
+  });
+  opts.forEach(o => o.addEventListener('click', () => { applyTheme(o.dataset.theme); }));
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#settingsBtn') && !e.target.closest('#settingsPanel')) {
+      panel.classList.remove('open');
+      settingsBtn.classList.remove('open');
+    }
+  });
 })();
 </script>
 
@@ -851,7 +897,7 @@
 ══════════════════════════════════════════ */
 const introAudio   = document.getElementById('introAudio');
 const ambientAudio = document.getElementById('ambientAudio');
-const ambientBtn   = document.getElementById('ambientBtn');
+const ambientBtn   = document.getElementById('ambientRow');
 const soundNudge   = document.getElementById('soundNudge');
 
 let audioCtx         = null;   // Web Audio context — unlocked on first gesture
@@ -1213,7 +1259,7 @@ self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>
 
   close.addEventListener('click', () => modal.classList.remove('open'));
   modal.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
-  window.addEventListener('appinstalled', () => btn.classList.remove('visible'));
+  window.addEventListener('appinstalled', () => { if(btn) btn.style.display='none'; });
 })();
 
 </script>
