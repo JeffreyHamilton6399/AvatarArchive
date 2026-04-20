@@ -596,7 +596,35 @@ async function loadBook(seriesIdx, bookIdx) {
 
   try {
     const lib = await ensurePDFJS();
-    pdfDoc = await lib.getDocument({ url, withCredentials: false }).promise;
+
+    // GitHub Releases redirects through CDN URLs without CORS headers,
+    // so fetch the raw bytes and pass them to PDF.js as a typed array.
+    const loadingText = loadingEl.querySelector('.viewer-loading-text');
+    if (loadingText) loadingText.textContent = 'Downloading…';
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    // Show download % if the server sends Content-Length
+    const contentLength = resp.headers.get('content-length');
+    let buffer;
+    if (contentLength && resp.body && loadingText) {
+      const total = parseInt(contentLength);
+      const reader = resp.body.getReader();
+      const chunks = [];
+      let received = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        loadingText.textContent = `Downloading… ${Math.round(received / total * 100)}%`;
+      }
+      buffer = await new Blob(chunks).arrayBuffer();
+    } else {
+      buffer = await resp.arrayBuffer();
+    }
+    if (loadingText) loadingText.textContent = 'Rendering…';
+    pdfDoc = await lib.getDocument({ data: new Uint8Array(buffer) }).promise;
     totalPages  = pdfDoc.numPages;
     pageTotalEl.textContent = totalPages;
     pageInput.max = totalPages;
