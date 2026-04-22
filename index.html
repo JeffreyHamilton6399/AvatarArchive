@@ -67,6 +67,43 @@
     body.theme-parchment .search-input::placeholder,
     body.theme-water    .search-input::placeholder,
     body.theme-earth    .search-input::placeholder { color: var(--dim); }
+    /* Light-theme card text fixes */
+    body.theme-parchment .card-title,
+    body.theme-water    .card-title,
+    body.theme-earth    .card-title { color: var(--white); }
+    body.theme-parchment .card-sub,
+    body.theme-water    .card-sub,
+    body.theme-earth    .card-sub { color: var(--muted); }
+    body.theme-parchment .card-label,
+    body.theme-water    .card-label,
+    body.theme-earth    .card-label { opacity: .9; }
+    body.theme-parchment .card-cta,
+    body.theme-water    .card-cta,
+    body.theme-earth    .card-cta { color: var(--white); border-color: rgba(0,0,0,.18); }
+    body.theme-parchment .card-tag,
+    body.theme-water    .card-tag,
+    body.theme-earth    .card-tag { color: var(--muted); }
+    body.theme-parchment .merch-card,
+    body.theme-water    .merch-card,
+    body.theme-earth    .merch-card { background: rgba(255,255,255,.75); border-color: rgba(0,0,0,.09); }
+    body.theme-parchment .merch-name,
+    body.theme-water    .merch-name,
+    body.theme-earth    .merch-name { color: var(--white); }
+    body.theme-parchment #settingsPanel,
+    body.theme-water    #settingsPanel,
+    body.theme-earth    #settingsPanel { background: rgba(240,235,220,.98); border-color: rgba(0,0,0,.14); }
+    body.theme-parchment .sp-section-label,
+    body.theme-water    .sp-section-label,
+    body.theme-earth    .sp-section-label,
+    body.theme-parchment .sp-ambient-label,
+    body.theme-water    .sp-ambient-label,
+    body.theme-earth    .sp-ambient-label,
+    body.theme-parchment .theme-opt,
+    body.theme-water    .theme-opt,
+    body.theme-earth    .theme-opt { color: var(--white); }
+    body.theme-parchment .sp-divider,
+    body.theme-water    .sp-divider,
+    body.theme-earth    .sp-divider { background: rgba(0,0,0,.1); }
 
     /* ── Settings button + panel ── */
     #settingsBtn {
@@ -263,7 +300,7 @@
       position: relative;
       display: flex; flex-direction: column;
       border-radius: 18px; overflow: hidden;
-      background: linear-gradient(160deg,rgba(10,17,28,.95) 0%,rgba(6,11,20,.98) 100%);
+      background: var(--card-bg);
       border: 1px solid var(--border);
       text-decoration: none; color: inherit;
       transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, border-color .35s ease;
@@ -542,6 +579,13 @@
   </style>
 </head>
 <body>
+<script>
+/* Apply saved theme immediately to avoid flash */
+(function(){
+  var t=localStorage.getItem('avatarhub_theme');
+  if(t&&t!=='dark') document.body.classList.add(t);
+})();
+</script>
 
 <!-- ── World-map splash (shown first) ── -->
 <div id="mapSplash">
@@ -647,7 +691,7 @@
     </a>
 
     <!-- Movie (2026 Animated) -->
-    <a href="movie.html" class="hub-card movie">
+    <a href="movie2026.html" class="hub-card movie">
       <div class="card-poster">
         <div class="card-poster-bg" style="background-image:url('images/movie2026bg.png')"></div>
         <div class="card-poster-overlay"></div>
@@ -889,56 +933,65 @@
 
 <script>
 /* ══════════════════════════════════════════
-   AUDIO ENGINE
-   Chrome on GitHub Pages requires AudioContext.resume() to be called
-   synchronously inside a user-gesture handler. Once that's done the
-   context stays unlocked for the entire session — every subsequent
-   audio.play() (even inside setTimeout) will succeed.
+   AUDIO ENGINE  – robust intro → ambient chain
+   AudioContext must be unlocked synchronously
+   inside a user-gesture handler on Chrome.
 ══════════════════════════════════════════ */
 const introAudio   = document.getElementById('introAudio');
 const ambientAudio = document.getElementById('ambientAudio');
 const ambientBtn   = document.getElementById('ambientRow');
 const soundNudge   = document.getElementById('soundNudge');
 
-let audioCtx         = null;   // Web Audio context — unlocked on first gesture
+let audioCtx         = null;
 let ambientPlaying   = false;
+let introStarted     = false;
 let ambientFadeTimer = null;
 let nudgeTimer       = null;
 const savedMuted     = localStorage.getItem('avatarhub_ambient_off') === '1';
 
-/* Create / resume the AudioContext — must be called inside a click handler */
 function unlockAudioContext() {
-  if (audioCtx) { audioCtx.resume(); return; }
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    audioCtx.resume();
-  } catch(e) {}
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {}
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
 }
 
 function ambientFadeIn() {
   if (ambientPlaying) return;
   clearInterval(ambientFadeTimer);
   ambientAudio.volume = 0;
-  ambientAudio.play().then(() => {
+  const p = ambientAudio.play();
+  if (p && p.then) {
+    p.then(() => {
+      ambientPlaying = true;
+      ambientBtn.classList.add('active');
+      hideSoundNudge();
+      localStorage.setItem('avatarhub_ambient_off', '0');
+      ambientFadeTimer = setInterval(() => {
+        ambientAudio.volume = Math.min(0.55, ambientAudio.volume + 0.015);
+        if (ambientAudio.volume >= 0.55) clearInterval(ambientFadeTimer);
+      }, 60);
+    }).catch(() => {
+      if (!savedMuted) showSoundNudge();
+    });
+  } else {
     ambientPlaying = true;
     ambientBtn.classList.add('active');
-    hideSoundNudge();
-    localStorage.setItem('avatarhub_ambient_off', '0');
-    ambientFadeTimer = setInterval(() => {
-      ambientAudio.volume = Math.min(0.55, ambientAudio.volume + 0.015);
-      if (ambientAudio.volume >= 0.55) clearInterval(ambientFadeTimer);
-    }, 60);
-  }).catch(() => {
-    /* Still blocked — show the nudge pill so user has a clear way to enable */
-    if (!savedMuted) showSoundNudge();
-  });
+  }
 }
 
 function ambientFadeOut() {
   clearInterval(ambientFadeTimer);
   ambientFadeTimer = setInterval(() => {
     ambientAudio.volume = Math.max(0, ambientAudio.volume - 0.04);
-    if (ambientAudio.volume <= 0) { clearInterval(ambientFadeTimer); ambientAudio.pause(); ambientPlaying = false; }
+    if (ambientAudio.volume <= 0) {
+      clearInterval(ambientFadeTimer);
+      ambientAudio.pause();
+      ambientAudio.currentTime = 0;
+      ambientPlaying = false;
+    }
   }, 60);
   ambientBtn.classList.remove('active');
   hideSoundNudge();
@@ -956,22 +1009,37 @@ function hideSoundNudge() {
 
 /* Play intro then crossfade to ambient */
 function startAudioSequence() {
-  if (!introAudio) { if (!savedMuted) ambientFadeIn(); return; }
+  if (savedMuted) return;
+  if (introStarted) return;
+  introStarted = true;
+
+  if (!introAudio || !introAudio.src || introAudio.src === window.location.href) {
+    /* No intro file configured — go straight to ambient */
+    ambientFadeIn();
+    return;
+  }
+
   introAudio.volume = 1;
-  introAudio.play().then(() => {
-    introAudio.addEventListener('ended', () => {
+  const ip = introAudio.play();
+  if (ip && ip.then) {
+    ip.then(() => {
+      introAudio.addEventListener('ended', () => {
+        if (!savedMuted) ambientFadeIn();
+      }, { once: true });
+      /* Safety fallback in case 'ended' never fires */
+      setTimeout(() => { if (!ambientPlaying && !savedMuted) ambientFadeIn(); },
+        (introAudio.duration > 0 ? introAudio.duration * 1000 + 500 : 6000));
+    }).catch(() => {
+      /* Intro blocked — try ambient directly */
       if (!savedMuted) ambientFadeIn();
-    }, { once: true });
-    /* Fallback: start ambient 5 s after intro begins (covers short intros) */
-    setTimeout(() => { if (!savedMuted && !ambientPlaying) ambientFadeIn(); }, 5000);
-  }).catch(() => {
-    /* Intro blocked — try ambient directly (context already unlocked) */
-    if (!savedMuted) ambientFadeIn();
-  });
+    });
+  } else {
+    introAudio.addEventListener('ended', () => { if (!savedMuted) ambientFadeIn(); }, { once: true });
+  }
 }
 
 ambientBtn.addEventListener('click', () => {
-  unlockAudioContext();          // ensure context is live on this gesture too
+  unlockAudioContext();
   ambientPlaying ? ambientFadeOut() : ambientFadeIn();
 });
 if (soundNudge) soundNudge.addEventListener('click', () => {
@@ -1015,13 +1083,13 @@ mapSplash.addEventListener('keydown', e => {
 });
 mapSplash.setAttribute('tabindex', '0');
 
-/* Auto-advance after 5 s if user doesn't click (no gesture = no audio) */
+/* Auto-advance after 8 s if user doesn't click (no gesture = no audio) */
 setTimeout(() => {
   if (!mapDone) {
     dismissMap();
     if (!savedMuted && !ambientPlaying) showSoundNudge();
   }
-}, 5000);
+}, 8000);
 
 /* ══════════════════════════════════════════
    GLOBAL SEARCH
@@ -1046,16 +1114,16 @@ const ALL_EPISODES = [
   ...['After All These Years','Korra Alone','The Coronation','The Calling','Enemy at the Gates','The Battle of Zaofu','Reunion','Remembrances','Beyond the Wilds','Operation Beifong',"Kuvira's Gambit",'Day of the Colossus','The Last Stand']
     .map((t,i) => ({title:t, series:'korra', seriesLabel:'The Legend of Korra', ep:`Book 4 · Ep ${i+1}`, href:'kora.html', cls:'korra'})),
   // Animated Movie
-  {title:'Aang, The Last Airbender', series:'movie', seriesLabel:'The Animated Film · 2026', ep:'Feature Film', href:'movie.html', cls:'movie'},
+  {title:'Aang, The Last Airbender', series:'movie', seriesLabel:'The Animated Film · 2026', ep:'Feature Film', href:'movie2026.html', cls:'movie'},
   // Live Action Movie
   {title:'The Last Airbender', series:'liveactionmovie', seriesLabel:'Live Action Film · 2010', ep:'Feature Film', href:'movie2010.html', cls:'liveactionmovie'},
   // Live Action Show
   {title:'Avatar: The Last Airbender (Netflix)', series:'liveactionshow', seriesLabel:'Netflix Live Action · 2024', ep:'Season 1 & 2', href:'liveshow.html', cls:'liveactionshow'},
   // Games
-  {title:'Atla Generations', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/search/?term=avatar+last+airbender+generations', cls:'games'},
-  {title:'Atla Quest for Balance', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/search/?term=avatar+last+airbender+quest+for+balance', cls:'games'},
-  {title:'Avatar Legends', series:'games', seriesLabel:'ATLA Games', ep:'Official Website', href:'https://www.magpiegames.com/pages/avatar-legends', cls:'games'},
-  {title:'Ultra Lite', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/search/?term=avatar+ultra+lite', cls:'games'},
+  {title:'Quest for Balance', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/app/1620030/Avatar_The_Last_Airbender__Quest_for_Balance/', cls:'games'},
+  {title:'Nickelodeon All-Star Brawl 2', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/app/2134520/Nickelodeon_AllStar_Brawl_2/', cls:'games'},
+  {title:'The Legend of Korra', series:'games', seriesLabel:'ATLA Games', ep:'Download on Steam', href:'https://store.steampowered.com/app/306400/The_Legend_of_Korra/', cls:'games'},
+  {title:'Avatar Legends TTRPG', series:'games', seriesLabel:'ATLA Games', ep:'Official Website', href:'https://www.magpiegames.com/pages/avatar-legends', cls:'games'},
 ];
 
 const searchInput   = document.getElementById('searchInput');
@@ -1173,8 +1241,8 @@ searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runS
   // Minimal service worker for offline shell caching
   if ('serviceWorker' in navigator) {
     const swCode = `
-const CACHE='avatar-hub-v2';
-const SHELL=['./index.html','./atla.html','./kora.html','./movie.html','./movie2010.html','./liveshow.html','./books.html'];
+const CACHE='avatar-hub-v3';
+const SHELL=['./index.html','./atla.html','./kora.html','./movie2026.html','./movie2010.html','./liveshow.html','./books.html','./games.html'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL).catch(()=>{})));self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
 self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('./index.html'))));});
