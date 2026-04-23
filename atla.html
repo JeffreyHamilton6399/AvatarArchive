@@ -71,7 +71,7 @@
     body.page-ready .anim-sub    {animation:slideUp .8s cubic-bezier(.22,1,.36,1) .30s both;}
     body.page-ready .anim-player {animation:slideUp .9s cubic-bezier(.22,1,.36,1) .42s both;}
 
-    header{padding:1.4rem 4rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+    header{padding:1.4rem 4rem;padding-top:max(1.4rem,env(safe-area-inset-top));padding-left:max(4rem,env(safe-area-inset-left));padding-right:max(4rem,env(safe-area-inset-right));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
     .back-link{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid var(--dim);padding:.4em 1.2em;border-radius:30px;transition:color .2s,border-color .2s;display:flex;align-items:center;gap:.5em;}
     .back-link:hover{color:var(--gold);border-color:rgba(201,168,76,.4);}
     .movie-link{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,168,76,.4);padding:.4em 1.4em;border-radius:30px;transition:color .2s,border-color .2s,background .2s;background:rgba(201,168,76,.06);display:flex;align-items:center;gap:.5em;}
@@ -123,7 +123,7 @@
 
     /* Skip Intro */
     #skipIntroBtn{
-      position:absolute;bottom:90px;right:24px;z-index:25;
+      position:absolute;bottom:90px;right:24px;z-index:200;
       font-family:'Cinzel',serif;font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;
       color:var(--white);background:rgba(10,15,25,.8);backdrop-filter:blur(12px);
       border:1px solid rgba(255,255,255,.22);border-radius:6px;
@@ -132,11 +132,11 @@
       animation:skipPop .35s cubic-bezier(.22,1,.36,1) both;
     }
     #skipIntroBtn:hover{background:rgba(77,184,255,.15);border-color:var(--blue);color:var(--blue);}
-    :fullscreen #skipIntroBtn,:-webkit-full-screen #skipIntroBtn{bottom:80px;right:32px;}
+    :fullscreen #skipIntroBtn,:-webkit-full-screen #skipIntroBtn{bottom:max(80px,env(safe-area-inset-bottom) + 70px);right:max(32px,env(safe-area-inset-right) + 16px);z-index:9999;}
 
     /* Next Episode panel */
     #nextEpPanel{
-      position:absolute;bottom:90px;right:24px;z-index:25;
+      position:absolute;bottom:90px;right:24px;z-index:200;
       background:rgba(8,12,22,.9);backdrop-filter:blur(20px);
       border:1px solid rgba(255,255,255,.1);border-radius:14px;
       padding:1.2rem 1.4rem;min-width:250px;max-width:310px;
@@ -144,7 +144,7 @@
       animation:nextSlide .4s cubic-bezier(.22,1,.36,1) both;
     }
     #nextEpPanel.visible{display:block;}
-    :fullscreen #nextEpPanel,:-webkit-full-screen #nextEpPanel{bottom:80px;right:32px;}
+    :fullscreen #nextEpPanel,:-webkit-full-screen #nextEpPanel{bottom:max(80px,env(safe-area-inset-bottom) + 70px);right:max(32px,env(safe-area-inset-right) + 16px);z-index:9999;}
     .nep-eyebrow{font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;}
     .nep-title{font-family:'Philosopher',serif;font-size:.98rem;color:var(--white);margin-bottom:.85rem;line-height:1.35;font-style:italic;}
     .nep-btn{width:100%;font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;background:var(--blue);color:#000;border:none;border-radius:7px;padding:.75em 1em;cursor:pointer;transition:filter .2s;position:relative;overflow:hidden;}
@@ -161,7 +161,7 @@
       .ctrls-row{flex-wrap:nowrap;gap:4px;}
       .vol-wrap{display:none;}
       .time-disp{font-size:.55rem;margin-left:4px;}
-      header{padding:1rem 1.2rem;}
+      header{padding:max(1rem,env(safe-area-inset-top)) max(1.2rem,env(safe-area-inset-right)) 1rem max(1.2rem,env(safe-area-inset-left));}
     }
     /* Speed button + popup */
     .speed-wrap{display:flex;align-items:center;position:relative;}
@@ -940,7 +940,7 @@ vid.addEventListener('timeupdate',()=>{ if(isSeeking)return; const pct=(vid.curr
     }
   }
   handleSkipIntro();handleNextPanel(); });
-vid.addEventListener('ended',()=>{ updateShimmer(); if(currentEp)showNextPanel(true); });
+
 let isSeeking=false;
 function seekTo(cx){ const r=prog.getBoundingClientRect(),pct=Math.max(0,Math.min(1,(cx-r.left)/r.width)),t=pct*vid.duration; vid.currentTime=t;progFill.style.width=(pct*100)+'%';progThumb.style.left=(pct*100)+'%';curEl.textContent=fmt(t); }
 prog.addEventListener('mousedown',e=>{isSeeking=true;seekTo(e.clientX);e.stopPropagation();});
@@ -963,20 +963,42 @@ vid.addEventListener('volumechange',()=>{localStorage.setItem('atlaepisodes_volu
 function handleSkipIntro(){ if(!currentEp)return; const t=vid.currentTime; skipBtn.style.display=(t>=INTRO_SHOW_FROM&&t<INTRO_END_SEC)?'block':'none'; }
 skipBtn.addEventListener('click',()=>{ vid.currentTime=INTRO_END_SEC; skipBtn.style.display='none'; });
 
-/* Next Episode panel */
-function handleNextPanel(){ if(!currentEp||!isFinite(vid.duration))return; const rem=vid.duration-vid.currentTime; if(rem<=NEXT_EP_BEFORE_END&&rem>0) showNextPanel(false); else if(rem>NEXT_EP_BEFORE_END) hideNextPanel(); }
-function showNextPanel(ended){
-  const next=getNext(currentEp.book,currentEp.num); if(!next){hideNextPanel();return;}
-  nepTitle.textContent=next.title; nextPanel.classList.add('visible'); nextPanel.style.display='block';
+/* ── Netflix-style Next Episode panel ── */
+/* Panel appears NEXT_EP_BEFORE_END seconds before the end (during outro).
+   The blue bar fills over that remaining time then auto-plays. */
+let panelShown = false;
+function handleNextPanel(){
+  if(!currentEp||!isFinite(vid.duration)||vid.duration===0) return;
+  const rem=vid.duration-vid.currentTime;
+  if(rem<=NEXT_EP_BEFORE_END && rem>0) {
+    if(!panelShown) showNextPanel();
+  } else if(rem>NEXT_EP_BEFORE_END) {
+    if(panelShown) hideNextPanel();
+  }
+}
+function showNextPanel(){
+  const next=getNext(currentEp.book,currentEp.num);
+  if(!next){ hideNextPanel(); return; }
+  panelShown=true;
+  nepTitle.textContent=next.title;
+  nextPanel.classList.add('visible'); nextPanel.style.display='block';
   cancelAuto(); autoStart=Date.now();
-  const dur=ended?AUTO_PLAY_SECS*1000:(isFinite(vid.duration)?(vid.duration-vid.currentTime)*1000:AUTO_PLAY_SECS*1000);
-  function tick(){ const el=Date.now()-autoStart,pct=Math.min(100,(el/dur)*100); nepProgress.style.width=pct+'%'; if(pct>=100){loadEpisode(next.book,next.num);return;} autoFrame=requestAnimationFrame(tick); }
+  /* Fill bar over the REMAINING time in the episode */
+  const fillDur = Math.max(1, (isFinite(vid.duration) ? vid.duration-vid.currentTime : NEXT_EP_BEFORE_END)) * 1000;
+  function tick(){
+    const elapsed=Date.now()-autoStart;
+    const pct=Math.min(100,(elapsed/fillDur)*100);
+    nepProgress.style.width=pct+'%';
+    if(pct>=100){ loadEpisode(next.book,next.num); return; }
+    autoFrame=requestAnimationFrame(tick);
+  }
   autoFrame=requestAnimationFrame(tick);
 }
-function hideNextPanel(){ nextPanel.classList.remove('visible');nextPanel.style.display='none';cancelAuto(); }
-function cancelAuto(){ if(autoFrame){cancelAnimationFrame(autoFrame);autoFrame=null;} nepProgress.style.width='0%';autoStart=null; }
-nepBtn.addEventListener('click',()=>{ const n=getNext(currentEp.book,currentEp.num);if(n)loadEpisode(n.book,n.num); });
-nepSkip.addEventListener('click',()=>hideNextPanel());
+function hideNextPanel(){ panelShown=false; nextPanel.classList.remove('visible'); nextPanel.style.display='none'; cancelAuto(); }
+function cancelAuto(){ if(autoFrame){cancelAnimationFrame(autoFrame);autoFrame=null;} nepProgress.style.width='0%'; autoStart=null; }
+nepBtn.addEventListener('click',()=>{ const n=getNext(currentEp.book,currentEp.num); if(n) loadEpisode(n.book,n.num); });
+nepSkip.addEventListener('click',()=>{ hideNextPanel(); panelShown=true; /* stay hidden even if time matches */ });
+vid.addEventListener('ended',()=>{ updateShimmer(); if(currentEp){ const n=getNext(currentEp.book,currentEp.num); if(n) showNextPanel(); } });
 
 /* Captions */
 let captionsOn=false,srtCues=[],lastCueText=null;
@@ -992,7 +1014,7 @@ ccBtn.addEventListener('click',()=>{captionsOn=!captionsOn;ccBtn.classList.toggl
 function loadEpisode(book,epNum){
   const bData=BOOKS[book-1];
   const title = epNum===0 ? (bData.pilot||'Unaired Pilot') : bData.episodes[epNum-1];
-  currentEp={book,num:epNum,title}; hideNextPanel(); skipBtn.style.display='none';
+  currentEp={book,num:epNum,title}; hideNextPanel(); panelShown=false; skipBtn.style.display='none';
   srtCues=[];lastCueText=null;hideCaption();
   vid.pause(); vid.src=epUrl(book,epNum)+'#t=0.001'; vid.load();
   vid.addEventListener('loadedmetadata',function restorePos(){
@@ -1229,6 +1251,31 @@ window.addEventListener('pagehide', () => {
   if (vid) { vid.pause(); }
   clearTimeout(idleTimer);
 });
+
+/* ── Whisper AI Captions ── */
+(function(){
+  const script = document.createElement('script');
+  script.src = 'whisper-captions.js';
+  script.onload = () => {
+    if(window.WhisperCaptions && typeof ccBtn!=='undefined'){
+      WhisperCaptions.injectButton(
+        ccBtn, vid, captionBox,
+         + series_label + ,
+        (currentEp ? `b${currentEp.book}_e${currentEp.num}` : 'unknown')
+      );
+      /* Update button episode ref when episode changes */
+      const origLoad = loadEpisode;
+      window.loadEpisode = function(b,n,...args){
+        origLoad(b,n,...args);
+        const aiBtn=document.getElementById('aiCCBtn');
+        if(aiBtn) aiBtn.onclick = ()=>WhisperCaptions.run(
+          aiBtn,vid,captionBox, + series_label + ,`b${b}_e${n}`
+        );
+      };
+    }
+  };
+  document.head.appendChild(script);
+})();
 </script>
 </body>
 </html>

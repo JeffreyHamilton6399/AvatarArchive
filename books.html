@@ -126,7 +126,7 @@
     .corner-earth { animation:pulseGlowEarth 2.6s ease-in-out infinite .8s; }
     .corner-fire  { animation:pulseGlowFire  2.6s ease-in-out infinite 1.2s; }
     .corner-air   { animation:pulseGlowAir   2.6s ease-in-out infinite 0s; }
-    .viewer-shell { background:#111; border-radius:16px; overflow:hidden; position:relative; min-height:600px; display:flex; flex-direction:column; }
+    .viewer-shell { background:#111; border-radius:16px; overflow:hidden; position:relative; min-height:0; display:flex; flex-direction:column; }
     .viewer-placeholder { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.2rem; padding:4rem 2rem; }
     .placeholder-text { font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.4em; text-transform:uppercase; color:var(--muted); text-align:center; line-height:1.8; }
     .viewer-loading { position:absolute; inset:0; background:rgba(4,7,13,.85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; z-index:10; border-radius:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
@@ -136,7 +136,7 @@
 
     /* PDF.js two-page spread reader */
     #pdfReader { display:none; flex-direction:column; flex:1; background:#0d0d0d; border-radius:16px 16px 0 0; overflow:hidden; }
-    #pdfSpread { flex:1; display:flex; align-items:center; justify-content:center; gap:0; padding:2rem 1.5rem; background:#0d0d0d; min-height:500px; position:relative; }
+    #pdfSpread { flex:1; display:flex; align-items:center; justify-content:center; gap:0; padding:1rem; background:#0d0d0d; min-height:0; position:relative; }
     .spread-page { display:flex; align-items:center; justify-content:center; position:relative; }
     .spread-page canvas { display:block; max-width:100%; height:auto; box-shadow:0 6px 32px rgba(0,0,0,.7); }
     /* Left page: shadow on the right (spine), right page: shadow on the left */
@@ -237,6 +237,31 @@
       .info-divider { display:none; }
       .book-grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
     }
+    /* ── Mobile portrait: single-page mode, no stretch ── */
+    @media(max-width:600px) and (orientation:portrait) {
+      .viewer-shell { min-height:0; }
+      #pdfSpread { padding:.5rem; flex-direction:column; }
+      .spread-page { width:100%; }
+      .spread-page canvas { width:100% !important; height:auto !important; }
+      .spread-page.left canvas, .spread-page.right canvas { border-radius:3px; box-shadow:0 4px 16px rgba(0,0,0,.6); }
+      .spread-spine { display:none; }
+      .viewer-controls { padding:.6rem .75rem; gap:.4rem; flex-wrap:wrap; justify-content:center; }
+      .ctrl-group { gap:.3rem; }
+      .vcbtn { padding:.4em .7em; font-size:.38rem; }
+      .zoom-wrap { display:none; }
+      .zoom-val { display:none; }
+    }
+    /* ── Mobile fullscreen: use viewport-filling div since iOS blocks requestFullscreen ── */
+    .viewer-frame.fake-fs {
+      position:fixed !important; inset:0 !important; z-index:9000 !important;
+      border-radius:0 !important; padding:0 !important;
+      width:100vw !important; height:100vh !important;
+      background:#000 !important;
+    }
+    .viewer-frame.fake-fs .viewer-shell { border-radius:0; flex:1; min-height:0; }
+    .viewer-frame.fake-fs #pdfSpread { flex:1; min-height:0; padding:.5rem; }
+    .viewer-frame.fake-fs .viewer-controls { border-radius:0; }
+    .viewer-frame.fake-fs .corner { display:none; }
   
     /* ── Cross-page theme variables ── */
     body.theme-parchment {
@@ -497,16 +522,7 @@
           <span class="viewer-loading-text">Loading Book…</span>
         </div>
         <div class="viewer-controls" id="viewerControls" style="display:none;">
-          <div class="ctrl-group">
-            <button class="vcbtn" id="prevBookBtn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
-              Prev Book
-            </button>
-            <button class="vcbtn" id="nextBookBtn">
-              Next Book
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-            </button>
-          </div>
+
           <div class="ctrl-group">
             <button class="vcbtn" id="prevPageBtn">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
@@ -526,10 +542,7 @@
               <span class="zoom-val" id="zoomVal">100%</span>
               <button class="zoom-btn" id="zoomIn">+</button>
             </div>
-            <a class="vcbtn vcbtn-primary" id="openPdfBtn" href="#" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-              Open PDF
-            </a>
+
             <button class="vcbtn" id="fsBookBtn" title="Fullscreen">
               <svg id="fsIconOpen" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
               <svg id="fsIconClose" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
@@ -693,7 +706,6 @@ const viewerCtrl   = document.getElementById('viewerControls');
 const nrBar        = document.getElementById('nowReadingBar');
 const nrTitle      = document.getElementById('nrTitle');
 const nrSeries     = document.getElementById('nrSeries');
-const openPdfBtn   = document.getElementById('openPdfBtn');
 const loadingEl    = document.getElementById('viewerLoading');
 const prevPageBtn  = document.getElementById('prevPageBtn');
 const nextPageBtn  = document.getElementById('nextPageBtn');
@@ -806,9 +818,7 @@ async function loadBook(seriesIdx, bookIdx) {
   nrTitle.textContent  = b.title;
   nrSeries.textContent = s.label;
   nrBar.style.opacity  = '1';
-  openPdfBtn.href = url;
-
-  placeholder.style.display = 'none';
+    placeholder.style.display = 'none';
   pdfReader.style.display   = 'none';
   viewerCtrl.style.display  = 'none';
   document.getElementById('pdfSpread').querySelectorAll('.spread-page,.spread-spine').forEach(el => el.remove());
@@ -906,18 +916,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); goPrevSpread(); }
 });
 
-/* ─── Book nav buttons ─── */
-document.getElementById('prevBookBtn').addEventListener('click', () => {
-  if (currentBookIdx === null) return;
-  if (currentBookIdx > 0) { loadBook(currentSeries, currentBookIdx - 1); }
-  else if (currentSeries > 0) { const prev = currentSeries - 1; loadBook(prev, SERIES[prev].books.length - 1); }
-});
-document.getElementById('nextBookBtn').addEventListener('click', () => {
-  if (currentBookIdx === null) return;
-  const s = SERIES[currentSeries];
-  if (currentBookIdx < s.books.length - 1) { loadBook(currentSeries, currentBookIdx + 1); }
-  else if (currentSeries < SERIES.length - 1) { loadBook(currentSeries + 1, 0); }
-});
+/* Book nav handled via swipe/drag — prev/next book buttons removed */
 
 /* ─── Intro overlay ─── */
 const overlay = document.getElementById('introOverlay');
@@ -1043,17 +1042,37 @@ document.body.addEventListener('animationend', function onReady(e) {
   if (!fsBtn || !viewerFrame) return;
 
   function updateFsIcons() {
-    const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    const inFs = !!(document.fullscreenElement || document.webkitFullscreenElement) || viewerFrame.classList.contains('fake-fs');
     fsOpen.style.display  = inFs ? 'none' : '';
     fsClose.style.display = inFs ? ''     : 'none';
   }
 
   fsBtn.addEventListener('click', () => {
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
+    const inNativeFS = document.fullscreenElement || document.webkitFullscreenElement;
+    const inFakeFS   = viewerFrame.classList.contains('fake-fs');
+    if (inNativeFS) {
       (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else if (inFakeFS) {
+      viewerFrame.classList.remove('fake-fs');
+      document.body.style.overflow = '';
+      fsIconOpen.style.display = '';
+      fsIconClose.style.display = 'none';
+    } else if (viewerFrame.requestFullscreen) {
+      viewerFrame.requestFullscreen().catch(() => {
+        /* Native FS failed (iOS) — fall back to fake fullscreen */
+        viewerFrame.classList.add('fake-fs');
+        document.body.style.overflow = 'hidden';
+        fsIconOpen.style.display = 'none';
+        fsIconClose.style.display = '';
+      });
+    } else if (viewerFrame.webkitRequestFullscreen) {
+      viewerFrame.webkitRequestFullscreen();
     } else {
-      if (viewerFrame.requestFullscreen) viewerFrame.requestFullscreen().catch(()=>{});
-      else if (viewerFrame.webkitRequestFullscreen) viewerFrame.webkitRequestFullscreen();
+      /* iOS Safari — use fake fullscreen */
+      viewerFrame.classList.add('fake-fs');
+      document.body.style.overflow = 'hidden';
+      fsIconOpen.style.display = 'none';
+      fsIconClose.style.display = '';
     }
   });
 

@@ -1867,6 +1867,21 @@ window.addEventListener('pagehide', () => {
   if (vid) { vid.pause(); }
   clearTimeout(idleTimer);
 });
+
+/* ── Whisper AI Captions ── */
+(function(){
+  const script = document.createElement('script');
+  script.src = 'whisper-captions.js';
+  script.onload = () => {
+    if(window.WhisperCaptions){
+      const v = document.getElementById('mainVideo');
+      const cb = document.getElementById('captionBox');
+      const cc = document.getElementById('ccBtn');
+      if(v && cb && cc) WhisperCaptions.injectButton(cc, v, cb, 'movie2010', 'movie2010');
+    }
+  };
+  document.head.appendChild(script);
+})();
 </script>
 </body>
 </html>
