@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ATLA Games — Avatar Hub</title>
+  <meta name="theme-color" content="#04070d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ATLA Games">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="icon" type="image/jpeg" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cinzel+Decorative:wght@400;700;900&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --deep:   #04070d;
+      --panel:  #0a111c;
+      --blue:   #4db8ff;
+      --white:  #f0f4ff;
+      --muted:  #6b8aab;
+      --dim:    #2d3f56;
+      --border: rgba(255,255,255,0.06);
+      --gold:   #c9a84c;
+      --green:  #3ddc84;
+      --green-rgb: 61,220,132;
+      --air:    #f5c518;
+      --water:  #4db8ff;
+      --earth:  #6abf69;
+      --fire:   #f97316;
+    }
+
+    @keyframes slideUp    { from{opacity:0;transform:translateY(36px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes overlayOut { from{opacity:1} to{opacity:0} }
+    @keyframes pulseGreen { 0%,100%{filter:drop-shadow(0 0 5px #3ddc84)} 50%{filter:drop-shadow(0 0 18px #3ddc84)} }
+    @keyframes pulseGlowAir   { 0%,100%{filter:drop-shadow(0 0 5px #f5c518)} 50%{filter:drop-shadow(0 0 18px #f5c518)} }
+    @keyframes pulseGlowWater { 0%,100%{filter:drop-shadow(0 0 5px #4db8ff)} 50%{filter:drop-shadow(0 0 18px #4db8ff)} }
+    @keyframes pulseGlowEarth { 0%,100%{filter:drop-shadow(0 0 5px #6abf69)} 50%{filter:drop-shadow(0 0 18px #6abf69)} }
+    @keyframes pulseGlowFire  { 0%,100%{filter:drop-shadow(0 0 5px #f97316)} 50%{filter:drop-shadow(0 0 18px #f97316)} }
+    @keyframes cardIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shimmerBar { 0%{background-position:-200% center} 100%{background-position:200% center} }
+
+    body {
+      background: var(--deep);
+      color: var(--white);
+      font-family: 'Philosopher', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-layer {
+      position: fixed; inset: 0;
+      background-image: url('images/gamesbg.png');
+      background-size: cover; background-position: center top;
+      filter: blur(8px) brightness(0.18) saturate(1.5) hue-rotate(100deg);
+      transform: scale(1.04); z-index: 0;
+    }
+    .bg-layer::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom,rgba(4,7,13,.65) 0%,transparent 30%,transparent 65%,rgba(4,7,13,.8) 100%);
+    }
+
+    /* ── Intro overlay ── */
+    #introOverlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(4,7,13,.75); backdrop-filter: blur(2px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;
+      cursor: pointer;
+    }
+    #introOverlay.fade-out { animation: overlayOut .65s ease forwards; pointer-events: none; }
+    .intro-tagline {
+      font-family: 'Philosopher', serif; font-size: clamp(.6rem,1.6vw,.8rem);
+      font-style: italic; letter-spacing: .5em; text-transform: uppercase;
+      color: rgba(61,220,132,.6); opacity: 0; transition: opacity .6s ease .15s;
+    }
+    #introOverlay.symbols-in .intro-tagline { opacity: 1; }
+    .symbols-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: clamp(2rem,5vw,5rem); align-items: center; justify-items: center;
+    }
+    @media(max-width:600px){ .symbols-grid{ grid-template-columns:repeat(2,1fr); gap:2rem } }
+    .sym-item {
+      display: flex; flex-direction: column; align-items: center; gap: .9rem;
+      opacity: 0; transform: scale(.78);
+      transition: opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1);
+    }
+    #introOverlay.symbols-in .sym-item { opacity:1; transform:scale(1); }
+    .sym-img { width: clamp(64px,8vw,100px); height: clamp(64px,8vw,100px); object-fit: contain; }
+    .sym-item.air   .sym-img { animation: pulseGlowAir   2.6s ease-in-out infinite 0s; }
+    .sym-item.water .sym-img { animation: pulseGlowWater 2.6s ease-in-out infinite .4s; }
+    .sym-item.earth .sym-img { animation: pulseGlowEarth 2.6s ease-in-out infinite .8s; }
+    .sym-item.fire  .sym-img { animation: pulseGlowFire  2.6s ease-in-out infinite 1.2s; }
+    .sym-label { font-family:'Philosopher',serif; font-size:clamp(.55rem,1.3vw,.7rem); letter-spacing:.3em; text-transform:uppercase; }
+    .sym-item.air   .sym-label { color:var(--air); }
+    .sym-item.water .sym-label { color:var(--water); }
+    .sym-item.earth .sym-label { color:var(--earth); }
+    .sym-item.fire  .sym-label { color:var(--fire); }
+    .intro-hint {
+      font-family: 'Cinzel', serif; font-size: clamp(.38rem,.9vw,.48rem);
+      letter-spacing: .35em; text-transform: uppercase; color: rgba(61,220,132,.35);
+      opacity: 0; transition: opacity .6s ease 1.2s;
+    }
+    #introOverlay.symbols-in .intro-hint { opacity: 1; }
+
+    /* ── Page ── */
+    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    .anim-header, .anim-hero, .anim-grid { opacity: 0; }
+    body.page-ready .anim-header { animation: slideUp .7s cubic-bezier(.22,1,.36,1) .05s both; }
+    body.page-ready .anim-hero   { animation: slideUp .8s cubic-bezier(.22,1,.36,1) .18s both; }
+    body.page-ready .anim-grid   { animation: slideUp .9s cubic-bezier(.22,1,.36,1) .32s both; }
+
+    /* ── Header ── */
+    header {
+      padding: 1.4rem clamp(1.5rem,5vw,4rem);
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .back-link {
+      font-family: 'Cinzel', serif; font-size: .52rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; border: 1px solid var(--dim);
+      padding: .4em 1.2em; border-radius: 30px;
+      transition: color .2s, border-color .2s;
+      display: flex; align-items: center; gap: .5em;
+    }
+    .back-link:hover { color: var(--green); border-color: rgba(61,220,132,.4); }
+    .header-tag {
+      font-family: 'Cinzel', serif; font-size: .55rem; letter-spacing: .35em;
+      text-transform: uppercase; color: var(--muted); border: 1px solid var(--dim);
+      padding: .4em 1.2em; border-radius: 30px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: clamp(3rem,6vh,5rem) 2rem clamp(1.5rem,3vh,2.5rem);
+    }
+    .hero-eyebrow {
+      font-family: 'Cinzel', serif; font-size: clamp(.44rem,1.1vw,.56rem);
+      letter-spacing: .45em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem;
+    }
+    .hero-main {
+      font-family: 'Cinzel Decorative', serif; font-weight: 900;
+      font-size: clamp(2.2rem,5vw,4rem); letter-spacing: .1em;
+      background: linear-gradient(135deg,#fff 0%,#a0ffcc 40%,#3ddc84 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: .4rem;
+    }
+    .hero-sub {
+      font-family: 'Philosopher', serif; font-style: italic;
+      font-size: clamp(.9rem,2.2vw,1.3rem); color: var(--muted); letter-spacing: .2em;
+    }
+    .hero-divider {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right,transparent,rgba(61,220,132,.5),transparent);
+      margin: 1.5rem auto 0;
+    }
+
+    /* ── Games grid ── */
+    .games-grid {
+      width: 100%; max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(2,1fr);
+      gap: clamp(1.2rem,2.5vw,2rem);
+      padding: clamp(2rem,4vh,3.5rem) clamp(1.5rem,5vw,4rem) clamp(4rem,8vh,7rem);
+    }
+    @media(max-width:640px) {
+      .games-grid { grid-template-columns: 1fr; padding-left: 1.2rem; padding-right: 1.2rem; }
+    }
+
+    /* ── Game card ── */
+    .game-card {
+      position: relative;
+      background: linear-gradient(160deg,rgba(10,17,28,.95) 0%,rgba(6,11,20,.98) 100%);
+      border: 1px solid rgba(61,220,132,.15);
+      border-radius: 18px; overflow: hidden;
+      display: flex; flex-direction: column;
+      opacity: 0;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, border-color .35s ease;
+    }
+    body.page-ready .game-card { animation: cardIn .7s cubic-bezier(.22,1,.36,1) both; }
+    body.page-ready .game-card:nth-child(1) { animation-delay: .38s; }
+    body.page-ready .game-card:nth-child(2) { animation-delay: .48s; }
+    body.page-ready .game-card:nth-child(3) { animation-delay: .58s; }
+    body.page-ready .game-card:nth-child(4) { animation-delay: .68s; }
+    body.page-ready .game-card:nth-child(5) { animation-delay: .78s; }
+    /* Discontinued game card */
+    .game-card.discontinued { border-color: rgba(249,115,22,.15); opacity: .85; }
+    .game-card.discontinued::before { background: linear-gradient(to right, rgba(249,115,22,.5), rgba(249,115,22,.15), transparent); }
+    .game-card.discontinued:hover { box-shadow: 0 8px 30px rgba(249,115,22,.12), 0 0 0 1px rgba(249,115,22,.25); border-color: rgba(249,115,22,.3); }
+    .disc-badge {
+      display: inline-block; font-family: 'Cinzel', serif; font-size: .38rem;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(249,115,22,.9); border: 1px solid rgba(249,115,22,.35);
+      background: rgba(249,115,22,.08); padding: .22em .8em; border-radius: 20px;
+      margin-top: .1rem; width: fit-content;
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 55px rgba(61,220,132,.18), 0 0 0 1px rgba(61,220,132,.3);
+      border-color: rgba(61,220,132,.35);
+    }
+
+    /* Top accent bar */
+    .game-card::before {
+      content: ''; display: block; height: 3px;
+      background: linear-gradient(to right, rgba(61,220,132,.6), rgba(77,184,255,.3), transparent);
+    }
+
+    .game-body { padding: 1.6rem 1.8rem 1.8rem; flex: 1; display: flex; flex-direction: column; gap: .6rem; }
+
+    .game-platform {
+      font-family: 'Cinzel', serif; font-size: clamp(.36rem,.8vw,.46rem);
+      letter-spacing: .35em; text-transform: uppercase; color: var(--green);
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .game-platform svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    .game-title {
+      font-family: 'Cinzel Decorative', serif; font-weight: 700;
+      font-size: clamp(.95rem,1.8vw,1.2rem); color: var(--white);
+      letter-spacing: .04em; line-height: 1.3;
+    }
+
+    .game-desc {
+      font-family: 'Philosopher', serif; font-style: italic;
+      font-size: clamp(.78rem,1.3vw,.9rem); color: var(--muted);
+      line-height: 1.6; flex: 1;
+    }
+
+    .game-tags {
+      display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .3rem;
+    }
+    .game-tag {
+      font-family: 'Cinzel', serif; font-size: clamp(.34rem,.7vw,.42rem);
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--green); border: 1px solid rgba(61,220,132,.25);
+      padding: .22em .7em; border-radius: 20px; background: rgba(61,220,132,.05);
+    }
+
+    .game-divider {
+      height: 1px; background: linear-gradient(to right,rgba(61,220,132,.2),transparent);
+      margin-top: .8rem;
+    }
+
+    /* Big download button */
+    .download-btn {
+      display: flex; align-items: center; justify-content: center; gap: .7rem;
+      margin-top: 1.1rem;
+      padding: .85em 1.4em;
+      background: linear-gradient(135deg,rgba(61,220,132,.15),rgba(61,220,132,.08));
+      border: 1px solid rgba(61,220,132,.35);
+      border-radius: 12px;
+      color: var(--green); text-decoration: none;
+      font-family: 'Cinzel', serif; font-size: clamp(.44rem,.95vw,.56rem);
+      letter-spacing: .25em; text-transform: uppercase;
+      transition: background .25s, border-color .25s, color .25s, transform .2s;
+      position: relative; overflow: hidden;
+    }
+    .download-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(105deg,transparent 40%,rgba(255,255,255,.08) 50%,transparent 60%);
+      background-size: 200% 100%; opacity: 0;
+      transition: opacity .3s;
+    }
+    .download-btn:hover { background: linear-gradient(135deg,rgba(61,220,132,.28),rgba(61,220,132,.15)); border-color: rgba(61,220,132,.65); color: #fff; transform: scale(1.02); }
+    .download-btn:hover::after { opacity: 1; animation: shimmerBar .6s ease; }
+    .download-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* Steam icon */
+    .steam-badge {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-family: 'Cinzel', serif; font-size: clamp(.32rem,.65vw,.4rem);
+      letter-spacing: .15em; text-transform: uppercase;
+      color: rgba(61,220,132,.5); margin-top: .5rem;
+    }
+    .steam-badge svg { width: 10px; height: 10px; opacity: .6; }
+
+    /* ── Jeffrey watermark ── */
+    .jeffrey-watermark {
+      position: fixed; bottom: 14px; right: 18px; z-index: 50;
+      display: inline-flex; align-items: center; gap: 5px;
+      text-decoration: none; font-family: 'Cinzel', serif;
+      font-size: .42rem; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(107,138,171,.45); transition: color .2s, opacity .2s; opacity: .6;
+    }
+    .jeffrey-watermark:hover { color: rgba(240,244,255,.7); opacity: 1; }
+
+    /* ── Particles ── */
+    #particleCanvas { position:fixed;top:0;left:0;z-index:0;pointer-events:none;opacity:0.4;width:100%;height:100%; }
+
+    /* ── Mobile ── */
+    @media(max-width:640px) {
+      header { padding: 1.1rem 1.2rem; }
+      .hero { padding: 2.2rem 1.2rem 1.5rem; }
+      .game-body { padding: 1.3rem 1.4rem 1.5rem; }
+      .download-btn { padding: 1em 1.2em; font-size: .52rem; }
+    }
+  
+    /* ── Cross-page theme variables ── */
+    body.theme-parchment {
+      --deep:#f5efe0; --panel:#ede4ce; --white:#1a1008; --muted:#7a6040;
+      --dim:#b8a880; --border:rgba(0,0,0,0.10); --gold:#9a6820;
+      --card-bg: linear-gradient(160deg,rgba(255,250,235,.97) 0%,rgba(245,238,215,.99) 100%);
+    }
+    body.theme-water {
+      --deep:#dff0f8; --panel:#c8e4f2; --white:#0a1a2e; --muted:#3a6080;
+      --dim:#7ab0cc; --border:rgba(0,0,0,0.09);
+      --card-bg: linear-gradient(160deg,rgba(220,240,252,.97) 0%,rgba(200,228,245,.99) 100%);
+    }
+    body.theme-earth {
+      --deep:#f0f4e8; --panel:#e2ead0; --white:#1a2008; --muted:#5a7040;
+      --dim:#a0b878; --border:rgba(0,0,0,0.09);
+      --card-bg: linear-gradient(160deg,rgba(238,245,220,.97) 0%,rgba(224,235,200,.99) 100%);
+    }
+    body.theme-parchment .bg-layer { filter: blur(8px) brightness(0.45) saturate(.7); }
+    body.theme-water    .bg-layer  { filter: blur(8px) brightness(0.4) saturate(1.2) hue-rotate(190deg); }
+    body.theme-earth    .bg-layer  { filter: blur(8px) brightness(0.4) saturate(1.1) hue-rotate(55deg); }
+    body.theme-parchment,body.theme-water,body.theme-earth { background: var(--deep); color: var(--white); }
+    body.theme-parchment header,body.theme-water header,body.theme-earth header { border-color: rgba(0,0,0,.1); }
+    body.theme-parchment .back-link,body.theme-water .back-link,body.theme-earth .back-link { color: var(--muted); border-color: var(--dim); }
+    body.theme-parchment .header-tag,body.theme-water .header-tag,body.theme-earth .header-tag { color: var(--muted); border-color: var(--dim); }
+    body.theme-parchment .ep-card,body.theme-water .ep-card,body.theme-earth .ep-card { background: rgba(255,255,255,.6); border-color: rgba(0,0,0,.1); }
+    body.theme-parchment .ep-title-text,body.theme-water .ep-title-text,body.theme-earth .ep-title-text { color: var(--white); }
+    body.theme-parchment .ep-num,body.theme-water .ep-num,body.theme-earth .ep-num { color: var(--muted); }
+    body.theme-parchment .section-divider-line,body.theme-water .section-divider-line,body.theme-earth .section-divider-line { background: rgba(0,0,0,.1); }
+    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: var(--white); color: var(--white); }
+    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: var(--white); }
+    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: var(--muted); border-color: var(--dim); }
+    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: var(--white); }
+    body.theme-parchment .viewer-controls,body.theme-water .viewer-controls,body.theme-earth .viewer-controls { background: rgba(255,255,255,.88); }
+    body.theme-parchment .vcbtn,body.theme-water .vcbtn,body.theme-earth .vcbtn { color: var(--muted); border-color: var(--dim); }
+    body.theme-parchment .book-card,body.theme-water .book-card,body.theme-earth .book-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
+    body.theme-parchment .book-title-text,body.theme-water .book-title-text,body.theme-earth .book-title-text { color: var(--white); }
+    body.theme-parchment .game-card,body.theme-water .game-card,body.theme-earth .game-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
+    body.theme-parchment .game-title,body.theme-water .game-title,body.theme-earth .game-title { color: var(--white); }
+    body.theme-parchment .game-desc,body.theme-water .game-desc,body.theme-earth .game-desc { color: var(--muted); }
+    body.theme-parchment .game-tag,body.theme-water .game-tag,body.theme-earth .game-tag { color: var(--muted); border-color: var(--dim); }
+</style>
+</head>
+<body>
+<script>
+/* Apply saved theme immediately */
+(function(){
+  var t=localStorage.getItem("avatarhub_theme");
+  if(t&&t!=="dark") document.body.classList.add(t);
+})();
+</script>
+<script>
+/* ══ PASSWORD GATE — runs before anything renders ══
+   Stored in localStorage — only need to enter once ever.
+   Hash: simple obfuscated check (not cryptographic — just keeps casual visitors out). */
+(function(){
+  var PASS = 'AvatarAang';
+  var KEY  = 'avatarhub_auth';
+  if (localStorage.getItem(KEY) === '1') return; // already authed this session
+
+  /* Inject gate CSS */
+  var style = document.createElement('style');
+  style.textContent = [
+    '#avatarGate{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;',
+    'background:radial-gradient(ellipse at 50% 40%,#071220 0%,#04070d 65%);',
+    'font-family:"Cinzel",Georgia,serif;}',
+    '#avatarGate .gate-symbols{display:flex;align-items:center;gap:clamp(1.2rem,4vw,3rem);margin-bottom:.5rem;}',
+    '#avatarGate .gate-sym{width:clamp(36px,5vw,56px);height:clamp(36px,5vw,56px);object-fit:contain;opacity:.8;}',
+    '#avatarGate .gate-title{font-family:"Cinzel Decorative",Georgia,serif;font-size:clamp(1.4rem,4vw,2.4rem);',
+    'letter-spacing:.12em;background:linear-gradient(135deg,#fff 0%,#d4e8ff 40%,#4db8ff 100%);',
+    '-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}',
+    '#avatarGate .gate-sub{font-family:"Philosopher",Georgia,serif;font-style:italic;font-size:clamp(.75rem,1.8vw,1rem);',
+    'color:#6b8aab;letter-spacing:.3em;text-transform:uppercase;text-align:center;}',
+    '#avatarGate .gate-form{display:flex;flex-direction:column;align-items:center;gap:.9rem;width:min(340px,88vw);}',
+    '#avatarGate .gate-label{font-size:.44rem;letter-spacing:.35em;text-transform:uppercase;color:#6b8aab;}',
+    '#avatarGate .gate-input-wrap{position:relative;width:100%;}',
+    '#avatarGate .gate-input{width:100%;background:rgba(10,17,28,.85);border:1px solid rgba(77,184,255,.25);',
+    'border-radius:30px;color:#f0f4ff;font-family:"Philosopher",Georgia,serif;font-size:1rem;',
+    'padding:.75em 3rem .75em 1.4em;outline:none;letter-spacing:.05em;',
+    'transition:border-color .25s,box-shadow .25s;text-align:center;}',
+    '#avatarGate .gate-input:focus{border-color:rgba(77,184,255,.6);box-shadow:0 0 0 3px rgba(77,184,255,.1);}',
+    '#avatarGate .gate-eye{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);',
+    'background:none;border:none;cursor:pointer;color:#6b8aab;padding:.2em;display:flex;align-items:center;}',
+    '#avatarGate .gate-eye:hover{color:#4db8ff;}',
+    '#avatarGate .gate-btn{width:100%;font-family:"Cinzel",Georgia,serif;font-size:.55rem;letter-spacing:.35em;',
+    'text-transform:uppercase;color:#04070d;background:linear-gradient(135deg,#4db8ff,#1a8fcc);',
+    'border:none;border-radius:30px;padding:.8em 1.5em;cursor:pointer;',
+    'transition:opacity .2s,transform .15s,box-shadow .2s;',
+    'box-shadow:0 4px 18px rgba(77,184,255,.35);}',
+    '#avatarGate .gate-btn:hover{opacity:.92;box-shadow:0 6px 24px rgba(77,184,255,.5);}',
+    '#avatarGate .gate-btn:active{transform:scale(.97);}',
+    '#avatarGate .gate-err{font-family:"Philosopher",Georgia,serif;font-style:italic;',
+    'font-size:.82rem;color:#f97316;letter-spacing:.08em;opacity:0;transition:opacity .3s;min-height:1.2em;}',
+    '#avatarGate .gate-err.show{opacity:1;}',
+    '@keyframes gateShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}',
+    '#avatarGate .gate-form.shake{animation:gateShake .4s cubic-bezier(.36,.07,.19,.97) both;}',
+    '@keyframes gatePulseAir{0%,100%{filter:drop-shadow(0 0 4px #f5c518)}50%{filter:drop-shadow(0 0 14px #f5c518)}}',
+    '@keyframes gatePulseWater{0%,100%{filter:drop-shadow(0 0 4px #4db8ff)}50%{filter:drop-shadow(0 0 14px #4db8ff)}}',
+    '@keyframes gatePulseEarth{0%,100%{filter:drop-shadow(0 0 4px #6abf69)}50%{filter:drop-shadow(0 0 14px #6abf69)}}',
+    '@keyframes gatePulseFire{0%,100%{filter:drop-shadow(0 0 4px #f97316)}50%{filter:drop-shadow(0 0 14px #f97316)}}',
+    '@keyframes gateIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}',
+    '#avatarGate .gate-form{animation:gateIn .55s cubic-bezier(.22,1,.36,1) .2s both;}',
+    '#avatarGate .gate-title{animation:gateIn .55s cubic-bezier(.22,1,.36,1) .05s both;}',
+    '#avatarGate .gate-sub{animation:gateIn .55s cubic-bezier(.22,1,.36,1) .12s both;}',
+    '@keyframes gateOut{to{opacity:0;transform:scale(1.04)}}',
+    '#avatarGate.leaving{animation:gateOut .5s cubic-bezier(.4,0,1,1) both;pointer-events:none;}',
+    '#avatarGate .gate-divider{width:60px;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.4),transparent);}',
+  ].join('');
+  document.head.appendChild(style);
+
+  /* Build gate HTML */
+  var gate = document.createElement('div');
+  gate.id = 'avatarGate';
+  gate.innerHTML =
+    '<div class="gate-symbols">' +
+      '<img class="gate-sym" src="images/air.png"   alt="Air"   style="animation:gatePulseAir   2.8s ease-in-out infinite 0s">' +
+      '<img class="gate-sym" src="images/water.png" alt="Water" style="animation:gatePulseWater 2.8s ease-in-out infinite .5s">' +
+      '<img class="gate-sym" src="images/earth.png" alt="Earth" style="animation:gatePulseEarth 2.8s ease-in-out infinite 1s">' +
+      '<img class="gate-sym" src="images/fire.png"  alt="Fire"  style="animation:gatePulseFire  2.8s ease-in-out infinite 1.5s">' +
+    '</div>' +
+    '<div class="gate-title">Avatar Hub</div>' +
+    '<div class="gate-sub">Members Only</div>' +
+    '<div class="gate-divider"></div>' +
+    '<div class="gate-form" id="gateForm">' +
+      '<label class="gate-label" for="gateInput">Enter Password</label>' +
+      '<div class="gate-input-wrap">' +
+        '<input class="gate-input" type="password" id="gateInput" placeholder="••••••••••" autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false">' +
+        '<button class="gate-eye" id="gateEye" type="button" tabindex="-1" aria-label="Toggle visibility">' +
+          '<svg id="eyeShow" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>' +
+          '<svg id="eyeHide" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<button class="gate-btn" id="gateSubmit">Enter the Avatar World</button>' +
+      '<div class="gate-err" id="gateErr">Incorrect password — try again</div>' +
+    '</div>';
+
+  document.body.insertBefore(gate, document.body.firstChild);
+
+  /* Interactions */
+  var input  = document.getElementById('gateInput');
+  var btn    = document.getElementById('gateSubmit');
+  var err    = document.getElementById('gateErr');
+  var form   = document.getElementById('gateForm');
+  var eye    = document.getElementById('gateEye');
+  var eyeShow= document.getElementById('eyeShow');
+  var eyeHide= document.getElementById('eyeHide');
+
+  function showErr(msg){
+    err.textContent = msg || 'Incorrect password — try again';
+    err.classList.add('show');
+    form.classList.remove('shake');
+    void form.offsetWidth; // reflow to restart animation
+    form.classList.add('shake');
+    input.select();
+    setTimeout(function(){ err.classList.remove('show'); }, 2800);
+  }
+
+  function tryEnter(){
+    var val = input.value;
+    if (!val) { showErr('Please enter the password'); return; }
+    if (val === PASS) {
+      localStorage.setItem(KEY, '1');
+      gate.classList.add('leaving');
+      setTimeout(function(){ gate.style.display = 'none'; }, 500);
+    } else {
+      input.value = '';
+      showErr('Incorrect password — try again');
+    }
+  }
+
+  btn.addEventListener('click', tryEnter);
+  input.addEventListener('keydown', function(e){ if (e.key === 'Enter') tryEnter(); });
+
+  /* Show/hide password toggle */
+  eye.addEventListener('click', function(){
+    if (input.type === 'password') {
+      input.type = 'text';
+      eyeShow.style.display = 'none';
+      eyeHide.style.display = '';
+    } else {
+      input.type = 'password';
+      eyeShow.style.display = '';
+      eyeHide.style.display = 'none';
+    }
+    input.focus();
+  });
+
+  /* Auto-focus after a tiny delay (avoids mobile keyboard popping prematurely) */
+  setTimeout(function(){ input.focus(); }, 350);
+})();
+</script>
+
+
+<!-- ── Intro overlay ── -->
+<div id="introOverlay">
+  <p class="intro-tagline">The Avatar World</p>
+  <div class="symbols-grid">
+    <div class="sym-item air">   <img class="sym-img" src="images/air.png"   alt="Air">   <span class="sym-label">Air</span></div>
+    <div class="sym-item water"> <img class="sym-img" src="images/water.png" alt="Water"> <span class="sym-label">Water</span></div>
+    <div class="sym-item earth"> <img class="sym-img" src="images/earth.png" alt="Earth"> <span class="sym-label">Earth</span></div>
+    <div class="sym-item fire">  <img class="sym-img" src="images/fire.png"  alt="Fire">  <span class="sym-label">Fire</span></div>
+  </div>
+  <p class="intro-hint">Tap anywhere to enter</p>
+</div>
+
+<!-- ── Background + particles ── -->
+<div class="bg-layer"></div>
+<canvas id="particleCanvas"></canvas>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="anim-header">
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      Back to Hub
+    </a>
+    <span class="header-tag">Avatar Games</span>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero anim-hero">
+    <p class="hero-eyebrow">The Avatar Universe · Games</p>
+    <h1 class="hero-main">ATLA Games</h1>
+    <p class="hero-sub">Download &amp; Play</p>
+    <div class="hero-divider"></div>
+  </div>
+
+  <!-- Games grid -->
+  <div class="games-grid anim-grid">
+
+    <!-- Quest for Balance -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93l-3.61 6.25h7.22L11.64 5.93zM4.5 18.07c1.11 0 2.01-.9 2.01-2.01S5.61 14.05 4.5 14.05 2.49 14.95 2.49 16.06s.9 2.01 2.01 2.01zm18.99-3.5c0 .67-.33 1.26-.83 1.62l-2.64 4.57c-.3.52-.86.84-1.46.84H5.94c-.6 0-1.16-.32-1.46-.84l-2.64-4.57A1.94 1.94 0 0 1 1 14.57c0-1.07.87-1.94 1.94-1.94h18.12c1.07 0 1.93.87 1.93 1.94z"/></svg>
+          Steam · PC, Switch, PS4/5, Xbox
+        </div>
+        <div class="game-title">Quest for Balance</div>
+        <div class="game-desc">Team Avatar is back! Play as Aang and 8 friends across 18 chapters retelling the original series, with 1–2 player co-op bending combat.</div>
+        <div class="game-tags">
+          <span class="game-tag">Action</span>
+          <span class="game-tag">Co-op</span>
+          <span class="game-tag">PC &amp; Console</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://store.steampowered.com/app/1620030/Avatar_The_Last_Airbender__Quest_for_Balance/" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+          Get on Steam
+        </a>
+      </div>
+    </div>
+
+    <!-- The Legend of Korra (game) — delisted -->
+    <div class="game-card discontinued">
+      <div class="game-body">
+        <div class="game-platform" style="color:rgba(249,115,22,.7)">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          Steam · Delisted
+        </div>
+        <div class="game-title">The Legend of Korra</div>
+        <div class="disc-badge">Discontinued</div>
+        <div class="game-desc">This official Korra beat-em-up was developed by PlatinumGames and set between Books Two and Three. It was removed from Steam in 2018 due to expired licensing and is no longer available for purchase.</div>
+        <div class="game-tags">
+          <span class="game-tag" style="color:rgba(249,115,22,.7);border-color:rgba(249,115,22,.2)">Action</span>
+          <span class="game-tag" style="color:rgba(249,115,22,.7);border-color:rgba(249,115,22,.2)">Beat 'em Up</span>
+          <span class="game-tag" style="color:rgba(249,115,22,.7);border-color:rgba(249,115,22,.2)">Removed 2018</span>
+        </div>
+        <div class="game-divider"></div>
+        <div class="download-btn" style="opacity:.4;cursor:not-allowed;pointer-events:none;border-color:rgba(249,115,22,.3);color:rgba(249,115,22,.6);background:rgba(249,115,22,.05)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          No Longer Available
+        </div>
+      </div>
+    </div>
+
+    <!-- Nickelodeon All-Star Brawl 2 -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.64 5.93l-3.61 6.25h7.22L11.64 5.93zM4.5 18.07c1.11 0 2.01-.9 2.01-2.01S5.61 14.05 4.5 14.05 2.49 14.95 2.49 16.06s.9 2.01 2.01 2.01zm18.99-3.5c0 .67-.33 1.26-.83 1.62l-2.64 4.57c-.3.52-.86.84-1.46.84H5.94c-.6 0-1.16-.32-1.46-.84l-2.64-4.57A1.94 1.94 0 0 1 1 14.57c0-1.07.87-1.94 1.94-1.94h18.12c1.07 0 1.93.87 1.93 1.94z"/></svg>
+          Steam · PC, Switch, PS4/5, Xbox
+        </div>
+        <div class="game-title">Nickelodeon All-Star Brawl 2</div>
+        <div class="game-desc">Platform fighter featuring Aang, Korra, and Azula as playable characters alongside iconic Nickelodeon heroes. Includes Avatar stages.</div>
+        <div class="game-tags">
+          <span class="game-tag">Fighter</span>
+          <span class="game-tag">Multiplayer</span>
+          <span class="game-tag">PC &amp; Console</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://store.steampowered.com/app/2017080/Nickelodeon_AllStar_Brawl_2/" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>
+          Get on Steam
+        </a>
+      </div>
+    </div>
+
+    <!-- Avatar Legends TTRPG -->
+    <div class="game-card">
+      <div class="game-body">
+        <div class="game-platform">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          Official Site · Tabletop RPG
+        </div>
+        <div class="game-title">Avatar Legends</div>
+        <div class="game-desc">The official Avatar tabletop roleplaying game by Magpie Games. Create your own bender and adventure through the four nations in original stories.</div>
+        <div class="game-tags">
+          <span class="game-tag">TTRPG</span>
+          <span class="game-tag">Tabletop</span>
+          <span class="game-tag">Official</span>
+        </div>
+        <div class="game-divider"></div>
+        <a href="https://www.magpiegames.com/pages/avatar-legends" target="_blank" rel="noopener" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+          Visit Official Site
+        </a>
+      </div>
+    </div>
+
+
+    <!-- Official Merch card -->
+    <div class="game-card merch-hub-card" style="grid-column:1/-1">
+      <div class="game-body" style="flex-direction:row;align-items:center;gap:2rem;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:.6rem">
+          <div class="game-platform" style="color:var(--gold)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+            Official Merchandise
+          </div>
+          <div class="game-title" style="color:var(--gold)">Avatar Official Stores</div>
+          <div class="game-desc">Get official Avatar: The Last Airbender and Legend of Korra merchandise — apparel, collectibles, posters, and more from the official stores.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.75rem;min-width:200px">
+          <a href="https://avatarthelastairbenderstore.com/" target="_blank" rel="noopener" class="download-btn" style="border-color:rgba(201,168,76,.4);color:var(--gold);background:rgba(201,168,76,.1)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+            Avatar Official Store
+          </a>
+          <a href="https://avatarthelastairbendermerch.com/" target="_blank" rel="noopener" class="download-btn" style="border-color:rgba(201,168,76,.4);color:var(--gold);background:rgba(201,168,76,.08)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+            Avatar Merch Store
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Jeffrey Creates watermark -->
+<a class="jeffrey-watermark" href="https://www.youtube.com/@Jeffrey_Creates" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24" style="width:9px;height:9px;fill:#ff1c1c;flex-shrink:0"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+  Jeffrey Creates
+</a>
+
+<script>
+/* ── Intro overlay ── */
+const introOverlay = document.getElementById('introOverlay');
+let introDone = false;
+requestAnimationFrame(() => setTimeout(() => introOverlay.classList.add('symbols-in'), 60));
+function dismissIntro() {
+  if (introDone) return; introDone = true;
+  introOverlay.classList.add('fade-out');
+  setTimeout(() => { introOverlay.style.display = 'none'; document.body.classList.add('page-ready'); }, 650);
+}
+introOverlay.addEventListener('click', dismissIntro, { once: true });
+introOverlay.addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'Enter') dismissIntro(); });
+introOverlay.setAttribute('tabindex', '0');
+setTimeout(() => { if (!introDone) dismissIntro(); }, 5000);
+
+/* ── Ambient particles ── */
+(function() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx    = canvas.getContext('2d');
+  const BASE   = 'images/';
+  const imgs   = ['air','water','earth','fire'].map(n => {
+    const img = new Image(); img.crossOrigin = 'anonymous'; img.src = BASE + n + '.png'; return img;
+  });
+  let W, H, particles = [];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  /* Debounced resize — avoids thrashing on every pixel of window drag */
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 150); });
+  function rand(a,b){ return a + Math.random()*(b-a); }
+  function spawn() {
+    const img  = imgs[Math.floor(Math.random()*imgs.length)];
+    const type = Math.random()<.4 ? 'orbit' : (Math.random()<.5 ? 'wave' : 'drift');
+    const base = { img, x:rand(0,W), y:rand(0,H), alpha:rand(.04,.1), size:rand(10,22),
+                   rot:rand(0,Math.PI*2), vrot:rand(-.004,.004), type };
+    if (type==='orbit') return {...base, cx:rand(0,W), cy:rand(0,H), rx:rand(40,160), ry:rand(30,110),
+                                angle:rand(0,Math.PI*2), speed:rand(.002,.006)*(Math.random()<.5?1:-1)};
+    const angle=rand(0,Math.PI*2), sp=rand(.06,.22);
+    if (type==='wave') return {...base, vx:Math.cos(angle)*sp, vy:Math.sin(angle)*sp,
+                                wAmp:rand(.4,1.6), wFreq:rand(.008,.02), wOff:rand(0,Math.PI*2), t:0};
+    return {...base, vx:Math.cos(angle)*sp, vy:Math.sin(angle)*sp};
+  }
+  for (let i=0; i<80; i++) particles.push(spawn());
+  const pad = 60;
+  let rafId;
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    for (const p of particles) {
+      if (p.type==='orbit') {
+        p.angle += p.speed; p.x = p.cx + Math.cos(p.angle)*p.rx; p.y = p.cy + Math.sin(p.angle)*p.ry;
+      } else if (p.type==='wave') {
+        p.t++; p.x += p.vx + Math.sin(p.t*p.wFreq+p.wOff)*p.wAmp*.08; p.y += p.vy;
+      } else { p.x += p.vx; p.y += p.vy; }
+      p.rot += p.vrot;
+      if (p.type!=='orbit' && (p.x<-pad||p.x>W+pad||p.y<-pad||p.y>H+pad)) {
+        Object.assign(p, spawn()); p.x=rand(0,W); p.y=rand(0,H); continue;
+      }
+      if (!p.img.complete || !p.img.naturalWidth) continue;
+      ctx.save(); ctx.globalAlpha=p.alpha;
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.drawImage(p.img,-p.size/2,-p.size/2,p.size,p.size);
+      ctx.restore();
+    }
+    rafId = requestAnimationFrame(draw);
+  }
+  rafId = requestAnimationFrame(draw);
+  /* Pause when tab hidden — saves CPU */
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { cancelAnimationFrame(rafId); }
+    else { rafId = requestAnimationFrame(draw); }
+  });
+})();
+</script>
+</body>
+</html>
