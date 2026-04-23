@@ -1207,30 +1207,15 @@ window.addEventListener('pagehide', () => {
   clearTimeout(idleTimer);
 });
 
-/* ── Whisper AI Captions ── */
-(function(){
-  const script = document.createElement('script');
-  script.src = 'whisper-captions.js';
-  script.onload = () => {
-    if(window.WhisperCaptions && typeof ccBtn!=='undefined'){
-      WhisperCaptions.injectButton(
-        ccBtn, vid, captionBox,
-        'korra',
-        (currentEp ? `b${currentEp.book}_e${currentEp.num}` : 'unknown')
-      );
-      /* Update button episode ref when episode changes */
-      const origLoad = loadEpisode;
-      window.loadEpisode = function(b,n,...args){
-        origLoad(b,n,...args);
-        const aiBtn=document.getElementById('aiCCBtn');
-        if(aiBtn) aiBtn.onclick = ()=>WhisperCaptions.run(
-          aiBtn,vid,captionBox, 'korra' ,`b${b}_e${n}`
-        );
-      };
-    }
-  };
-  document.head.appendChild(script);
-})();
+/* CC button — load SRT on first enable if not yet loaded */
+ccBtn.addEventListener('click',()=>{
+  if(captionsOn && !srtCues.length && currentEp){
+    fetch(subUrl(currentEp.book,currentEp.num))
+      .then(r=>r.ok?r.text():Promise.reject())
+      .then(t=>{srtCues=parseSRT(t);})
+      .catch(()=>{});
+  }
+});
 </script>
 </body>
 </html>
