@@ -851,7 +851,7 @@ const BOOKS = [
 function epUrl(b,n){ const bd=BOOKS[b-1]; return `${GH}/${bd.tag}/S${b}E${n}.${bd.ext}`; }
 function epMime(b){ return BOOKS[b-1].ext==='mp4'?'video/mp4':'video/x-matroska'; }
 function subUrl(b,n){
-  return `captions/kora-season${b}-merged/${n}.srt`;
+  return `captions/kora-season${b}/${n}.srt`;
 }
 function getNext(b,n){ const bd=BOOKS[b-1]; if(n<bd.episodes.length) return{book:b,num:n+1,title:bd.episodes[n]}; if(b<4) return{book:b+1,num:1,title:BOOKS[b].episodes[0]}; return null; }
 

@@ -854,7 +854,7 @@ const BOOKS = [
 // epUrl defined below in renderEpisodes block
 function subUrl(b,n){
   if(b===1&&n===0) return null; // unaired pilot
-  return `captions/atla-season${b}-merged/${n}.srt`;
+  return `captions/atla-season${b}/${n}.srt`;
 }
 function getNext(b,n){ const bd=BOOKS[b-1]; if(n===0) return{book:b,num:1,title:bd.episodes[0]}; if(n<bd.episodes.length) return{book:b,num:n+1,title:bd.episodes[n]}; if(b<3) return{book:b+1,num:1,title:BOOKS[b].episodes[0]}; return null; }
 
