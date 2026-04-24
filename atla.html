@@ -820,6 +820,8 @@
       <div class="sk-row"><span class="sk-key">M</span><span class="sk-desc">Mute / Unmute</span></div>
       <div class="sk-row"><span class="sk-key">F</span><span class="sk-desc">Toggle Fullscreen</span></div>
       <div class="sk-row"><span class="sk-key">C</span><span class="sk-desc">Toggle Captions</span></div>
+      <div class="sk-row"><span class="sk-key">[ / ]</span><span class="sk-desc">Caption sync −0.5s / +0.5s</span></div>
+      <div class="sk-row"><span class="sk-key">\</span><span class="sk-desc">Reset caption sync</span></div>
       <div class="sk-row"><span class="sk-key">N</span><span class="sk-desc">Next Episode</span></div>
       <div class="sk-row"><span class="sk-key">?</span><span class="sk-desc">Show this guide</span></div>
     </div>
@@ -873,7 +875,10 @@ const vid=document.getElementById('mainVideo'),shell=document.getElementById('pl
 let idleTimer;
 function resetIdle(){ shell.classList.remove('idle'); clearTimeout(idleTimer); if(!vid.paused) idleTimer=setTimeout(()=>shell.classList.add('idle'),1250); }
 document.addEventListener('mousemove',resetIdle); document.addEventListener('keydown',resetIdle); document.addEventListener('touchstart',resetIdle,{passive:true});
-document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT')return; switch(e.code){ case'Space':case'KeyK':e.preventDefault();togglePlay();break;case'ArrowRight':e.preventDefault();if(isFinite(vid.duration))vid.currentTime=Math.min(vid.duration,vid.currentTime+5);showOSD('+5s');break;case'ArrowLeft':e.preventDefault();vid.currentTime=Math.max(0,vid.currentTime-5);showOSD('−5s');break;case'ArrowUp':e.preventDefault();vid.volume=Math.min(1,vid.volume+.1);vid.muted=false;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'ArrowDown':e.preventDefault();vid.volume=Math.max(0,vid.volume-.1);vid.muted=vid.volume===0;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'KeyM':vid.muted=!vid.muted;volSlider.value=vid.muted?0:(vid.volume||1);updateVolUI();showOSD(vid.muted?'Muted':'Sound On');break;case'KeyF':e.preventDefault();toggleFullscreen();showOSD('Fullscreen');break;case'KeyC':ccBtn&&ccBtn.click();break;case'KeyN':{ const nxt=currentEp&&getNext(currentEp.book,currentEp.num);if(nxt)loadEpisode(nxt.book,nxt.num);break;}case'Slash':if(e.shiftKey){e.preventDefault();document.getElementById('shortcutsModal').classList.toggle('open');}break;} });
+document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT')return; switch(e.code){ case'Space':case'KeyK':e.preventDefault();togglePlay();break;case'ArrowRight':e.preventDefault();if(isFinite(vid.duration))vid.currentTime=Math.min(vid.duration,vid.currentTime+5);showOSD('+5s');break;case'ArrowLeft':e.preventDefault();vid.currentTime=Math.max(0,vid.currentTime-5);showOSD('−5s');break;case'ArrowUp':e.preventDefault();vid.volume=Math.min(1,vid.volume+.1);vid.muted=false;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'ArrowDown':e.preventDefault();vid.volume=Math.max(0,vid.volume-.1);vid.muted=vid.volume===0;volSlider.value=vid.volume;updateVolUI();showOSD('Vol '+Math.round(vid.volume*100)+'%');break;case'KeyM':vid.muted=!vid.muted;volSlider.value=vid.muted?0:(vid.volume||1);updateVolUI();showOSD(vid.muted?'Muted':'Sound On');break;case'KeyF':e.preventDefault();toggleFullscreen();showOSD('Fullscreen');break;case'KeyC':ccBtn&&ccBtn.click();break;
+case'BracketLeft':nudgeCaptionOffset(-0.5);break;
+case'BracketRight':nudgeCaptionOffset(0.5);break;
+case'Backslash':nudgeCaptionOffset(-CAPTION_OFFSET);break;case'KeyN':{ const nxt=currentEp&&getNext(currentEp.book,currentEp.num);if(nxt)loadEpisode(nxt.book,nxt.num);break;}case'Slash':if(e.shiftKey){e.preventDefault();document.getElementById('shortcutsModal').classList.toggle('open');}break;} });
 let tapTimer=null,tapCount=0,lastTapX=0;
 clickArea.addEventListener('touchend',e=>{
   e.preventDefault();resetIdle();
@@ -1001,13 +1006,21 @@ vid.addEventListener('ended',()=>{ updateShimmer(); if(currentEp){ const n=getNe
 
 /* Captions */
 let captionsOn=false,srtCues=[],lastCueText=null;
-const CAPTION_OFFSET=0;
+let CAPTION_OFFSET=parseFloat(localStorage.getItem('avatarhub_cc_offset')||'0');
 function parseSRT(text){ return text.replace(/\r/g,'').trim().split(/\n\n+/).reduce((c,b)=>{ const l=b.split('\n'),t=l[1]?.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s-->\s(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);if(t&&l.length>=3){const p=(h,m,s,ms)=>+h*3600+ +m*60+ +s+ +ms/1000;c.push({start:p(t[1],t[2],t[3],t[4]),end:p(t[5],t[6],t[7],t[8]),text:l.slice(2).join('\n')});}return c;},[]);}
 function showCaption(t){captionBox.innerHTML='<span>'+t.replace(/\n/g,'<br>')+'</span>';captionBox.style.display='block';requestAnimationFrame(()=>captionBox.classList.add('visible'));}
 function hideCaption(){captionBox.classList.remove('visible');setTimeout(()=>{if(!captionBox.classList.contains('visible'))captionBox.style.display='none';},200);}
 function renderCaption(){ if(!captionsOn||!srtCues.length){hideCaption();return;} const t=vid.currentTime+CAPTION_OFFSET,cue=srtCues.find(c=>t>=c.start&&t<=c.end),text=cue?.text??null; if(text===lastCueText)return;lastCueText=text;text?showCaption(text):hideCaption(); }
 vid.addEventListener('timeupdate',renderCaption);
 ccBtn.addEventListener('click',()=>{captionsOn=!captionsOn;ccBtn.classList.toggle('active',captionsOn);if(!captionsOn){hideCaption();lastCueText=null;}});
+/* Caption sync nudge — [ to shift earlier, ] to shift later, \ to reset */
+function nudgeCaptionOffset(delta){
+  CAPTION_OFFSET=Math.round((CAPTION_OFFSET+delta)*10)/10;
+  localStorage.setItem('avatarhub_cc_offset',CAPTION_OFFSET);
+  lastCueText=null;
+  const sign=CAPTION_OFFSET>0?'+':'';
+  showOSD('CC '+(CAPTION_OFFSET===0?'Sync Reset':sign+CAPTION_OFFSET+'s'));
+}
 
 /* Load episode */
 function loadEpisode(book,epNum){

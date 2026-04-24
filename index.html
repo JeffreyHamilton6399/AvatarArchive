@@ -105,6 +105,38 @@
     body.theme-water    .sp-divider,
     body.theme-earth    .sp-divider { background: rgba(0,0,0,.1); }
 
+    /* ── Additional light-theme fixes ── */
+    body.theme-parchment .hero-eyebrow,
+    body.theme-water    .hero-eyebrow,
+    body.theme-earth    .hero-eyebrow { color: var(--muted); }
+    body.theme-parchment .hero-sub,
+    body.theme-water    .hero-sub,
+    body.theme-earth    .hero-sub { color: var(--muted); }
+    body.theme-parchment .hub-card,
+    body.theme-water    .hub-card,
+    body.theme-earth    .hub-card { border-color: rgba(0,0,0,.1); }
+    body.theme-parchment .sr-meta,
+    body.theme-water    .sr-meta,
+    body.theme-earth    .sr-meta { color: var(--muted); }
+    body.theme-parchment .search-results .sr-empty,
+    body.theme-water    .search-results .sr-empty,
+    body.theme-earth    .search-results .sr-empty { color: var(--muted); }
+    body.theme-parchment #settingsPanel,
+    body.theme-water    #settingsPanel { background: rgba(245,239,224,.98); }
+    body.theme-earth    #settingsPanel { background: rgba(240,244,232,.98); }
+    body.theme-parchment .sp-ambient-row:hover,
+    body.theme-water    .sp-ambient-row:hover,
+    body.theme-earth    .sp-ambient-row:hover { background: rgba(0,0,0,.05); }
+    body.theme-parchment .theme-opt:hover,
+    body.theme-water    .theme-opt:hover,
+    body.theme-earth    .theme-opt:hover { background: rgba(0,0,0,.05); }
+    body.theme-parchment .sp-install-row,
+    body.theme-water    .sp-install-row,
+    body.theme-earth    .sp-install-row { color: var(--muted); }
+    body.theme-parchment .sp-install-row:hover,
+    body.theme-water    .sp-install-row:hover,
+    body.theme-earth    .sp-install-row:hover { background: rgba(0,0,0,.05); color: var(--white); }
+
     /* ── Settings button + panel ── */
     #settingsBtn {
       position: fixed; bottom: 14px; left: 18px; z-index: 50;
@@ -228,6 +260,7 @@
       background-size: cover; background-position: center top;
       filter: blur(8px) brightness(0.2) saturate(1.4);
       transform: scale(1.04); z-index: 0;
+      will-change: transform;
     }
     .bg-layer::after {
       content: ''; position: absolute; inset: 0;
@@ -312,6 +345,7 @@
       border: 1px solid var(--border);
       text-decoration: none; color: inherit;
       transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, border-color .35s ease;
+      will-change: transform;
     }
     .hub-card:hover { transform: translateY(-7px); }
 
@@ -340,6 +374,7 @@
       background-size: cover; background-position: center;
       filter: brightness(.5) saturate(1.2);
       transition: filter .4s ease, transform .45s ease;
+      will-change: transform, filter;
     }
     .hub-card:hover .card-poster-bg { filter: brightness(.72) saturate(1.5); transform: scale(1.06); }
     .card-poster-overlay {
@@ -802,8 +837,8 @@
       </div>
       <div class="card-body">
         <span class="card-label">Animated Film · 2026</span>
-        <div class="card-title">Aang, The Last Airbender</div>
-        <div class="card-sub">Avatar: The Movie</div>
+        <div class="card-title">Legend of Aang</div>
+        <div class="card-sub">Avatar: The Last Airbender Film</div>
         <div class="card-meta">
           <span class="card-tag">Avatar Studios</span>
           <span class="card-tag">Paramount+</span>
@@ -1023,37 +1058,37 @@
 
 <script>
 /* ══════════════════════════════════════════
-   AUDIO ENGINE  — Web Audio API approach
-   Fetches and decodes audio as ArrayBuffers,
-   then plays via AudioContext nodes.
-   This fully bypasses the <audio> autoplay
-   policy because the context is unlocked
-   synchronously inside the click handler.
+   AUDIO ENGINE  — Web Audio API
+   Fixed: AudioContext is properly created &
+   resumed before any decode/play call.
 ══════════════════════════════════════════ */
 const ambientBtn = document.getElementById('ambientRow');
 const soundNudge = document.getElementById('soundNudge');
 
-let audioCtx        = null;
-let ambientSource   = null;   // AudioBufferSourceNode for looping ambient
-let gainNode        = null;   // GainNode for fade
-let introBuffer     = null;   // decoded intro AudioBuffer
-let ambientBuffer   = null;   // decoded ambient AudioBuffer
-let ambientPlaying  = false;
-let introStarted    = false;
-let fadeTimer       = null;
-let nudgeTimer      = null;
-const savedMuted    = localStorage.getItem('avatarhub_ambient_off') === '1';
+let audioCtx       = null;
+let ambientSource  = null;
+let gainNode       = null;
+let introBuffer    = null;
+let ambientBuffer  = null;
+let ambientPlaying = false;
+let introStarted   = false;
+let fadeTimer      = null;
+let nudgeTimer     = null;
+const savedMuted   = localStorage.getItem('avatarhub_ambient_off') === '1';
 
-/* Create / resume AudioContext — MUST be called inside a click handler */
-function unlockAudioContext() {
+/* Create & resume AudioContext — call synchronously inside a user gesture */
+async function ensureAudioCtx() {
   if (!audioCtx) {
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return false; }
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return false; }
   }
-  if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-  return true;
+  if (audioCtx.state === 'suspended') {
+    try { await audioCtx.resume(); } catch(e) {}
+  }
+  return audioCtx.state === 'running';
 }
 
-/* Fetch + decode an audio file into an AudioBuffer */
+/* Fetch + decode — only called after ctx is running */
 async function fetchBuffer(url) {
   try {
     const resp = await fetch(url);
@@ -1063,35 +1098,44 @@ async function fetchBuffer(url) {
   } catch(e) { return null; }
 }
 
-/* Preload both files as soon as AudioContext exists */
-async function preloadBuffers() {
+/* Pre-fetch raw bytes passively (no ctx needed) */
+let _introRaw   = null;
+let _ambientRaw = null;
+fetch('audio/intro.mp3')  .then(r => r.ok ? r.arrayBuffer() : null).then(b => { _introRaw   = b; }).catch(()=>{});
+fetch('audio/ambient.mp3').then(r => r.ok ? r.arrayBuffer() : null).then(b => { _ambientRaw = b; }).catch(()=>{});
+
+/* Decode pre-fetched raw buffers once ctx exists */
+async function ensureBuffers() {
   if (!audioCtx) return;
+  if (!introBuffer && _introRaw) {
+    try { introBuffer = await audioCtx.decodeAudioData(_introRaw.slice(0)); } catch(e) {}
+  }
+  if (!ambientBuffer && _ambientRaw) {
+    try { ambientBuffer = await audioCtx.decodeAudioData(_ambientRaw.slice(0)); } catch(e) {}
+  }
+  /* Fallback: fetch if passive pre-fetch missed */
   if (!introBuffer)   introBuffer   = await fetchBuffer('audio/intro.mp3');
   if (!ambientBuffer) ambientBuffer = await fetchBuffer('audio/ambient.mp3');
 }
 
-/* Play a buffer through a gain node, returns the source node */
-function playBuffer(buf, loop, vol) {
+function _playBuffer(buf, loop, vol) {
   if (!buf || !audioCtx) return null;
   const src  = audioCtx.createBufferSource();
-  src.buffer = buf;
-  src.loop   = !!loop;
+  src.buffer = buf; src.loop = !!loop;
   const gain = audioCtx.createGain();
   gain.gain.value = vol ?? 1;
-  src.connect(gain);
-  gain.connect(audioCtx.destination);
+  src.connect(gain); gain.connect(audioCtx.destination);
   src.start(0);
   return { src, gain };
 }
 
 function ambientFadeIn() {
-  if (ambientPlaying || !audioCtx) return;
-  if (!ambientBuffer) { showSoundNudge(); return; }
+  if (ambientPlaying || !audioCtx || !ambientBuffer) return;
   clearInterval(fadeTimer);
-  const nodes = playBuffer(ambientBuffer, true, 0);
+  const nodes = _playBuffer(ambientBuffer, true, 0);
   if (!nodes) return;
-  ambientSource = nodes.src;
-  gainNode      = nodes.gain;
+  ambientSource  = nodes.src;
+  gainNode       = nodes.gain;
   ambientPlaying = true;
   ambientBtn.classList.add('active');
   hideSoundNudge();
@@ -1106,20 +1150,19 @@ function ambientFadeIn() {
 function ambientFadeOut() {
   if (!ambientPlaying) return;
   clearInterval(fadeTimer);
-  const g = gainNode;
-  const s = ambientSource;
+  const g = gainNode, s = ambientSource;
+  ambientPlaying = false;
+  ambientBtn.classList.remove('active');
+  hideSoundNudge();
+  localStorage.setItem('avatarhub_ambient_off', '1');
   fadeTimer = setInterval(() => {
     if (!g) { clearInterval(fadeTimer); return; }
     g.gain.value = Math.max(0, g.gain.value - 0.04);
     if (g.gain.value <= 0) {
       clearInterval(fadeTimer);
       try { s.stop(); } catch(e) {}
-      ambientPlaying = false;
     }
   }, 60);
-  ambientBtn.classList.remove('active');
-  hideSoundNudge();
-  localStorage.setItem('avatarhub_ambient_off', '1');
 }
 
 function showSoundNudge() {
@@ -1135,34 +1178,46 @@ function hideSoundNudge() {
 async function startAudioSequence() {
   if (savedMuted || introStarted) return;
   introStarted = true;
-  await preloadBuffers();
+  const ok = await ensureAudioCtx();
+  if (!ok) return;
+  await ensureBuffers();
   if (introBuffer) {
-    const nodes = playBuffer(introBuffer, false, 1);
+    const nodes = _playBuffer(introBuffer, false, 1);
     if (nodes) {
-      nodes.src.addEventListener('ended', () => {
-        if (!savedMuted) ambientFadeIn();
-      });
-      /* Safety timeout */
-      const dur = introBuffer.duration > 0 ? introBuffer.duration * 1000 + 500 : 6000;
+      const dur = (introBuffer.duration > 0 ? introBuffer.duration * 1000 + 400 : 5500);
+      nodes.src.onended = () => { if (!ambientPlaying && !savedMuted) ambientFadeIn(); };
       setTimeout(() => { if (!ambientPlaying && !savedMuted) ambientFadeIn(); }, dur);
       return;
     }
   }
-  /* No intro or failed — go straight to ambient */
   if (!savedMuted) ambientFadeIn();
 }
 
-ambientBtn.addEventListener('click', () => {
-  if (!unlockAudioContext()) return;
-  preloadBuffers().then(() => {
-    ambientPlaying ? ambientFadeOut() : ambientFadeIn();
+/* Toggle button — reliable click handler */
+ambientBtn.addEventListener('click', async () => {
+  const ok = await ensureAudioCtx();
+  if (!ok) return;
+  if (ambientPlaying) {
+    ambientFadeOut();
+  } else {
+    await ensureBuffers();
+    if (ambientBuffer) {
+      ambientFadeIn();
+    } else {
+      showSoundNudge();
+    }
+  }
+});
+
+if (soundNudge) {
+  soundNudge.addEventListener('click', async () => {
+    const ok = await ensureAudioCtx();
+    if (!ok) return;
+    hideSoundNudge();
+    await ensureBuffers();
+    if (!ambientPlaying && ambientBuffer) ambientFadeIn();
   });
-});
-if (soundNudge) soundNudge.addEventListener('click', () => {
-  if (!unlockAudioContext()) return;
-  hideSoundNudge();
-  preloadBuffers().then(() => { if (!ambientPlaying) ambientFadeIn(); });
-});
+}
 
 /* ══════════════════════════════════════════
    WORLD MAP SPLASH  →  MAIN PAGE
@@ -1184,15 +1239,15 @@ function dismissMap() {
 
 /* Click → unlock audio synchronously (required by browsers), start audio,
    then dismiss the splash */
-mapSplash.addEventListener('click', () => {
-  unlockAudioContext();   // must be synchronous inside the click gesture
-  startAudioSequence();   // safe now — AudioContext is unlocked
+mapSplash.addEventListener('click', async () => {
+  await ensureAudioCtx();   // must be inside the click gesture
+  startAudioSequence();
   dismissMap();
 }, { once: true });
 
-mapSplash.addEventListener('keydown', e => {
+mapSplash.addEventListener('keydown', async e => {
   if (e.code === 'Space' || e.code === 'Enter') {
-    unlockAudioContext();
+    await ensureAudioCtx();
     startAudioSequence();
     dismissMap();
   }
@@ -1230,7 +1285,7 @@ const ALL_EPISODES = [
   ...['After All These Years','Korra Alone','The Coronation','The Calling','Enemy at the Gates','The Battle of Zaofu','Reunion','Remembrances','Beyond the Wilds','Operation Beifong',"Kuvira's Gambit",'Day of the Colossus','The Last Stand']
     .map((t,i) => ({title:t, series:'korra', seriesLabel:'The Legend of Korra', ep:`Book 4 · Ep ${i+1}`, href:'kora.html', cls:'korra'})),
   // Animated Movie
-  {title:'Aang, The Last Airbender', series:'movie', seriesLabel:'The Animated Film · 2026', ep:'Feature Film', href:'movie2026.html', cls:'movie'},
+  {title:'Legend of Aang', series:'movie', seriesLabel:'Animated Film · 2026', ep:'Feature Film', href:'movie2026.html', cls:'movie'},
   // Live Action Movie
   {title:'The Last Airbender', series:'liveactionmovie', seriesLabel:'Live Action Film · 2010', ep:'Feature Film', href:'movie2010.html', cls:'liveactionmovie'},
   // Live Action Show
@@ -1279,7 +1334,7 @@ document.addEventListener('click', e => { if (!e.target.closest('.search-bar-wra
 searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runSearch(searchInput.value); });
 
 /* ══════════════════════════════════════════
-   AMBIENT PARTICLES (unchanged)
+   AMBIENT PARTICLES — optimised
 ══════════════════════════════════════════ */
 (function() {
   const canvas = document.getElementById('particleCanvas');
@@ -1289,9 +1344,10 @@ searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runS
     const img = new Image(); img.crossOrigin = 'anonymous'; img.src = BASE + n + '.png'; return img;
   });
   let W, H, particles = [];
+  const isMobile = window.matchMedia('(max-width:640px)').matches;
+  const COUNT = isMobile ? 40 : 100;
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   resize();
-  /* Debounced resize — avoids thrashing on every pixel of window drag */
   let resizeTimer;
   window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 150); });
   function rand(a,b){ return a + Math.random()*(b-a); }
@@ -1307,7 +1363,7 @@ searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runS
                                 wAmp:rand(.4,1.6), wFreq:rand(.008,.02), wOff:rand(0,Math.PI*2), t:0};
     return {...base, vx:Math.cos(angle)*sp, vy:Math.sin(angle)*sp};
   }
-  for (let i=0; i<100; i++) particles.push(spawn());
+  for (let i=0; i<COUNT; i++) particles.push(spawn());
   const pad = 60;
   let rafId;
   function draw() {
@@ -1337,7 +1393,6 @@ searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) runS
     rafId = requestAnimationFrame(draw);
   }
   rafId = requestAnimationFrame(draw);
-  /* Pause when tab hidden — saves CPU */
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) { cancelAnimationFrame(rafId); }
     else { rafId = requestAnimationFrame(draw); }

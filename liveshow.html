@@ -1427,8 +1427,28 @@ document.addEventListener('keydown', e => {
       toggleFullscreen();
       showOSD(document.fullscreenElement ? '⤡ Exit' : '⤢ Fullscreen');
       break;
+    case 'KeyC':
+      ccBtn && ccBtn.click();
+      break;
+    case 'BracketLeft':
+      nudgeCaptionOffset(-0.5);
+      break;
+    case 'BracketRight':
+      nudgeCaptionOffset(0.5);
+      break;
+    case 'Backslash':
+      nudgeCaptionOffset(-CAPTION_OFFSET);
+      break;
   }
 });
+
+function nudgeCaptionOffset(delta) {
+  CAPTION_OFFSET = Math.round((CAPTION_OFFSET + delta) * 10) / 10;
+  localStorage.setItem('avatarhub_cc_offset', CAPTION_OFFSET);
+  lastCueText = null;
+  const sign = CAPTION_OFFSET > 0 ? '+' : '';
+  showOSD('CC ' + (CAPTION_OFFSET === 0 ? 'Sync Reset' : sign + CAPTION_OFFSET + 's'));
+}
 
 /* ── Touch: double-tap left/right to seek 10s, single tap play/pause ── */
 let tapTimer = null, tapCount = 0, lastTapX = 0;
@@ -1575,7 +1595,7 @@ const captionBox = document.getElementById('captionBox');
 let captionsOn   = false;
 let srtCues      = [];
 let lastCueText  = null;
-const CAPTION_OFFSET = 0; // adjust if captions are out of sync
+let CAPTION_OFFSET = parseFloat(localStorage.getItem('avatarhub_cc_offset') || '0'); // [ and ] to nudge, \ to reset
 
 function parseSRT(text) {
   return text.replace(/\r/g, '').trim().split(/\n\n+/).reduce((cues, block) => {
