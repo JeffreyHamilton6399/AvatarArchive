@@ -1,77 +1,72 @@
 # AvatarArchive
 
-A fan-made personal media hub for the entire Avatar universe — built by Jeffrey Creates.
+> A fan-made personal media hub for the entire Avatar universe.
+
+Built by [Jeffrey Creates](https://www.youtube.com/@Jeffrey_Creates) — vanilla web tech, no frameworks, no servers.
 
 ---
 
 ## Pages
 
-| File | Content |
-|------|---------|
-| `index.html` | Home screen — all series, films, and features in one place |
-| `atla.html` | Avatar: The Last Airbender (2005–2008) — all 3 Books, 61 episodes |
-| `kora.html` | The Legend of Korra (2012–2014) — all 4 Books, 52 episodes |
-| `liveshow.html` | Netflix Live Action Series (2024) — Seasons 1 & 2 |
-| `movie2026.html` | Aang, The Last Airbender — 2026 animated film |
-| `movie2010.html` | The Last Airbender — 2010 live action film |
-| `books.html` | Avatar graphic novels and comics (Dark Horse) |
+| File | Description |
+|------|-------------|
+| `index.html` | Home — all series, films, and features in one place |
+| `atla.html` | Avatar: The Last Airbender (2005–2008) · Books 1–3 · 61 episodes |
+| `kora.html` | The Legend of Korra (2012–2014) · Books 1–4 · 52 episodes |
+| `liveshow.html` | Netflix Live Action Series (2024) · Seasons 1–2 |
+| `movie2026.html` | Aang, The Last Airbender · 2026 animated film |
+| `movie2010.html` | The Last Airbender · 2010 live action film |
+| `books.html` | Avatar graphic novels & comics (Dark Horse) |
 | `games.html` | ATLA games collection |
-| `merch.html` | Official merchandise — links to Paramount, Netflix, Nick, Funko, and more |
+| `merch.html` | Official merchandise — Paramount, Netflix, Nick, Funko, and more |
 
 ---
 
 ## Features
 
-### Video Player
-Custom-built player with skip-intro detection, next-episode auto-advance, and per-episode progress memory stored in `localStorage`. Keyboard shortcuts cover playback, volume, fullscreen, and captions.
+**Video Player**
+Custom-built player with skip-intro detection, next-episode auto-advance, and per-episode progress memory via `localStorage`. Full keyboard shortcut support for playback, volume, fullscreen, and captions.
 
-### AI Captions
-The **AI CC** button in the video player uses Whisper Tiny (via Transformers.js + WebAssembly) to generate captions in real time as the video plays — no server required. Audio is captured through the Web Audio API at the browser's native sample rate and downsampled to 16 kHz before being processed by the model.
+**AI Captions**
+The **AI CC** button runs Whisper Tiny (via Transformers.js + WebAssembly) entirely in the browser — no server, no upload. Audio is captured through the Web Audio API at the browser's native sample rate and software-downsampled to 16 kHz before model inference.
 
-- First use downloads approximately 39 MB of model weights (cached permanently in IndexedDB)
-- Audio is processed in 30-second chunks; captions appear progressively like YouTube auto-captions
-- Once an episode is fully captioned, results are cached in `localStorage` for instant replay on subsequent views
-- The cache key updates per episode so each episode's captions are stored and retrieved independently
+- ~39 MB of model weights downloaded on first use, then permanently cached in IndexedDB
+- Audio processed in 30-second chunks with captions appearing progressively
+- Completed caption sets cached in `localStorage` per episode for instant replay
+- Cache keys are episode-scoped, so switching episodes never serves stale captions
 
-### SRT Subtitles
-Each episode supports standard SRT subtitle files fetched automatically at load time. The CC button toggles these; AI CC generates captions independently.
+**SRT Subtitles**
+Standard SRT files fetched automatically at load time. The CC button toggles them; AI CC operates independently.
 
-### Cross-Series Search
-A debounced search bar on the home page queries all 113+ episodes across ATLA, Korra, the films, games, and merchandise — results appear inline with series color-coding.
+**Cross-Series Search**
+Debounced search across all 113+ episodes, films, games, and merchandise — results appear inline with per-series color coding.
 
-### Themes
-Four built-in themes — Dark, Parchment, Water, Earth — applied via CSS custom properties and persisted in `localStorage`.
+**Themes**
+Four built-in themes — Dark, Parchment, Water, Earth — driven by CSS custom properties and persisted in `localStorage`.
 
-### Ambient Sound
-Optional looping ambient audio with fade-in and fade-out, triggered on user gesture to comply with browser autoplay policies. Toggle lives in the settings panel.
+**Ambient Sound**
+Optional looping ambient audio with fade-in/out, triggered on user gesture to respect browser autoplay policies. Toggled from the settings panel.
 
-### PWA
-Installable on mobile and desktop via a Web App Manifest and inline service worker. Offline shell caching covers all HTML pages.
-
----
-
-## AI Captions — Technical Detail
-
-The engine lives in `whisper-captions.js`. Key design decisions:
-
-**Native-rate AudioContext.** The `AudioContext` is created at the browser's default sample rate (44100 or 48000 Hz). Using 16 kHz here would route all video audio through a degraded graph, silencing or distorting playback entirely.
-
-**Software downsampling.** The captured PCM buffer is resampled from the native rate down to 16 kHz via a linear averaging function (`_downsample`) before being passed to Whisper. Playback quality is never affected.
-
-**Per-episode cache keys.** The episode identifier is evaluated lazily via a getter function passed to `injectButton`, so the cache key always matches the episode currently loaded in the player — even after the user switches episodes without refreshing.
-
-**Capture lifecycle.** `loadEpisode()` calls `WhisperCaptions._stopCapture()` before changing the video source, preventing the `ScriptProcessorNode` from processing stale audio after a track change.
+**PWA**
+Fully installable on mobile and desktop via Web App Manifest and inline service worker. Offline shell caching covers all HTML pages.
 
 ---
 
-## Tech Stack
+## AI Captions — Technical Notes
 
-- Vanilla HTML, CSS, and JavaScript — no frameworks
-- Transformers.js + Whisper Tiny for AI captions
-- Web Audio API for real-time audio capture and processing
-- `localStorage` for progress tracking, caption cache, and user preferences
-- PWA with service worker for offline shell caching
+The caption engine lives in `whisper-captions.js`.
+
+- **Native-rate AudioContext** — Created at the browser's default sample rate (44.1 or 48 kHz). Forcing 16 kHz here would degrade or silence video playback entirely.
+- **Software downsampling** — PCM is resampled from the native rate to 16 kHz via a linear averaging function (`_downsample`) before being passed to Whisper. Playback quality is never affected.
+- **Lazy episode keys** — The episode identifier is resolved via a getter passed to `injectButton`, so the cache key always reflects the currently loaded episode — even after switching without a page refresh.
+- **Clean capture lifecycle** — `loadEpisode()` calls `WhisperCaptions._stopCapture()` before changing the video source, preventing the `ScriptProcessorNode` from processing stale audio after a track change.
 
 ---
 
-*Made by [Jeffrey Creates](https://www.youtube.com/@Jeffrey_Creates)*
+## Stack
+
+- Vanilla HTML, CSS, JavaScript — zero frameworks
+- Transformers.js + Whisper Tiny — in-browser AI captions
+- Web Audio API — real-time audio capture and processing
+- `localStorage` — progress, caption cache, and user preferences
+- PWA — service worker offline shell caching
