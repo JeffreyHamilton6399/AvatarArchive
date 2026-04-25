@@ -1154,6 +1154,7 @@
     hideSoundNudge();
     localStorage.setItem('avatarhub_ambient_off', '0');
     sessionStorage.setItem('avatarhub_ambient_active', '1');
+    sessionStorage.setItem('avatarhub_ambient_t0', Date.now());
     let v = 0;
     fadeTimer = setInterval(() => {
       v = Math.min(0.55, v + 0.015); gain.gain.value = v;

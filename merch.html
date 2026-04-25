@@ -606,61 +606,64 @@ document.body.classList.add('page-ready');
   if (localStorage.getItem('avatarhub_ambient_off') === '1') return;
   if (sessionStorage.getItem('avatarhub_ambient_active') !== '1') return;
 
-  let _raw     = null;   // raw ArrayBuffer from fetch
-  let _ctx     = null;   // AudioContext (created inside gesture)
+  let _raw     = null;
+  let _ctx     = null;
   let _started = false;
 
-  // Pre-fetch bytes immediately — no AudioContext needed for this
   fetch('audio/ambient.MP3')
     .then(r => r.ok ? r.arrayBuffer() : null)
     .then(b => { _raw = b; })
     .catch(() => {});
 
-  // Try to start immediately (works on desktop, usually blocked on mobile)
   setTimeout(tryStart, 80);
+  armGesture();
 
-  // Also arm a one-time gesture listener as fallback for mobile
   function armGesture() {
     ['click','touchstart','keydown'].forEach(ev =>
-      document.addEventListener(ev, function handler() {
-        document.removeEventListener(ev, handler);
+      document.addEventListener(ev, function h() {
+        document.removeEventListener(ev, h);
         tryStart();
       }, { passive: true })
     );
   }
-  armGesture();
 
   async function tryStart() {
     if (_started) return;
-    // Create context inside this call (may or may not be inside a gesture)
     if (!_ctx) {
       try { _ctx = new (window.AudioContext || window.webkitAudioContext)(); }
       catch (e) { return; }
     }
-    // Try to resume — succeeds without gesture on desktop, may need gesture on mobile
     try { await _ctx.resume(); } catch (e) {}
-    if (_ctx.state !== 'running') {
-      // Still blocked — gesture listener will fire tryStart on next interaction
-      armGesture();
-      return;
-    }
-    // Decode
+    if (_ctx.state !== 'running') { armGesture(); return; }
+
     const raw = _raw || await fetch('audio/ambient.MP3')
       .then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
     if (!raw) return;
+
     let decoded;
     try { decoded = await _ctx.decodeAudioData(raw.slice(0)); }
     catch (e) { return; }
     if (_started) return;
     _started = true;
+
+    // Resume at the exact position in the loop the hub was at
+    const t0 = parseInt(sessionStorage.getItem('avatarhub_ambient_t0') || '0');
+    const offset = (t0 && decoded.duration > 0)
+      ? ((Date.now() - t0) / 1000) % decoded.duration
+      : 0;
+
     const src  = _ctx.createBufferSource();
     const gain = _ctx.createGain();
-    src.buffer = decoded; src.loop = true; gain.gain.value = 0;
+    src.buffer = decoded;
+    src.loop   = true;
+    gain.gain.value = 0;
     src.connect(gain).connect(_ctx.destination);
-    src.start(0);
+    src.start(0, offset);
+
     let v = 0;
     const t = setInterval(() => {
-      gain.gain.value = v = Math.min(0.55, v + 0.015);
+      v = Math.min(0.55, v + 0.015);
+      gain.gain.value = v;
       if (v >= 0.55) clearInterval(t);
     }, 60);
   }
