@@ -743,8 +743,12 @@ async function computeFitScale(isTwoPage) {
 }
 
 /* ─── Render the current spread ─── */
+let _rendering = false;
 async function renderSpread(animate) {
   if (!pdfDoc) return;
+  if (_rendering) return;
+  _rendering = true;
+  try {
   const spread = document.getElementById('pdfSpread');
 
   // Remove old pages but keep hit zones
@@ -791,6 +795,9 @@ async function renderSpread(animate) {
   // Save position
   if (currentSeries !== null && currentBookIdx !== null) {
     localStorage.setItem(`avatarbooks_page_${currentSeries}_${currentBookIdx}`, currentPage);
+  }
+  } finally {
+    _rendering = false;
   }
 }
 
