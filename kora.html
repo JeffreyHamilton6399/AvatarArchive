@@ -15,14 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://github.com" crossorigin>
   <link rel="dns-prefetch" href="https://objects.githubusercontent.com">
+  <link rel="stylesheet" href="shared.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cinzel+Decorative:wght@400;700;900&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --deep:#04070d;--panel:#0a111c;--blue:#4db8ff;--white:#f0f4ff;
-      --muted:#6b8aab;--dim:#2d3f56;--border:rgba(255,255,255,0.06);
-      --gold:#c9a84c;--air:#f5c518;--water:#4db8ff;--earth:#6abf69;--fire:#f97316;
-    }
     @keyframes slideUp    {from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
     @keyframes overlayOut {from{opacity:1}to{opacity:0}}
 
@@ -360,196 +356,10 @@
     @media(max-width:768px){header{padding:1.5rem 2rem;}.episode-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
   
     /* ── Cross-page theme variables ── */
-    body.theme-parchment {
-      --deep:#f5efe0; --panel:#ede4ce; --white:#1a1008; --muted:#7a6040;
-      --dim:#b8a880; --border:rgba(0,0,0,0.10); --gold:#9a6820;
-      --card-bg: linear-gradient(160deg,rgba(255,250,235,.97) 0%,rgba(245,238,215,.99) 100%);
-    }
-    body.theme-water {
-      --deep:#dff0f8; --panel:#c8e4f2; --white:#0a1a2e; --muted:#3a6080;
-      --dim:#7ab0cc; --border:rgba(0,0,0,0.09);
-      --card-bg: linear-gradient(160deg,rgba(220,240,252,.97) 0%,rgba(200,228,245,.99) 100%);
-    }
-    body.theme-earth {
-      --deep:#f0f4e8; --panel:#e2ead0; --white:#1a2008; --muted:#5a7040;
-      --dim:#a0b878; --border:rgba(0,0,0,0.09);
-      --card-bg: linear-gradient(160deg,rgba(238,245,220,.97) 0%,rgba(224,235,200,.99) 100%);
-    }
-    body.theme-parchment .bg-layer { filter: blur(8px) brightness(0.45) saturate(.7); }
-    body.theme-water    .bg-layer  { filter: blur(8px) brightness(0.4) saturate(1.2) hue-rotate(190deg); }
-    body.theme-earth    .bg-layer  { filter: blur(8px) brightness(0.4) saturate(1.1) hue-rotate(55deg); }
-    body.theme-parchment,body.theme-water,body.theme-earth { background: var(--deep); color: var(--white); }
-    body.theme-parchment header,body.theme-water header,body.theme-earth header { border-color: rgba(0,0,0,.1); }
-    body.theme-parchment .back-link,body.theme-water .back-link,body.theme-earth .back-link { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .header-tag,body.theme-water .header-tag,body.theme-earth .header-tag { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .ep-card,body.theme-water .ep-card,body.theme-earth .ep-card { background: rgba(255,255,255,.6); border-color: rgba(0,0,0,.1); }
-    body.theme-parchment .ep-title-text,body.theme-water .ep-title-text,body.theme-earth .ep-title-text { color: var(--white); }
-    body.theme-parchment .ep-num,body.theme-water .ep-num,body.theme-earth .ep-num { color: var(--muted); }
-    body.theme-parchment .section-divider-line,body.theme-water .section-divider-line,body.theme-earth .section-divider-line { background: rgba(0,0,0,.1); }
-    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: var(--white); color: var(--white); }
-    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: var(--white); }
-    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: var(--white); }
-    body.theme-parchment .viewer-controls,body.theme-water .viewer-controls,body.theme-earth .viewer-controls { background: rgba(255,255,255,.88); }
-    body.theme-parchment .vcbtn,body.theme-water .vcbtn,body.theme-earth .vcbtn { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .book-card,body.theme-water .book-card,body.theme-earth .book-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
-    body.theme-parchment .book-title-text,body.theme-water .book-title-text,body.theme-earth .book-title-text { color: var(--white); }
-    body.theme-parchment .game-card,body.theme-water .game-card,body.theme-earth .game-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
-    body.theme-parchment .game-title,body.theme-water .game-title,body.theme-earth .game-title { color: var(--white); }
-    body.theme-parchment .game-desc,body.theme-water .game-desc,body.theme-earth .game-desc { color: var(--muted); }
-    body.theme-parchment .game-tag,body.theme-water .game-tag,body.theme-earth .game-tag { color: var(--muted); border-color: var(--dim); }
+    body.theme-parchment,body.theme-water,    body.theme-parchment header,body.theme-water header,body.theme-earth header { border-color: rgba(0,0,0,.1); }
 </style>
 </head>
 <body>
-<script>
-/* Apply saved theme immediately */
-(function(){
-  var t=localStorage.getItem("avatarhub_theme");
-  if(t&&t!=="dark") document.body.classList.add(t);
-})();
-</script>
-<script>
-/* ══ PASSWORD GATE — runs before anything renders ══
-   Stored in localStorage — only need to enter once ever.
-   Hash: simple obfuscated check (not cryptographic — just keeps casual visitors out). */
-(function(){
-  var PASS = 'AvatarAang';
-  var KEY  = 'avatarhub_auth';
-  if (localStorage.getItem(KEY) === '1') return; // already authed this session
-
-  /* Inject gate CSS */
-  var style = document.createElement('style');
-  style.textContent = [
-    '#avatarGate{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;',
-    'background:radial-gradient(ellipse at 50% 40%,#071220 0%,#04070d 65%);',
-    'font-family:"Cinzel",Georgia,serif;}',
-    '#avatarGate .gate-symbols{display:flex;align-items:center;gap:clamp(1.2rem,4vw,3rem);margin-bottom:.5rem;}',
-    '#avatarGate .gate-sym{width:clamp(36px,5vw,56px);height:clamp(36px,5vw,56px);object-fit:contain;opacity:.8;}',
-    '#avatarGate .gate-title{font-family:"Cinzel Decorative",Georgia,serif;font-size:clamp(1.4rem,4vw,2.4rem);',
-    'letter-spacing:.12em;background:linear-gradient(135deg,#fff 0%,#d4e8ff 40%,#4db8ff 100%);',
-    '-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;overflow:visible;padding:0.05em 0.1em 0.15em;line-height:1.15;}',
-    '#avatarGate .gate-sub{font-family:"Philosopher",Georgia,serif;font-style:italic;font-size:clamp(.75rem,1.8vw,1rem);',
-    'color:#6b8aab;letter-spacing:.3em;text-transform:uppercase;text-align:center;}',
-    '#avatarGate .gate-form{display:flex;flex-direction:column;align-items:center;gap:.9rem;width:min(340px,88vw);}',
-    '#avatarGate .gate-label{font-size:.44rem;letter-spacing:.35em;text-transform:uppercase;color:#6b8aab;}',
-    '#avatarGate .gate-input-wrap{position:relative;width:100%;}',
-    '#avatarGate .gate-input{width:100%;background:rgba(10,17,28,.85);border:1px solid rgba(77,184,255,.25);',
-    'border-radius:30px;color:#f0f4ff;font-family:"Philosopher",Georgia,serif;font-size:1rem;',
-    'padding:.75em 3rem .75em 1.4em;outline:none;letter-spacing:.05em;',
-    'transition:border-color .25s,box-shadow .25s;text-align:center;}',
-    '#avatarGate .gate-input:focus{border-color:rgba(77,184,255,.6);box-shadow:0 0 0 3px rgba(77,184,255,.1);}',
-    '#avatarGate .gate-eye{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);',
-    'background:none;border:none;cursor:pointer;color:#6b8aab;padding:.2em;display:flex;align-items:center;}',
-    '#avatarGate .gate-eye:hover{color:#4db8ff;}',
-    '#avatarGate .gate-btn{width:100%;font-family:"Cinzel",Georgia,serif;font-size:.55rem;letter-spacing:.35em;',
-    'text-transform:uppercase;color:#04070d;background:linear-gradient(135deg,#4db8ff,#1a8fcc);',
-    'border:none;border-radius:30px;padding:.8em 1.5em;cursor:pointer;',
-    'transition:opacity .2s,transform .15s,box-shadow .2s;',
-    'box-shadow:0 4px 18px rgba(77,184,255,.35);}',
-    '#avatarGate .gate-btn:hover{opacity:.92;box-shadow:0 6px 24px rgba(77,184,255,.5);}',
-    '#avatarGate .gate-btn:active{transform:scale(.97);}',
-    '#avatarGate .gate-err{font-family:"Philosopher",Georgia,serif;font-style:italic;',
-    'font-size:.82rem;color:#f97316;letter-spacing:.08em;opacity:0;transition:opacity .3s;min-height:1.2em;}',
-    '#avatarGate .gate-err.show{opacity:1;}',
-    '@keyframes gateShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}',
-    '#avatarGate .gate-form.shake{animation:gateShake .4s cubic-bezier(.36,.07,.19,.97) both;}',
-    '@keyframes gatePulseAir{0%,100%{filter:drop-shadow(0 0 4px #f5c518)}50%{filter:drop-shadow(0 0 14px #f5c518)}}',
-    '@keyframes gatePulseWater{0%,100%{filter:drop-shadow(0 0 4px #4db8ff)}50%{filter:drop-shadow(0 0 14px #4db8ff)}}',
-    '@keyframes gatePulseEarth{0%,100%{filter:drop-shadow(0 0 4px #6abf69)}50%{filter:drop-shadow(0 0 14px #6abf69)}}',
-    '@keyframes gatePulseFire{0%,100%{filter:drop-shadow(0 0 4px #f97316)}50%{filter:drop-shadow(0 0 14px #f97316)}}',
-    '@keyframes gateIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}',
-    '#avatarGate .gate-form{animation:gateIn .55s cubic-bezier(.22,1,.36,1) .2s both;}',
-    '#avatarGate .gate-title{animation:gateIn .55s cubic-bezier(.22,1,.36,1) .05s both;}',
-    '#avatarGate .gate-sub{animation:gateIn .55s cubic-bezier(.22,1,.36,1) .12s both;}',
-    '@keyframes gateOut{to{opacity:0;transform:scale(1.04)}}',
-    '#avatarGate.leaving{animation:gateOut .5s cubic-bezier(.4,0,1,1) both;pointer-events:none;}',
-    '#avatarGate .gate-divider{width:60px;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.4),transparent);}',
-  ].join('');
-  document.head.appendChild(style);
-
-  /* Build gate HTML */
-  var gate = document.createElement('div');
-  gate.id = 'avatarGate';
-  gate.innerHTML =
-    '<div class="gate-symbols">' +
-      '<img class="gate-sym" src="images/air.png"   alt="Air"   style="animation:gatePulseAir   2.8s ease-in-out infinite 0s">' +
-      '<img class="gate-sym" src="images/water.png" alt="Water" style="animation:gatePulseWater 2.8s ease-in-out infinite .5s">' +
-      '<img class="gate-sym" src="images/earth.png" alt="Earth" style="animation:gatePulseEarth 2.8s ease-in-out infinite 1s">' +
-      '<img class="gate-sym" src="images/fire.png"  alt="Fire"  style="animation:gatePulseFire  2.8s ease-in-out infinite 1.5s">' +
-    '</div>' +
-    '<div class="gate-title">AvatarArchive</div>' +
-    '<div class="gate-sub">Members Only</div>' +
-    '<div class="gate-divider"></div>' +
-    '<div class="gate-form" id="gateForm">' +
-      '<label class="gate-label" for="gateInput">Enter Password</label>' +
-      '<div class="gate-input-wrap">' +
-        '<input class="gate-input" type="password" id="gateInput" placeholder="••••••••••" autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false">' +
-        '<button class="gate-eye" id="gateEye" type="button" tabindex="-1" aria-label="Toggle visibility">' +
-          '<svg id="eyeShow" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>' +
-          '<svg id="eyeHide" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>' +
-        '</button>' +
-      '</div>' +
-      '<button class="gate-btn" id="gateSubmit">Enter the Avatar World</button>' +
-      '<div class="gate-err" id="gateErr">Incorrect password — try again</div>' +
-    '</div>';
-
-  document.body.insertBefore(gate, document.body.firstChild);
-
-  /* Interactions */
-  var input  = document.getElementById('gateInput');
-  var btn    = document.getElementById('gateSubmit');
-  var err    = document.getElementById('gateErr');
-  var form   = document.getElementById('gateForm');
-  var eye    = document.getElementById('gateEye');
-  var eyeShow= document.getElementById('eyeShow');
-  var eyeHide= document.getElementById('eyeHide');
-
-  function showErr(msg){
-    err.textContent = msg || 'Incorrect password — try again';
-    err.classList.add('show');
-    form.classList.remove('shake');
-    void form.offsetWidth; // reflow to restart animation
-    form.classList.add('shake');
-    input.select();
-    setTimeout(function(){ err.classList.remove('show'); }, 2800);
-  }
-
-  function tryEnter(){
-    var val = input.value;
-    if (!val) { showErr('Please enter the password'); return; }
-    if (val === PASS) {
-      localStorage.setItem(KEY, '1');
-      gate.classList.add('leaving');
-      setTimeout(function(){ gate.style.display = 'none'; }, 500);
-    } else {
-      input.value = '';
-      showErr('Incorrect password — try again');
-    }
-  }
-
-  btn.addEventListener('click', tryEnter);
-  input.addEventListener('keydown', function(e){ if (e.key === 'Enter') tryEnter(); });
-
-  /* Show/hide password toggle */
-  eye.addEventListener('click', function(){
-    if (input.type === 'password') {
-      input.type = 'text';
-      eyeShow.style.display = 'none';
-      eyeHide.style.display = '';
-    } else {
-      input.type = 'password';
-      eyeShow.style.display = '';
-      eyeHide.style.display = 'none';
-    }
-    input.focus();
-  });
-
-  /* Auto-focus after a tiny delay (avoids mobile keyboard popping prematurely) */
-  setTimeout(function(){ input.focus(); }, 350);
-})();
-</script>
-
-
 <div id="introOverlay" title="Click to enter">
   <p class="intro-tagline">Four elements. One destiny.</p>
   <div class="symbols-grid">
@@ -829,7 +639,13 @@
   Jeffrey Creates
 </a>
 
+<script>/* Critical: apply theme before paint */(function(){var t=localStorage.getItem('avatarhub_theme');if(t&&t!=='dark')document.body.classList.add(t);})();</script>
 <script>
+window.PLAYER_CONFIG = {
+  introShowFrom:   2,
+  introEndSec:     90,
+  nextEpBeforeEnd: 30,
+};
 /* ─── CONFIG ─── */
 const GH    = 'https://github.com/JeffreyHamilton6399/Legend-of-Aang-The-Last-Airbender/releases/download';
 const ASSETS= 'images';
@@ -1218,6 +1034,28 @@ renderEpisodes(1);
 
 
 /* Clean up timers on page unload */
+
+/* ── Bridge: expose page functions to player-engine.js ── */
+window._playerGetNext    = () => currentEp ? getNext(currentEp.book, currentEp.num) : null;
+window._playerLoadNext   = () => { const n = window._playerGetNext(); if (n) loadEpisode(n.book, n.num); };
+window._playerGetSubUrl  = () => currentEp ? subUrl(currentEp.book, currentEp.num) : null;
+window._playerOnTimeUpdate = function(vid, pct) {
+  if (!currentEp) return;
+  const now = Date.now();
+  if (now - _lastSave > 5000) {
+    _lastSave = now;
+    localStorage.setItem(`koraepisodes_b${currentEp.book}_e${currentEp.num}`, vid.currentTime);
+  }
+  if (isFinite(vid.duration) && vid.duration > 0 && vid.currentTime / vid.duration >= 0.9) {
+    const wKey = `koraepisodes_watched_b${currentEp.book}_e${currentEp.num}`;
+    if (localStorage.getItem(wKey) !== '1') {
+      localStorage.setItem(wKey, '1');
+      const wCard = epGrid && epGrid.querySelector(`.ep-card[data-b="${currentEp.book}"][data-ep="${currentEp.num}"]`);
+      if (wCard) wCard.classList.add('watched');
+    }
+  }
+};
+
 window.addEventListener('pagehide', () => {
   if (vid) { vid.pause(); }
   clearTimeout(idleTimer);
@@ -1234,206 +1072,7 @@ ccBtn.addEventListener('click',()=>{
 });
 </script>
 
-<script>
-/* ── Background ambient — resumes seamlessly from hub ── */
-(function () {
-  if (localStorage.getItem('avatarhub_ambient_off') === '1') return;
-  if (sessionStorage.getItem('avatarhub_ambient_active') !== '1') return;
-
-  let _raw     = null;
-  let _ctx     = null;
-  let _gain    = null;   // master gain — controls both fade-in and duck
-  let _started = false;
-
-  // Pre-fetch bytes immediately (no AudioContext needed yet)
-  fetch('audio/ambient.MP3')
-    .then(r => r.ok ? r.arrayBuffer() : null)
-    .then(b => { _raw = b; })
-    .catch(() => {});
-
-  // Try immediately (works on desktop); arm gesture fallback for mobile
-  setTimeout(tryStart, 80);
-  armGesture();
-
-  function armGesture() {
-    ['click','touchstart','keydown'].forEach(ev =>
-      document.addEventListener(ev, function h() {
-        document.removeEventListener(ev, h);
-        tryStart();
-      }, { passive: true })
-    );
-  }
-
-  async function tryStart() {
-    if (_started) return;
-    if (!_ctx) {
-      try { _ctx = new (window.AudioContext || window.webkitAudioContext)(); }
-      catch (e) { return; }
-    }
-    try { await _ctx.resume(); } catch (e) {}
-    if (_ctx.state !== 'running') { armGesture(); return; }
-
-    const raw = _raw || await fetch('audio/ambient.MP3')
-      .then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
-    if (!raw) return;
-
-    let decoded;
-    try { decoded = await _ctx.decodeAudioData(raw.slice(0)); }
-    catch (e) { return; }
-    if (_started) return;
-    _started = true;
-
-    // Resume at the exact position in the loop the hub was at
-    const t0      = parseInt(sessionStorage.getItem('avatarhub_ambient_t0') || '0');
-    const elapsed = parseFloat(sessionStorage.getItem('avatarhub_ambient_elapsed') || '0');
-    const rawSecs = t0 ? (Date.now() - t0) / 1000 : elapsed;
-    const offset  = (rawSecs > 0 && decoded.duration > 0)
-      ? rawSecs % decoded.duration
-      : 0;
-
-    const src = _ctx.createBufferSource();
-    _gain = _ctx.createGain();
-    src.buffer = decoded;
-    src.loop   = true;
-    _gain.gain.value = 0;
-    src.connect(_gain).connect(_ctx.destination);
-    src.start(0, offset);
-
-    // Fade in to full volume
-    _gain.gain.setValueAtTime(0, _ctx.currentTime);
-    _gain.gain.linearRampToValueAtTime(0.55, _ctx.currentTime + 2.5);
-
-    // Duck ambient when video is playing, restore when paused/ended
-    const video = document.getElementById('mainVideo');
-    if (video) {
-      video.addEventListener('play',  () => fadeTo(0));
-      video.addEventListener('pause', () => fadeTo(0.55));
-      video.addEventListener('ended', () => fadeTo(0.55));
-    }
-  }
-
-  function fadeTo(target) {
-    if (!_gain) return;
-    _gain.gain.cancelScheduledValues(_ctx.currentTime);
-    _gain.gain.setValueAtTime(_gain.gain.value, _ctx.currentTime);
-    _gain.gain.linearRampToValueAtTime(target, _ctx.currentTime + 0.8);
-  }
-})();
-</script>
-
-<script>
-/* ══════════════════════════════════════════
-   UI SFX  — click + hover ticks (synthesised, no audio file)
-   + ambient t0 keepalive so offset stays accurate across pages
-══════════════════════════════════════════ */
-(function () {
-  'use strict';
-
-  // ── Shared AudioContext (lazy, reuse existing if index already made one) ──
-  let _sfxCtx = null;
-  function getSfxCtx() {
-    if (_sfxCtx && _sfxCtx.state !== 'closed') return _sfxCtx;
-    try { _sfxCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
-    return _sfxCtx;
-  }
-
-  // ── Core synth: shaped noise burst ───────────────────────────────────────
-  //   freq      – bandpass centre frequency (Hz)
-  //   dur       – duration in seconds
-  //   vol       – peak gain (0-1)
-  //   Q         – bandpass Q (sharpness)
-  function playTick(freq, dur, vol, Q) {
-    const ctx = getSfxCtx();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
-    if (ctx.state !== 'running') return;
-
-    const len  = Math.floor(ctx.sampleRate * dur);
-    const buf  = ctx.createBuffer(1, len, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) {
-      // White noise shaped by an exponential decay envelope
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
-    }
-
-    const src    = ctx.createBufferSource();
-    const bp     = ctx.createBiquadFilter();
-    const gain   = ctx.createGain();
-
-    bp.type            = 'bandpass';
-    bp.frequency.value = freq;
-    bp.Q.value         = Q;
-
-    gain.gain.setValueAtTime(vol, ctx.currentTime);
-
-    src.buffer = buf;
-    src.connect(bp).connect(gain).connect(ctx.destination);
-    src.start();
-  }
-
-  // ── Click SFX ─────────────────────────────────────────────────────────────
-  function playClickSfx() { playTick(1100, 0.038, 0.22, 0.9); }
-
-  // ── Hover SFX ─────────────────────────────────────────────────────────────
-  function playHoverSfx() { playTick(2200, 0.018, 0.06, 1.2); }
-
-  // ── Target detection ──────────────────────────────────────────────────────
-  const CLICK_SEL  = 'a, button, [role="button"], .hub-card, .card-cta, ' +
-                     '.ep-card, .ep-thumb, .book-tab, .season-tab, ' +
-                     '.pill-btn, .pill-tab, .theme-opt, .sp-ambient-row, ' +
-                     '.sp-install-row, .star-btn, .ctrl-btn, .card-poster, ' +
-                     '.merch-card, .comic-btn, .nav-btn, .modal-close, ' +
-                     '.page-btn, [data-ep], [data-book]';
-
-  const HOVER_SEL  = 'a, button, [role="button"], .hub-card, .ep-card, ' +
-                     '.ep-thumb, .pill-btn, .pill-tab, .theme-opt, ' +
-                     '.card-cta, .merch-card, .comic-btn, .nav-btn, ' +
-                     '.ctrl-btn, .star-btn, [data-ep], [data-book]';
-
-  // ── Delegated click listener ──────────────────────────────────────────────
-  document.addEventListener('click', function (e) {
-    if (e.target.closest(CLICK_SEL)) playClickSfx();
-  }, { passive: true });
-
-  // ── Delegated hover listener (mouseover = fires once per enter) ───────────
-  let _hoverCooldown = false;
-  document.addEventListener('mouseover', function (e) {
-    if (_hoverCooldown) return;
-    if (e.target.closest(HOVER_SEL)) {
-      playHoverSfx();
-      _hoverCooldown = true;
-      setTimeout(() => { _hoverCooldown = false; }, 80); // max ~12 ticks/s
-    }
-  }, { passive: true });
-
-  // ── Ambient t0 keepalive ──────────────────────────────────────────────────
-  // The index.html stamps avatarhub_ambient_t0 = Date.now() when ambient
-  // starts. Sub-pages use (Date.now() - t0) to compute the loop offset.
-  // But if you stay on a sub-page for a while that t0 gets stale for the
-  // *next* page — so we re-stamp it every 10 s with the *current* wall time
-  // minus the current computed offset, effectively sliding the anchor forward
-  // without changing the perceived position.
-  (function keepAliveT0() {
-    if (localStorage.getItem('avatarhub_ambient_off') === '1') return;
-    if (sessionStorage.getItem('avatarhub_ambient_active') !== '1') return;
-
-    setInterval(function () {
-      const t0old = parseInt(sessionStorage.getItem('avatarhub_ambient_t0') || '0');
-      if (!t0old) return;
-      // We don't know duration here, but we can just slide the anchor:
-      // new anchor = now − (now − t0old)  →  same offset, fresher timestamp
-      // i.e. simply re-stamp with current time minus elapsed (no-op for position)
-      // Actually simplest: just leave t0 as-is; the modulo arithmetic on the
-      // next page will handle any large elapsed value correctly.
-      // What we DO need: update t0 so the NEXT page doesn't over-run a stale value.
-      // Re-stamp = now - currentOffset.  We don't know decoded.duration here,
-      // so we store elapsed seconds separately instead.
-      const elapsed = (Date.now() - t0old) / 1000;
-      sessionStorage.setItem('avatarhub_ambient_elapsed', elapsed.toFixed(3));
-    }, 10000);
-  })();
-})();
-</script>
-
+<script src="player-engine.js" defer></script>
+<script src="shared.js" defer></script>
 </body>
 </html>
