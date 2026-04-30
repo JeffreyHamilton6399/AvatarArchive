@@ -53,7 +53,7 @@
     body.theme-earth    .bg-layer  { filter: blur(8px) brightness(0.4) saturate(1.1) hue-rotate(55deg); }
     body.theme-parchment .hero-main,
     body.theme-water    .hero-main,
-    body.theme-earth    .hero-main { background: linear-gradient(135deg,var(--white) 0%,var(--muted) 50%,var(--gold,#c9a84c) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    body.theme-earth    .hero-main { background: linear-gradient(135deg,rgba(255,242,210,.98) 0%,rgba(235,205,140,.92) 50%,#c9a84c 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
     body.theme-parchment .search-results,
     body.theme-water    .search-results,
     body.theme-earth    .search-results { background: rgba(255,255,255,.97); border-color: rgba(0,0,0,.12); }
@@ -109,10 +109,10 @@
     /* ── Additional light-theme fixes ── */
     body.theme-parchment .hero-eyebrow,
     body.theme-water    .hero-eyebrow,
-    body.theme-earth    .hero-eyebrow { color: var(--muted); }
+    body.theme-earth    .hero-eyebrow { color: rgba(235,215,165,.75); }
     body.theme-parchment .hero-sub,
     body.theme-water    .hero-sub,
-    body.theme-earth    .hero-sub { color: var(--muted); }
+    body.theme-earth    .hero-sub { color: rgba(235,215,165,.75); }
     body.theme-parchment .hub-card,
     body.theme-water    .hub-card,
     body.theme-earth    .hub-card { border-color: rgba(0,0,0,.1); }
@@ -293,10 +293,13 @@
       background: linear-gradient(135deg,#fff 0%,#d4e8ff 40%,#4db8ff 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       margin-bottom: .5rem;
-      padding: 0.1em 0.2em;
+      padding: 0.1em 0.4em;
       display: block;
       text-align: center;
       width: 100%;
+      white-space: nowrap;
+      overflow: visible;
+      box-sizing: border-box;
     }
     .hero-sub {
       font-family: 'Philosopher', serif; font-style: italic;
@@ -1308,6 +1311,7 @@
     if (mapDone) return;
     mapDone = true;
     clearTimeout(autoMapTimer);
+    localStorage.setItem('aa_intro_seen', '1');
     mapSplash.classList.add('fade-out');
     setTimeout(() => { mapSplash.style.display = 'none'; document.body.classList.add('page-ready'); }, 800);
   }
@@ -1328,15 +1332,19 @@
 
   // ── Orchestration ────────────────────────────────────────────────────────
   if (isAuthed) {
-    if (ambientWasActive) {
-      // Returning from sub-page: skip loader, quick map
+    if (localStorage.getItem('aa_intro_seen') === '1') {
+      // Already seen intro — go straight to content, no loader, no map
+      document.body.classList.add('page-ready');
+      if (ambientWasActive) startAudio();
+    } else if (ambientWasActive) {
+      // Returning from sub-page mid-session, intro not yet completed: quick map
       showMap();
       startAudio();
       autoMapTimer = setTimeout(() => { if (!mapDone) dismissMap(); }, 2000);
       mapSplash.addEventListener('click', () => { clearTimeout(autoMapTimer); dismissMap(); }, { once: true });
       mapSplash.setAttribute('tabindex','0');
     } else {
-      // Fresh visit: loader → audio → map
+      // Fresh first visit: loader → audio → map
       loader.addEventListener('click', () => ensureCtx(), { once: true });
       runLoader(async () => {
         const ok = await ensureCtx();
@@ -1659,7 +1667,7 @@ self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>
   }
 
   // ── Click SFX ─────────────────────────────────────────────────────────────
-  function playClickSfx() { playTick(90, 0.10, 0.20, 4.0); playTick(280, 0.045, 0.09, 2.5); }
+  function playClickSfx() { playTick(1100, 0.038, 0.22, 0.9); }
 
   // ── Hover SFX ─────────────────────────────────────────────────────────────
   function playHoverSfx() { playTick(2200, 0.018, 0.06, 1.2); }

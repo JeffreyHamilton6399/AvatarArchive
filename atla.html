@@ -874,11 +874,15 @@ let currentEp=null, autoFrame=null, autoStart=null;
 
 /* Intro overlay */
 const overlay=document.getElementById('introOverlay'); let dismissed=false, overlayReady=false;
-requestAnimationFrame(()=>setTimeout(()=>overlay.classList.add('symbols-in'),80));
-function dismissOverlay(){ if(!overlayReady||dismissed)return;dismissed=true;document.body.classList.add('page-ready');overlay.classList.add('fade-out');setTimeout(()=>{overlay.style.display='none';},650); }
-overlay.addEventListener('click',dismissOverlay);
-/* Gate: only allow tap once page assets are loaded */
-window.addEventListener('load',()=>{ overlayReady=true; overlay.classList.add('ready'); });
+if(localStorage.getItem('aa_intro_seen')==='1'){
+  /* Already seen intro — skip overlay, show content immediately */
+  dismissed=true; overlay.style.display='none'; document.body.classList.add('page-ready');
+} else {
+  requestAnimationFrame(()=>setTimeout(()=>overlay.classList.add('symbols-in'),80));
+  function dismissOverlay(){ if(!overlayReady||dismissed)return;dismissed=true;document.body.classList.add('page-ready');overlay.classList.add('fade-out');setTimeout(()=>{overlay.style.display='none';},650); }
+  overlay.addEventListener('click',dismissOverlay);
+  window.addEventListener('load',()=>{ overlayReady=true; overlay.classList.add('ready'); });
+}
 
 /* Player refs */
 const vid=document.getElementById('mainVideo'),shell=document.getElementById('playerShell'),bigPlay=document.getElementById('bigPlay'),clickArea=document.getElementById('clickArea'),playBtn=document.getElementById('playBtn'),icPlay=document.getElementById('icPlay'),icPause=document.getElementById('icPause'),curEl=document.getElementById('curTime'),durEl=document.getElementById('durTime'),progFill=document.getElementById('progFill'),progBuf=document.getElementById('progBuf'),progThumb=document.getElementById('progThumb'),prog=document.getElementById('prog'),volBtn=document.getElementById('volBtn'),volSlider=document.getElementById('volSlider'),icVolOn=document.getElementById('icVolOn'),icVolOff=document.getElementById('icVolOff'),playerFrame=document.getElementById('playerFrame'),skipBtn=document.getElementById('skipIntroBtn'),nextPanel=document.getElementById('nextEpPanel'),nepTitle=document.getElementById('nepTitle'),nepBtn=document.getElementById('nepBtn'),nepProgress=document.getElementById('nepProgress'),nepSkip=document.getElementById('nepSkip'),bufSpin=document.getElementById('bufferSpinner'),ccBtn=document.getElementById('ccBtn'),captionBox=document.getElementById('captionBox');
