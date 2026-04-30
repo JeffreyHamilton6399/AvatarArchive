@@ -1,0 +1,809 @@
+﻿1
+00:00:00,649 --> 00:00:03,021
+<i>Water.</i>
+
+2
+00:00:03,022 --> 00:00:04,895
+<i>Earth.</i>
+
+3
+00:00:04,896 --> 00:00:07,004
+<i>Fire.</i>
+
+4
+00:00:07,005 --> 00:00:08,296
+<i>Air.</i>
+
+5
+00:00:09,362 --> 00:00:13,496
+<i>Long ago, the four nations lived together in harmony.</i>
+
+6
+00:00:13,497 --> 00:00:17,575
+<i>Then, everything changed when the Fire Nation attacked.</i>
+
+7
+00:00:17,776 --> 00:00:21,888
+<i>Only the Avatar, master of all four elements, could stop them.</i>
+
+8
+00:00:21,889 --> 00:00:25,048
+<i>But when the world needed him most, he vanished.</i>
+
+9
+00:00:25,389 --> 00:00:29,210
+<i>A hundred years passed, and my brother and I discovered the new Avatar...</i>
+
+10
+00:00:29,211 --> 00:00:31,050
+<i>...an airbender named Aang.</i>
+
+11
+00:00:31,151 --> 00:00:33,256
+<i>And although his airbending skills are great.</i>
+
+12
+00:00:33,257 --> 00:00:36,989
+<i>He has a lot to learn before he's ready to save anyone.</i>
+
+13
+00:00:36,990 --> 00:00:40,612
+<i>But I believe Aang can save the world.</i>
+
+14
+00:00:45,922 --> 00:00:50,132
+Book Two: Earth
+Chapter Four: The Swamp
+
+15
+00:01:07,479 --> 00:01:11,411
+Spare coins for weary travelers?
+
+16
+00:01:12,488 --> 00:01:14,745
+This is humiliating! We're royalty.
+
+17
+00:01:14,758 --> 00:01:17,779
+These people should be giving us whatever we want.
+
+18
+00:01:17,797 --> 00:01:22,078
+They will... if you ask nicely.
+
+19
+00:01:22,233 --> 00:01:26,706
+Spare change for a hungry old man?
+
+20
+00:01:26,731 --> 00:01:29,800
+Aww, here you go.
+
+21
+00:01:29,813 --> 00:01:37,117
+The coin is appreciated, but not as much as your smile.
+
+22
+00:01:38,490 --> 00:01:43,926
+How about some entertainment in exchange for... a gold piece.
+
+23
+00:01:43,944 --> 00:01:46,192
+We're not performers.
+
+24
+00:01:46,216 --> 00:01:48,743
+Not professional, anyway.
+
+25
+00:01:48,754 --> 00:01:59,864
+♫ It's a long, long way to Ba Sing Se, but the girls in the city they look soo prett-ay! ♫
+
+26
+00:01:59,881 --> 00:02:05,117
+Come on! We're talking a gold piece here! Let's see some action!
+
+27
+00:02:05,128 --> 00:02:06,182
+Dance!
+
+28
+00:02:06,195 --> 00:02:17,666
+♫ And they kiss so sweet that you've really got to meet the girls from Ba Sing Se! ♫
+
+29
+00:02:18,609 --> 00:02:25,229
+Nothing like a fat man dancing for his dinner. Here ya go!
+
+30
+00:02:26,345 --> 00:02:29,585
+Such a kind man!
+
+31
+00:02:52,478 --> 00:02:55,937
+Hey, you takin' us down for a reason?
+
+32
+00:02:56,062 --> 00:02:58,657
+Aang! Why are we going down?
+
+33
+00:02:58,669 --> 00:03:02,198
+What? I didn't even notice.
+
+34
+00:03:02,205 --> 00:03:03,967
+Are you noticing now?
+
+35
+00:03:03,977 --> 00:03:05,103
+Is something wrong?
+
+36
+00:03:05,112 --> 00:03:10,243
+I know this is gonna sound weird, but... I think the swamp is... calling to me.
+
+37
+00:03:10,261 --> 00:03:12,584
+It is telling ya where we can get something to eat?
+
+38
+00:03:12,604 --> 00:03:16,428
+No, I... I think it wants us to land there.
+
+39
+00:03:16,442 --> 00:03:20,193
+No offense to the swamp, but I don't see any land there to land on.
+
+40
+00:03:20,207 --> 00:03:21,256
+I don't know,...
+
+41
+00:03:21,267 --> 00:03:24,437
+Bumi said to learn earthbending I would have to wait and listen,...
+
+42
+00:03:24,450 --> 00:03:29,269
+...and now I'm actually hearing the earth. Do you want me to ignore it?
+
+43
+00:03:29,286 --> 00:03:30,659
+Yes!
+
+44
+00:03:30,664 --> 00:03:36,082
+I don't know... There's something ominous about that place.
+
+45
+00:03:38,322 --> 00:03:40,929
+See? Even Appa and Momo don't like it here.
+
+46
+00:03:40,942 --> 00:03:45,415
+Okay, since everyone feels so strongly about this... bye swamp.
+
+47
+00:03:45,422 --> 00:03:47,406
+Yip! Yip!
+
+48
+00:03:52,128 --> 00:03:56,171
+You better throw in an extra "yip"! We gotta move!
+
+49
+00:04:36,242 --> 00:04:39,008
+Where's Appa and Momo?
+
+50
+00:04:44,177 --> 00:04:48,234
+Appa! Momo!
+
+51
+00:04:50,797 --> 00:04:52,790
+Sokka! You've got an elbow leech!
+
+52
+00:04:52,803 --> 00:04:54,422
+Where! Where!
+
+53
+00:04:54,427 --> 00:04:56,573
+Where do you think?
+
+54
+00:04:56,577 --> 00:05:00,744
+Why do things keep attaching to me!
+
+55
+00:05:01,712 --> 00:05:03,131
+You couldn't find them?
+
+56
+00:05:03,147 --> 00:05:09,105
+No... and the tornado... it just disappeared.
+
+57
+00:05:44,447 --> 00:05:47,277
+We better speed things up!
+
+58
+00:05:47,769 --> 00:05:50,917
+Maybe... we should be a little nicer to the swamp.
+
+59
+00:05:50,926 --> 00:05:52,401
+Aang, these are just plants!
+
+60
+00:05:52,410 --> 00:05:54,063
+Do you want me to say "please" and "thank you"...
+
+61
+00:05:54,071 --> 00:05:56,482
+...as I swing my machete back and forth?
+
+62
+00:05:56,493 --> 00:06:02,370
+Maybe you should listen to Aang. Something about this place feels... alive.
+
+63
+00:06:02,386 --> 00:06:05,068
+I'm sure there are lots of things that are alive here,...
+
+64
+00:06:05,075 --> 00:06:07,432
+...and if we don't wanna wind up getting eaten by them,...
+
+65
+00:06:07,437 --> 00:06:11,373
+...we need to find Appa as fast as we can.
+
+66
+00:06:43,790 --> 00:06:47,039
+Appa! Momo!
+
+67
+00:06:47,051 --> 00:06:50,293
+There's no way they can hear us and no way we can see them.
+
+68
+00:06:50,298 --> 00:06:53,397
+We'll have to make camp for the night.
+
+69
+00:06:56,740 --> 00:06:58,179
+What was that!?
+
+70
+00:06:58,185 --> 00:07:04,524
+Nothing. Just swamp gas. Look, there's nothing supernatural going on here.
+
+71
+00:07:07,855 --> 00:07:10,865
+I think we should build a fire...
+
+72
+00:07:13,553 --> 00:07:17,356
+Sokka, the longer we're here the more I think you shouldn't be doing that.
+
+73
+00:07:17,371 --> 00:07:20,064
+No, I asked the swamp. It said this was fine.
+
+74
+00:07:20,072 --> 00:07:24,303
+Right, swamp? "No problem, Sokka!"
+
+75
+00:07:29,394 --> 00:07:32,747
+Does anyone else get the feeling that we're being watched?
+
+76
+00:07:32,752 --> 00:07:36,610
+Please, we're all alone out here.
+
+77
+00:07:41,935 --> 00:07:44,399
+...except for them.
+
+78
+00:07:44,406 --> 00:07:47,466
+Right, except for them.
+
+79
+00:09:17,587 --> 00:09:19,653
+Guys?
+
+80
+00:09:24,522 --> 00:09:27,262
+What'd you reckon make a track like that, Tho?
+
+81
+00:09:27,282 --> 00:09:33,451
+Don't know, Due. Something with six legs. Pretty big'uns too.
+
+82
+00:09:33,460 --> 00:09:35,855
+Leaves a nice, wide trail to folla'.
+
+83
+00:09:35,866 --> 00:09:39,430
+You know what's at the end of that trail?
+
+84
+00:09:39,450 --> 00:09:41,772
+Dinner.
+
+85
+00:10:13,609 --> 00:10:17,693
+Aang? Sokka?
+
+86
+00:10:19,971 --> 00:10:26,210
+Hello? Hello? Can you help me?
+
+87
+00:10:26,214 --> 00:10:29,729
+Mom? Mom!
+
+88
+00:10:32,573 --> 00:10:35,144
+I can't believe...
+
+89
+00:10:44,734 --> 00:10:50,430
+Aang! Stupid swamp! Dumb, ugly vines!
+
+90
+00:10:50,437 --> 00:10:56,075
+Katara! You think you're so tough, huh?
+
+91
+00:11:01,947 --> 00:11:03,921
+Hello?
+
+92
+00:11:07,711 --> 00:11:12,988
+Yue? This is just a trick of the light...swamp gas...
+
+93
+00:11:13,000 --> 00:11:18,255
+...I... hit my head running away last night. I'm going crazy.
+
+94
+00:11:19,491 --> 00:11:23,154
+You didn't protect me.
+
+95
+00:11:35,203 --> 00:11:37,952
+Katara!
+
+96
+00:11:38,784 --> 00:11:40,880
+Appa!
+
+97
+00:11:41,254 --> 00:11:45,065
+Hello? Who are you?
+
+98
+00:11:46,173 --> 00:11:49,013
+Hey, come back!
+
+99
+00:12:22,707 --> 00:12:27,386
+Look at that, Tho. Is that little hairy fellow ridin' that thing?
+
+100
+00:12:27,401 --> 00:12:29,603
+Naw, that's what they call a "lemoo,"...
+
+101
+00:12:29,612 --> 00:12:33,384
+...saw one at a travelin' show once. Real smart they say.
+
+102
+00:12:33,389 --> 00:12:35,486
+Bet he tastes a lot like possum chicken.
+
+103
+00:12:35,496 --> 00:12:38,235
+You think everything tastes like possum chicken.
+
+104
+00:12:38,253 --> 00:12:43,455
+C'mon now, fellas. Just a little closer. Nice and easy.
+
+105
+00:12:43,463 --> 00:12:48,260
+Nothing to worry about. We just fixin' to eat ya.
+
+106
+00:12:48,274 --> 00:12:49,757
+What'd ya say that fer?
+
+107
+00:12:49,776 --> 00:12:50,974
+Well, we are!
+
+108
+00:12:50,981 --> 00:12:52,821
+But you don't have to tell 'em that!
+
+109
+00:12:52,827 --> 00:12:54,853
+Well how'd I know they'd understand me!
+
+110
+00:12:54,860 --> 00:12:57,101
+Come on!
+
+111
+00:13:23,617 --> 00:13:26,395
+Who are you?
+
+112
+00:13:35,954 --> 00:13:39,702
+What do you guys think you're doing!? I've been looking all over for you!
+
+113
+00:13:39,718 --> 00:13:42,305
+Well, I've been wandering around looking for you!
+
+114
+00:13:42,315 --> 00:13:44,567
+I was chasing some girl.
+
+115
+00:13:44,572 --> 00:13:45,647
+What girl?
+
+116
+00:13:45,659 --> 00:13:49,957
+I don't know. I heard laughing and I saw some girl in a fancy dress.
+
+117
+00:13:50,000 --> 00:13:55,008
+Well, there must be a tea party here and we just didn't get our invitations!
+
+118
+00:13:55,059 --> 00:13:58,297
+I thought I saw Mom.
+
+119
+00:13:58,942 --> 00:14:03,134
+Look, we were all just scared and hungry and our minds were playing tricks on us.
+
+120
+00:14:03,143 --> 00:14:04,978
+That's why we all saw things out here.
+
+121
+00:14:04,987 --> 00:14:06,784
+You saw something too?
+
+122
+00:14:06,794 --> 00:14:10,173
+I thought I saw Yue. But, that doesn't prove anything.
+
+123
+00:14:10,188 --> 00:14:15,073
+Look, I think about her all the time, and you saw Mom, someone you miss a lot.
+
+124
+00:14:15,084 --> 00:14:21,101
+What about me? I didn't know the girl I saw. And all our visions led us right here.
+
+125
+00:14:21,109 --> 00:14:24,482
+Okay... so where's here? The middle of the swamp?
+
+126
+00:14:24,492 --> 00:14:28,685
+Yeh, the center...
+
+127
+00:14:29,714 --> 00:14:34,068
+It's the heart of the swamp, it's been calling us here, I knew it.
+
+128
+00:14:34,078 --> 00:14:38,784
+It's just a tree. It can't call anyone! For the last time,...
+
+129
+00:14:38,801 --> 00:14:45,644
+...there's nothing after us and there's nothing magical happening here.
+
+130
+00:16:15,590 --> 00:16:20,075
+Now what would a lemoo need a shirt fer?
+
+131
+00:17:32,220 --> 00:17:36,382
+There's someone in there! He's bending the vines!
+
+132
+00:17:49,138 --> 00:17:52,107
+Why did you call me here if you just wanted to kill us?
+
+133
+00:17:52,118 --> 00:17:57,587
+Wait! I didn't call you here.
+
+134
+00:17:57,877 --> 00:18:01,779
+We were flying over and I heard something calling to me, telling me to land.
+
+135
+00:18:01,924 --> 00:18:05,050
+He's the Avatar. Stuff like that happens to us... a lot.
+
+136
+00:18:05,055 --> 00:18:09,297
+The Avatar! Come with me.
+
+137
+00:18:11,231 --> 00:18:13,897
+So, who are you then?
+
+138
+00:18:13,993 --> 00:18:16,996
+I protect the swamp from folks that want to hurt it.
+
+139
+00:18:17,037 --> 00:18:19,424
+Like this fellow with his big knife.
+
+140
+00:18:19,430 --> 00:18:21,246
+See? Completely reasonable.
+
+141
+00:18:21,257 --> 00:18:24,296
+Not a monster, just a regular guy defending his home.
+
+142
+00:18:24,309 --> 00:18:27,248
+Nothing mystical about it.
+
+143
+00:18:27,262 --> 00:18:31,994
+Oh, the swamp is a mystical place, all right. It's sacred.
+
+144
+00:18:32,008 --> 00:18:36,496
+I reached enlightenment right here under the banion grove tree.
+
+145
+00:18:36,498 --> 00:18:40,301
+I hear it callin' me, just like you did.
+
+146
+00:18:40,308 --> 00:18:44,551
+Sure ya did. It seems real chatty.
+
+147
+00:18:44,562 --> 00:18:49,793
+See this whole swamp is actually just one tree spread out over miles...
+
+148
+00:18:49,794 --> 00:18:55,513
+...branches, spread and sink and take root and then spread some more...
+
+149
+00:18:55,531 --> 00:19:02,563
+...one big living organism, just like the entire world.
+
+150
+00:19:02,572 --> 00:19:06,878
+I get how the tree is one big thing, but, the whole world?
+
+151
+00:19:06,895 --> 00:19:13,070
+Sure. You think you're any different from me? Or your friends? Or this tree?
+
+152
+00:19:13,085 --> 00:19:18,544
+If you listen hard enough you can hear every living thing breathing together,...
+
+153
+00:19:18,545 --> 00:19:23,705
+...you can feel everything growing. We're all livin' together,...
+
+154
+00:19:23,718 --> 00:19:28,726
+...even if most folks don't act like it. We all have the same roots,...
+
+155
+00:19:28,735 --> 00:19:32,397
+...and we are all branches of the same tree.
+
+156
+00:19:32,408 --> 00:19:34,305
+But what did our visions mean?
+
+157
+00:19:34,315 --> 00:19:39,660
+In the swamp we see visions of people we've lost, people we loved...
+
+158
+00:19:39,670 --> 00:19:44,721
+...folks we think are gone. But the swamp tells us they're not.
+
+159
+00:19:44,734 --> 00:19:51,025
+We're still connected to 'em. Time is an illusion and so is death.
+
+160
+00:19:51,029 --> 00:19:54,808
+But what about my vision? It was someone I had never met.
+
+161
+00:19:54,813 --> 00:19:58,123
+You're the Avatar. You tell me.
+
+162
+00:19:58,137 --> 00:20:06,297
+Time is an illusion... so, it's... someone I will meet?
+
+163
+00:20:06,314 --> 00:20:10,007
+Sorry to interrupt the lesson, but we still need to Appa and Momo.
+
+164
+00:20:10,025 --> 00:20:16,712
+I think I know how to find them. Everything is connected.
+
+165
+00:20:33,819 --> 00:20:35,948
+Come on! We've got to hurry!
+
+166
+00:20:35,975 --> 00:20:42,859
+♫ Set my lines by the river bed! Caught ten fish and I killed'em dead! ♫
+
+167
+00:20:42,873 --> 00:20:45,795
+♫ Cut 'em and gut'em and I tossed the heads... ♫
+
+168
+00:20:45,806 --> 00:20:51,583
+♫ ...in the water to keep them cat gators dead. ♫
+
+169
+00:20:55,141 --> 00:20:57,298
+Appa!
+
+170
+00:20:58,614 --> 00:21:01,040
+We're under attack!
+
+171
+00:21:04,354 --> 00:21:07,130
+Hey, you guys are waterbenders!
+
+172
+00:21:07,139 --> 00:21:11,933
+You too? That means we're kin!
+
+173
+00:21:15,692 --> 00:21:18,005
+Hey Hue! How you been?
+
+174
+00:21:18,019 --> 00:21:23,329
+You know, scared some folks, swung some vines, the usual.
+
+175
+00:21:23,342 --> 00:21:25,500
+Hue?
+
+176
+00:21:28,386 --> 00:21:30,352
+How you like that possum chicken?
+
+177
+00:21:30,368 --> 00:21:32,602
+Tastes just like arctic hen.
+
+178
+00:21:32,613 --> 00:21:35,195
+So why were you guys so interested in eating Appa?
+
+179
+00:21:35,214 --> 00:21:37,997
+You've got plenty of those big things wandering around.
+
+180
+00:21:38,006 --> 00:21:43,160
+You want me to eat old Slim? He's like a member of the family!
+
+181
+00:21:43,179 --> 00:21:45,542
+Nice Slim!
+
+182
+00:21:47,386 --> 00:21:51,213
+Oh, oh, he don't eat no bugs! That's people food.
+
+183
+00:21:51,230 --> 00:21:52,793
+Where d'you say you're from?
+
+184
+00:21:52,812 --> 00:21:54,088
+The South Pole.
+
+185
+00:21:54,090 --> 00:21:56,764
+Didn't know there was waterbenders anywhere but here.
+
+186
+00:21:56,770 --> 00:21:58,899
+They got a nice swamp there, do they?
+
+187
+00:21:58,905 --> 00:22:02,375
+No, it' all ice and snow.
+
+188
+00:22:02,396 --> 00:22:04,360
+Hmm. No wonder you left.
+
+189
+00:22:04,377 --> 00:22:08,540
+Well, I hope you realize now that nothing strange was going on here.
+
+190
+00:22:08,551 --> 00:22:11,140
+Just a bunch of greasy people living in a swamp.
+
+191
+00:22:11,147 --> 00:22:12,850
+What about the visions?
+
+192
+00:22:12,905 --> 00:22:19,383
+I told you, we were hungry. I'm eating a giant bug!
+
+193
+00:22:20,439 --> 00:22:23,776
+But what about when the tree showed me where Appa and Momo were?
+
+194
+00:22:23,790 --> 00:22:26,225
+That's Avatar stuff, that doesn't count.
+
+195
+00:22:26,236 --> 00:22:29,949
+The only thing I can't figure out is how you made that tornado that sucked us down.
+
+196
+00:22:29,966 --> 00:22:36,182
+I can't do anything like that. I just bender the water in the plants.
+
+197
+00:22:36,196 --> 00:22:38,100
+Well, no accounting for weather.
+
+198
+00:22:38,108 --> 00:22:43,615
+Still, there's absolutely nothing mysterious about the swamp.
+
+199
+00:22:56,807 --> 00:22:59,499
+Who's there?
+
+200
+00:23:08,992 --> 00:23:12,481
+Subtitle by rendy1287 [at gmail dot com]
+
+201
+00:23:12,502 --> 00:23:14,811
+Thanks to Acastus for The Transcript.
+http://www.avatarspiritmedia.net/
+
+9999
+00:00:0,500 --> 00:00:2,00
+<font color="#ffff00" size=14>www.tvsubtitles.net</font>
