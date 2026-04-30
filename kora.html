@@ -49,6 +49,11 @@
     #introOverlay.fade-out{animation:overlayOut .65s ease forwards;pointer-events:none;}
     .intro-tagline{font-family:'Philosopher',serif;font-size:clamp(.6rem,1.6vw,.8rem);font-style:italic;letter-spacing:.5em;text-transform:uppercase;color:rgba(240,244,255,.8);opacity:0;transition:opacity .6s ease .15s;}
     #introOverlay.symbols-in .intro-tagline{opacity:1;}
+    .intro-tap-hint{font-family:'Cinzel',serif;font-size:clamp(.5rem,1.2vw,.65rem);letter-spacing:.4em;text-transform:uppercase;color:rgba(240,244,255,.5);opacity:0;transition:opacity .5s ease;margin-top:.5rem;}
+    #introOverlay.ready .intro-tap-hint{opacity:1;animation:tapPulse 2s ease-in-out infinite;}
+    .intro-loading{font-family:'Cinzel',serif;font-size:clamp(.45rem,1vw,.58rem);letter-spacing:.35em;text-transform:uppercase;color:rgba(240,244,255,.35);opacity:1;transition:opacity .4s ease;}
+    #introOverlay.ready .intro-loading{opacity:0;pointer-events:none;}
+    @keyframes tapPulse{0%,100%{opacity:.5}50%{opacity:1;}}
     .symbols-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(2rem,5vw,5rem);align-items:center;justify-items:center;}
     @media(max-width:600px){.symbols-grid{grid-template-columns:repeat(2,1fr);gap:2rem}}
     .sym-item{display:flex;flex-direction:column;align-items:center;gap:.9rem;opacity:0;transform:scale(.78);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1);}
@@ -386,10 +391,12 @@
     body.theme-parchment .ep-title-text,body.theme-water .ep-title-text,body.theme-earth .ep-title-text { color: var(--white); }
     body.theme-parchment .ep-num,body.theme-water .ep-num,body.theme-earth .ep-num { color: var(--muted); }
     body.theme-parchment .section-divider-line,body.theme-water .section-divider-line,body.theme-earth .section-divider-line { background: rgba(0,0,0,.1); }
-    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: var(--white); color: var(--white); }
-    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: var(--white); }
-    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: var(--white); }
+    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: rgba(240,228,196,.95); color: rgba(240,228,196,.95); }
+    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: rgba(235,222,190,.85); }
+    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: rgba(220,200,160,.8); border-color: rgba(220,200,160,.25); }
+    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: rgba(240,228,196,.9); }
+    body.theme-parchment .about-text p,body.theme-water .about-text p,body.theme-earth .about-text p { color: rgba(235,222,190,.82); }
+    body.theme-parchment .about-fact-value,body.theme-water .about-fact-value,body.theme-earth .about-fact-value { color: rgba(240,228,196,.9); }
     body.theme-parchment .viewer-controls,body.theme-water .viewer-controls,body.theme-earth .viewer-controls { background: rgba(255,255,255,.88); }
     body.theme-parchment .vcbtn,body.theme-water .vcbtn,body.theme-earth .vcbtn { color: var(--muted); border-color: var(--dim); }
     body.theme-parchment .book-card,body.theme-water .book-card,body.theme-earth .book-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
@@ -552,6 +559,8 @@
 
 <div id="introOverlay" title="Click to enter">
   <p class="intro-tagline">Four elements. One destiny.</p>
+  <p class="intro-loading">Loading&hellip;</p>
+  <p class="intro-tap-hint">Tap anywhere to enter</p>
   <div class="symbols-grid">
     <div class="sym-item water"><img src="images/water.png" alt="Water" class="sym-img"><span class="sym-label">Water</span></div>
     <div class="sym-item earth"><img src="images/earth.png" alt="Earth" class="sym-img"><span class="sym-label">Earth</span></div>
@@ -838,18 +847,18 @@ const INTRO_END_SEC         = 90;
 const NEXT_EP_BEFORE_END    = 30;
 
 const BOOKS = [
-  { book:1, tag:'kora-season1', ext:'mp4', label:'Book One', sublabel:'Air', symFile:'air.png',
+  { book:1, tag:'kora-season1', ext:'mkv', label:'Book One', sublabel:'Air', symFile:'air.png',
     episodes:['Welcome to Republic City','A Leaf in the Wind','The Revelation','The Voice in the Night','The Spirit of Competition','And the Winner Is...','The Aftermath','When Extremes Meet','Out of the Past','Turning the Tides','Skeletons in the Closet','Endgame'] },
   { book:2, tag:'kora-season2', ext:'mp4', label:'Book Two', sublabel:'Spirits', symFile:'water.png',
     episodes:['Rebel Spirit','The Southern Lights','Civil Wars, Part 1','Civil Wars, Part 2','Peacekeepers','The Sting','Beginnings, Part 1','Beginnings, Part 2','The Guide','A New Spiritual Age','Night of a Thousand Stars','Harmonic Convergence','Darkness Falls','Light in the Dark'] },
-  { book:3, tag:'kora-season3', ext:'mp4', label:'Book Three', sublabel:'Change', symFile:'earth.png',
+  { book:3, tag:'kora-season3', ext:'mkv', label:'Book Three', sublabel:'Change', symFile:'earth.png',
     episodes:['A Breath of Fresh Air','Rebirth','The Earth Queen','In Harm\'s Way','The Metal Clan','Old Wounds','Original Airbenders','The Terror Within','The Stakeout','Long Live the Queen','The Ultimatum','Enter the Void','Venom of the Red Lotus'] },
-  { book:4, tag:'kora-season4', ext:'mp4', label:'Book Four', sublabel:'Balance', symFile:'fire.png',
+  { book:4, tag:'kora-season4', ext:'mkv', label:'Book Four', sublabel:'Balance', symFile:'fire.png',
     episodes:['After All These Years','Korra Alone','The Coronation','The Calling','Enemy at the Gates','The Battle of Zaofu','Reunion','Remembrances','Beyond the Wilds','Operation Beifong','Kuvira\'s Gambit','Day of the Colossus','The Last Stand'] }
 ];
 
 function epUrl(b,n){ const bd=BOOKS[b-1]; return `${GH}/${bd.tag}/S${b}E${n}.${bd.ext}`; }
-function epMime(b){ return 'video/mp4'; }
+function epMime(b){ return BOOKS[b-1].ext==='mp4'?'video/mp4':'video/x-matroska'; }
 function subUrl(b,n){
   return `captions/kora-season${b}/${n}.srt`;
 }
@@ -859,12 +868,11 @@ function getNext(b,n){ const bd=BOOKS[b-1]; if(n<bd.episodes.length) return{book
 let currentEp=null, autoFrame=null, autoStart=null;
 
 /* Intro overlay */
-const overlay=document.getElementById('introOverlay'); let dismissed=false;
+const overlay=document.getElementById('introOverlay'); let dismissed=false, overlayReady=false;
 requestAnimationFrame(()=>setTimeout(()=>overlay.classList.add('symbols-in'),80));
-function dismissOverlay(){ if(dismissed)return;dismissed=true;overlay.classList.add('fade-out');setTimeout(()=>{overlay.style.display='none';document.body.classList.add('page-ready');},650); }
-overlay.addEventListener('click',dismissOverlay,{once:true});
-/* Auto-dismiss after a brief animation — no click required */
-setTimeout(dismissOverlay, 1400);
+function dismissOverlay(){ if(!overlayReady||dismissed)return;dismissed=true;document.body.classList.add('page-ready');overlay.classList.add('fade-out');setTimeout(()=>{overlay.style.display='none';},650); }
+overlay.addEventListener('click',dismissOverlay);
+window.addEventListener('load',()=>{ overlayReady=true; overlay.classList.add('ready'); });
 
 /* Player refs */
 const vid=document.getElementById('mainVideo'),shell=document.getElementById('playerShell'),bigPlay=document.getElementById('bigPlay'),clickArea=document.getElementById('clickArea'),playBtn=document.getElementById('playBtn'),icPlay=document.getElementById('icPlay'),icPause=document.getElementById('icPause'),curEl=document.getElementById('curTime'),durEl=document.getElementById('durTime'),progFill=document.getElementById('progFill'),progBuf=document.getElementById('progBuf'),progThumb=document.getElementById('progThumb'),prog=document.getElementById('prog'),volBtn=document.getElementById('volBtn'),volSlider=document.getElementById('volSlider'),icVolOn=document.getElementById('icVolOn'),icVolOff=document.getElementById('icVolOff'),playerFrame=document.getElementById('playerFrame'),skipBtn=document.getElementById('skipIntroBtn'),nextPanel=document.getElementById('nextEpPanel'),nepTitle=document.getElementById('nepTitle'),nepBtn=document.getElementById('nepBtn'),nepProgress=document.getElementById('nepProgress'),nepSkip=document.getElementById('nepSkip'),bufSpin=document.getElementById('bufferSpinner'),ccBtn=document.getElementById('ccBtn'),captionBox=document.getElementById('captionBox');
@@ -1133,6 +1141,7 @@ function openPill() {
 function closePill() { pill.classList.remove('open'); dropdown.classList.remove('open'); }
 pill.addEventListener('click', e => { e.stopPropagation(); pill.classList.contains('open') ? closePill() : openPill(); });
 document.addEventListener('click', () => closePill());
+window.addEventListener('scroll', closePill, { passive: true });
 dropdown.addEventListener('click', e => e.stopPropagation());
 
 /* Init */
@@ -1372,7 +1381,7 @@ ccBtn.addEventListener('click',()=>{
   }
 
   // ── Click SFX ─────────────────────────────────────────────────────────────
-  function playClickSfx() { playTick(1100, 0.038, 0.22, 0.9); }
+  function playClickSfx() { playTick(90, 0.10, 0.20, 4.0); playTick(280, 0.045, 0.09, 2.5); }
 
   // ── Hover SFX ─────────────────────────────────────────────────────────────
   function playHoverSfx() { playTick(2200, 0.018, 0.06, 1.2); }

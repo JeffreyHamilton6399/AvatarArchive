@@ -500,15 +500,6 @@
         </div>
         <div class="viewer-controls" id="viewerControls" style="display:none;">
           <div class="ctrl-group">
-            <button class="vcbtn" id="prevBookBtn">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
-              Prev Book
-            </button>
-            <button class="vcbtn" id="nextBookBtn">
-              Next Book
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-            </button>
-          </div>
           <div class="ctrl-group">
             <button class="vcbtn" id="prevPageBtn">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
@@ -943,18 +934,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); goPrevSpread(); }
 });
 
-/* ─── Book nav buttons ─── */
-document.getElementById('prevBookBtn').addEventListener('click', () => {
-  if (currentBookIdx === null) return;
-  if (currentBookIdx > 0) { loadBook(currentSeries, currentBookIdx - 1); }
-  else if (currentSeries > 0) { const prev = currentSeries - 1; loadBook(prev, SERIES[prev].books.length - 1); }
-});
-document.getElementById('nextBookBtn').addEventListener('click', () => {
-  if (currentBookIdx === null) return;
-  const s = SERIES[currentSeries];
-  if (currentBookIdx < s.books.length - 1) { loadBook(currentSeries, currentBookIdx + 1); }
-  else if (currentSeries < SERIES.length - 1) { loadBook(currentSeries + 1, 0); }
-});
 
 /* ─── Intro overlay ─── */
 const overlay = document.getElementById('introOverlay');
@@ -1228,7 +1207,7 @@ document.body.addEventListener('animationend', function onReady(e) {
   }
 
   // ── Click SFX ─────────────────────────────────────────────────────────────
-  function playClickSfx() { playTick(1100, 0.038, 0.22, 0.9); }
+  function playClickSfx() { playTick(90, 0.10, 0.20, 4.0); playTick(280, 0.045, 0.09, 2.5); }
 
   // ── Hover SFX ─────────────────────────────────────────────────────────────
   function playHoverSfx() { playTick(2200, 0.018, 0.06, 1.2); }

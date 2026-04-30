@@ -121,6 +121,11 @@
       transition: opacity 0.6s ease 0.15s;
     }
     #introOverlay.symbols-in .intro-tagline { opacity: 1; }
+    .intro-tap-hint{font-family:'Cinzel',serif;font-size:clamp(.5rem,1.2vw,.65rem);letter-spacing:.4em;text-transform:uppercase;color:rgba(240,244,255,.5);opacity:0;transition:opacity .5s ease;margin-top:.5rem;}
+    #introOverlay.ready .intro-tap-hint{opacity:1;animation:tapPulse 2s ease-in-out infinite;}
+    .intro-loading{font-family:'Cinzel',serif;font-size:clamp(.45rem,1vw,.58rem);letter-spacing:.35em;text-transform:uppercase;color:rgba(240,244,255,.35);opacity:1;transition:opacity .4s ease;}
+    #introOverlay.ready .intro-loading{opacity:0;pointer-events:none;}
+    @keyframes tapPulse{0%,100%{opacity:.5}50%{opacity:1;}}
 
     .symbols-grid {
       display: grid;
@@ -787,10 +792,12 @@
     body.theme-parchment .ep-title-text,body.theme-water .ep-title-text,body.theme-earth .ep-title-text { color: var(--white); }
     body.theme-parchment .ep-num,body.theme-water .ep-num,body.theme-earth .ep-num { color: var(--muted); }
     body.theme-parchment .section-divider-line,body.theme-water .section-divider-line,body.theme-earth .section-divider-line { background: rgba(0,0,0,.1); }
-    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: var(--white); color: var(--white); }
-    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: var(--white); }
-    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: var(--white); }
+    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: rgba(240,228,196,.95); color: rgba(240,228,196,.95); }
+    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: rgba(235,222,190,.85); }
+    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: rgba(220,200,160,.8); border-color: rgba(220,200,160,.25); }
+    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: rgba(240,228,196,.9); }
+    body.theme-parchment .about-text p,body.theme-water .about-text p,body.theme-earth .about-text p { color: rgba(235,222,190,.82); }
+    body.theme-parchment .about-fact-value,body.theme-water .about-fact-value,body.theme-earth .about-fact-value { color: rgba(240,228,196,.9); }
     body.theme-parchment .viewer-controls,body.theme-water .viewer-controls,body.theme-earth .viewer-controls { background: rgba(255,255,255,.88); }
     body.theme-parchment .vcbtn,body.theme-water .vcbtn,body.theme-earth .vcbtn { color: var(--muted); border-color: var(--dim); }
     body.theme-parchment .book-card,body.theme-water .book-card,body.theme-earth .book-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
@@ -954,6 +961,8 @@
 <!-- ── Intro overlay ── -->
 <div id="introOverlay" style="cursor:pointer;" title="Click to enter">
   <p class="intro-tagline">Four elements. One destiny.</p>
+  <p class="intro-loading">Loading&hellip;</p>
+  <p class="intro-tap-hint">Tap anywhere to enter</p>
   <div class="symbols-grid">
     <div class="sym-item water">
       <img src="images/water.png" alt="Water symbol" class="sym-img">
@@ -1289,29 +1298,25 @@ function stopIntroAudio() {
    Intro overlay sequence
 ══════════════════════════════════════════════ */
 const overlay = document.getElementById('introOverlay');
-let overlayDismissed = false;
+let overlayDismissed = false, overlayReady = false;
 
 // Animate symbols in after first paint
 requestAnimationFrame(() => setTimeout(() => overlay.classList.add('symbols-in'), 80));
 
 function dismissOverlay() {
-  if (overlayDismissed) return;
+  if (!overlayReady || overlayDismissed) return;
   overlayDismissed = true;
   playIntroAudio();
+  document.body.classList.add('page-ready');
   overlay.classList.add('fade-out');
   setTimeout(() => {
     overlay.style.display = 'none';
-    document.body.classList.add('page-ready');
   }, 650);
-  // Fade out audio after ~2.5s so it doesn't clash with the video
   setTimeout(stopIntroAudio, 2500);
 }
 
-// User can click to dismiss immediately
-overlay.addEventListener('click', dismissOverlay, { once: true });
-
-// Auto-dismiss after 2.8s (gives symbols time to breathe)
-setTimeout(dismissOverlay, 1400);
+overlay.addEventListener('click', dismissOverlay);
+window.addEventListener('load', () => { overlayReady = true; overlay.classList.add('ready'); });
 
 /* ══════════════════════════════════════════════
    Video player
@@ -2034,7 +2039,7 @@ window.addEventListener('pagehide', () => {
   }
 
   // ── Click SFX ─────────────────────────────────────────────────────────────
-  function playClickSfx() { playTick(1100, 0.038, 0.22, 0.9); }
+  function playClickSfx() { playTick(90, 0.10, 0.20, 4.0); playTick(280, 0.045, 0.09, 2.5); }
 
   // ── Hover SFX ─────────────────────────────────────────────────────────────
   function playHoverSfx() { playTick(2200, 0.018, 0.06, 1.2); }

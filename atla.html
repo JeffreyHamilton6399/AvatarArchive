@@ -49,6 +49,11 @@
     #introOverlay.fade-out{animation:overlayOut .65s ease forwards;pointer-events:none;}
     .intro-tagline{font-family:'Philosopher',serif;font-size:clamp(.6rem,1.6vw,.8rem);font-style:italic;letter-spacing:.5em;text-transform:uppercase;color:rgba(240,244,255,.8);opacity:0;transition:opacity .6s ease .15s;}
     #introOverlay.symbols-in .intro-tagline{opacity:1;}
+    .intro-tap-hint{font-family:'Cinzel',serif;font-size:clamp(.5rem,1.2vw,.65rem);letter-spacing:.4em;text-transform:uppercase;color:rgba(240,244,255,.5);opacity:0;transition:opacity .5s ease;margin-top:.5rem;}
+    #introOverlay.ready .intro-tap-hint{opacity:1;animation:tapPulse 2s ease-in-out infinite;}
+    .intro-loading{font-family:'Cinzel',serif;font-size:clamp(.45rem,1vw,.58rem);letter-spacing:.35em;text-transform:uppercase;color:rgba(240,244,255,.35);opacity:1;transition:opacity .4s ease;}
+    #introOverlay.ready .intro-loading{opacity:0;pointer-events:none;}
+    @keyframes tapPulse{0%,100%{opacity:.5}50%{opacity:1;}}
     .symbols-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(2rem,5vw,5rem);align-items:center;justify-items:center;}
     @media(max-width:600px){.symbols-grid{grid-template-columns:repeat(2,1fr);gap:2rem}}
     .sym-item{display:flex;flex-direction:column;align-items:center;gap:.9rem;opacity:0;transform:scale(.78);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1);}
@@ -386,10 +391,12 @@
     body.theme-parchment .ep-title-text,body.theme-water .ep-title-text,body.theme-earth .ep-title-text { color: var(--white); }
     body.theme-parchment .ep-num,body.theme-water .ep-num,body.theme-earth .ep-num { color: var(--muted); }
     body.theme-parchment .section-divider-line,body.theme-water .section-divider-line,body.theme-earth .section-divider-line { background: rgba(0,0,0,.1); }
-    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: var(--white); color: var(--white); }
-    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: var(--white); }
-    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: var(--muted); border-color: var(--dim); }
-    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: var(--white); }
+    body.theme-parchment .info-title,body.theme-water .info-title,body.theme-earth .info-title { -webkit-text-fill-color: rgba(240,228,196,.95); color: rgba(240,228,196,.95); }
+    body.theme-parchment .info-synopsis,body.theme-water .info-synopsis,body.theme-earth .info-synopsis { color: rgba(235,222,190,.85); }
+    body.theme-parchment .genre-tag,body.theme-water .genre-tag,body.theme-earth .genre-tag { color: rgba(220,200,160,.8); border-color: rgba(220,200,160,.25); }
+    body.theme-parchment .stat-value,body.theme-water .stat-value,body.theme-earth .stat-value { color: rgba(240,228,196,.9); }
+    body.theme-parchment .about-text p,body.theme-water .about-text p,body.theme-earth .about-text p { color: rgba(235,222,190,.82); }
+    body.theme-parchment .about-fact-value,body.theme-water .about-fact-value,body.theme-earth .about-fact-value { color: rgba(240,228,196,.9); }
     body.theme-parchment .viewer-controls,body.theme-water .viewer-controls,body.theme-earth .viewer-controls { background: rgba(255,255,255,.88); }
     body.theme-parchment .vcbtn,body.theme-water .vcbtn,body.theme-earth .vcbtn { color: var(--muted); border-color: var(--dim); }
     body.theme-parchment .book-card,body.theme-water .book-card,body.theme-earth .book-card { background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.1); }
@@ -552,6 +559,8 @@
 
 <div id="introOverlay" title="Click to enter">
   <p class="intro-tagline">Four elements. One destiny.</p>
+  <p class="intro-loading">Loading&hellip;</p>
+  <p class="intro-tap-hint">Tap anywhere to enter</p>
   <div class="symbols-grid">
     <div class="sym-item water"><img src="images/water.png" alt="Water" class="sym-img"><span class="sym-label">Water</span></div>
     <div class="sym-item earth"><img src="images/earth.png" alt="Earth" class="sym-img"><span class="sym-label">Earth</span></div>
@@ -592,7 +601,7 @@
       <div class="corner corner-br"><img src="images/air.png" alt="" class="corner-img corner-air"></div>
       <div class="player-shell idle" id="playerShell">
         <video id="mainVideo" preload="none" playsinline poster="images/previewATLA.png">
-          <source src="" type="video/mp4" id="videoSource">
+          <source src="" type="video/x-matroska" id="videoSource">
         </video>
         <div class="big-play" id="bigPlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         <div id="bufferSpinner"></div>
@@ -864,12 +873,12 @@ function getNext(b,n){ const bd=BOOKS[b-1]; if(n===0) return{book:b,num:1,title:
 let currentEp=null, autoFrame=null, autoStart=null;
 
 /* Intro overlay */
-const overlay=document.getElementById('introOverlay'); let dismissed=false;
+const overlay=document.getElementById('introOverlay'); let dismissed=false, overlayReady=false;
 requestAnimationFrame(()=>setTimeout(()=>overlay.classList.add('symbols-in'),80));
-function dismissOverlay(){ if(dismissed)return;dismissed=true;overlay.classList.add('fade-out');setTimeout(()=>{overlay.style.display='none';document.body.classList.add('page-ready');},650); }
-overlay.addEventListener('click',dismissOverlay,{once:true});
-/* Auto-dismiss after a brief animation — no click required */
-setTimeout(dismissOverlay, 1400);
+function dismissOverlay(){ if(!overlayReady||dismissed)return;dismissed=true;document.body.classList.add('page-ready');overlay.classList.add('fade-out');setTimeout(()=>{overlay.style.display='none';},650); }
+overlay.addEventListener('click',dismissOverlay);
+/* Gate: only allow tap once page assets are loaded */
+window.addEventListener('load',()=>{ overlayReady=true; overlay.classList.add('ready'); });
 
 /* Player refs */
 const vid=document.getElementById('mainVideo'),shell=document.getElementById('playerShell'),bigPlay=document.getElementById('bigPlay'),clickArea=document.getElementById('clickArea'),playBtn=document.getElementById('playBtn'),icPlay=document.getElementById('icPlay'),icPause=document.getElementById('icPause'),curEl=document.getElementById('curTime'),durEl=document.getElementById('durTime'),progFill=document.getElementById('progFill'),progBuf=document.getElementById('progBuf'),progThumb=document.getElementById('progThumb'),prog=document.getElementById('prog'),volBtn=document.getElementById('volBtn'),volSlider=document.getElementById('volSlider'),icVolOn=document.getElementById('icVolOn'),icVolOff=document.getElementById('icVolOff'),playerFrame=document.getElementById('playerFrame'),skipBtn=document.getElementById('skipIntroBtn'),nextPanel=document.getElementById('nextEpPanel'),nepTitle=document.getElementById('nepTitle'),nepBtn=document.getElementById('nepBtn'),nepProgress=document.getElementById('nepProgress'),nepSkip=document.getElementById('nepSkip'),bufSpin=document.getElementById('bufferSpinner'),ccBtn=document.getElementById('ccBtn'),captionBox=document.getElementById('captionBox');
@@ -1096,9 +1105,9 @@ function setPill(b) {
 
 /* Render episode grid for a book */
 function epUrl(b,n){
-  if(b===1&&n===0) return `${GH}/${BOOKS[0].tag}/S1E0.mp4`;
-  if(b===2&&(n===12||n===13)) return `${GH}/${BOOKS[b-1].tag}/S2E12E13.mp4`;
-  return `${GH}/${BOOKS[b-1].tag}/S${b}E${n}.mp4`;
+  if(b===1&&n===0) return `${GH}/${BOOKS[0].tag}/S1E0.mkv`;
+  if(b===2&&(n===12||n===13)) return `${GH}/${BOOKS[b-1].tag}/S2E12E13.mkv`;
+  return `${GH}/${BOOKS[b-1].tag}/S${b}E${n}.mkv`;
 }
 function renderEpisodes(b) {
   const bData = BOOKS[b - 1];
@@ -1168,6 +1177,7 @@ function openPill() {
 function closePill() { pill.classList.remove('open'); dropdown.classList.remove('open'); }
 pill.addEventListener('click', e => { e.stopPropagation(); pill.classList.contains('open') ? closePill() : openPill(); });
 document.addEventListener('click', () => closePill());
+window.addEventListener('scroll', closePill, { passive: true });
 dropdown.addEventListener('click', e => e.stopPropagation());
 
 /* Init */
@@ -1417,7 +1427,7 @@ ccBtn.addEventListener('click',()=>{
   }
 
   // ── Click SFX ─────────────────────────────────────────────────────────────
-  function playClickSfx() { playTick(1100, 0.038, 0.22, 0.9); }
+  function playClickSfx() { playTick(90, 0.10, 0.20, 4.0); playTick(280, 0.045, 0.09, 2.5); }
 
   // ── Hover SFX ─────────────────────────────────────────────────────────────
   function playHoverSfx() { playTick(2200, 0.018, 0.06, 1.2); }
