@@ -1293,7 +1293,6 @@
 
   function showMap() {
     mapSplash.style.display = '';
-    mapShowTs = Date.now();
     requestAnimationFrame(() => setTimeout(() => mapSplash.classList.add('map-in'), 60));
   }
 
