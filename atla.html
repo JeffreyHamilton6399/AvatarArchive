@@ -1009,7 +1009,7 @@ vid.addEventListener('ended',()=>{ updateShimmer(); if(currentEp){ const n=getNe
 
 /* Captions */
 let captionsOn=false,srtCues=[],lastCueText=null;
-let CAPTION_OFFSET=parseFloat(localStorage.getItem('avatarhub_cc_offset')||'0');
+let CAPTION_OFFSET=parseFloat(localStorage.getItem('avatarhub_cc_offset')||'-8');
 function parseSRT(text){ return text.replace(/\r/g,'').trim().split(/\n\n+/).reduce((c,b)=>{ const l=b.split('\n'),t=l[1]?.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s-->\s(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);if(t&&l.length>=3){const p=(h,m,s,ms)=>+h*3600+ +m*60+ +s+ +ms/1000;c.push({start:p(t[1],t[2],t[3],t[4]),end:p(t[5],t[6],t[7],t[8]),text:l.slice(2).join('\n')});}return c;},[]);}
 function showCaption(t){captionBox.innerHTML='<span>'+t.replace(/\n/g,'<br>')+'</span>';captionBox.style.display='block';requestAnimationFrame(()=>captionBox.classList.add('visible'));}
 function hideCaption(){captionBox.classList.remove('visible');setTimeout(()=>{if(!captionBox.classList.contains('visible'))captionBox.style.display='none';},200);}
