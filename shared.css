@@ -67,6 +67,27 @@ body.theme-earth    .bg-layer  { filter: blur(8px) brightness(0.4) saturate(1.1)
 @keyframes waveBar  { from{height:3px} to{height:11px} }
 @keyframes panelIn  { from{opacity:0;transform:scale(.93) translateY(6px)} to{opacity:1;transform:scale(1) translateY(0)} }
 
+/* ── Press / click animation ── */
+a, button, [role="button"],
+.hub-card, .card-cta, .ep-card, .ep-thumb,
+.book-tab, .season-tab, .pill-btn, .pill-tab,
+.theme-opt, .sp-ambient-row, .sp-install-row,
+.star-btn, .ctrl-btn, .card-poster, .merch-card,
+.comic-btn, .nav-btn, .vcbtn, .back-link,
+[data-ep], [data-book] {
+  transition: transform .1s cubic-bezier(.3,0,.5,1), opacity .1s ease;
+}
+a:active, button:active, [role="button"]:active,
+.hub-card:active, .card-cta:active, .ep-card:active, .ep-thumb:active,
+.book-tab:active, .season-tab:active, .pill-btn:active, .pill-tab:active,
+.theme-opt:active, .sp-ambient-row:active, .sp-install-row:active,
+.star-btn:active, .ctrl-btn:active, .card-poster:active, .merch-card:active,
+.comic-btn:active, .nav-btn:active, .vcbtn:active, .back-link:active,
+[data-ep]:active, [data-book]:active {
+  transform: scale(0.955);
+  opacity: .85;
+}
+
 /* ── Respect reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

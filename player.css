@@ -413,3 +413,15 @@
     body.theme-parchment .game-title,body.theme-water .game-title,body.theme-earth .game-title { color: var(--white); }
     body.theme-parchment .game-desc,body.theme-water .game-desc,body.theme-earth .game-desc { color: var(--muted); }
     body.theme-parchment .game-tag,body.theme-water .game-tag,body.theme-earth .game-tag { color: var(--muted); border-color: var(--dim); }
+
+/* ── Press animation (video pages) ── */
+.vcbtn:active, .pill-btn:active, .pill-tab:active,
+.ep-card:active, .ep-thumb:active, .season-tab:active,
+.book-tab:active, .back-link:active, .skipIntroBtn:active,
+#nepBtn:active, #nepSkip:active, #speedBtn:active,
+#pqBtn:active, #ccBtn:active, #fsBtn:active,
+#playBtn:active, #volBtn:active {
+  transform: scale(0.94);
+  opacity: .82;
+  transition: transform .08s cubic-bezier(.3,0,.5,1), opacity .08s ease;
+}
