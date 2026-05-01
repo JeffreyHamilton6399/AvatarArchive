@@ -447,7 +447,7 @@
   <header class="anim-header">
     <a href="index.html" class="back-link">
       <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      Hub
+      The Spirit Library
     </a>
   </header>
 
@@ -834,7 +834,7 @@ async function loadBook(seriesIdx, bookIdx) {
 
   nrTitle.textContent  = b.title;
   nrSeries.textContent = s.label;
-  nrBar.style.opacity = '1'; clearTimeout(window._nrFadeTimer); window._nrFadeTimer = setTimeout(() => { nrBar.style.opacity = '0'; }, 4000);
+  nrBar.style.opacity  = '1';
 
   placeholder.style.display = 'none';
   pdfReader.style.display   = 'none';
@@ -1230,14 +1230,24 @@ document.body.addEventListener('animationend', function onReady(e) {
     if (e.target.closest(CLICK_SEL)) playClickSfx();
   }, { passive: true });
 
-  // ── Delegated hover listener (mouseover = fires once per enter) ───────────
-  let _hoverCooldown = false;
+  // ── Delegated hover listener ─────────────────────────────────────────────
+  // Only fire when entering a NEW interactive element — compare the closest
+  // HOVER_SEL ancestor for both target and relatedTarget so moving between
+  // child nodes inside the same card doesn't re-trigger the sound.
+  let _lastHovered = null;
   document.addEventListener('mouseover', function (e) {
-    if (_hoverCooldown) return;
-    if (e.target.closest(HOVER_SEL)) {
-      playHoverSfx();
-      _hoverCooldown = true;
-      setTimeout(() => { _hoverCooldown = false; }, 80); // max ~12 ticks/s
+    const el = e.target.closest(HOVER_SEL);
+    if (!el) return;
+    const from = e.relatedTarget ? e.relatedTarget.closest(HOVER_SEL) : null;
+    if (el === from || el === _lastHovered) return; // still inside same element
+    _lastHovered = el;
+    playHoverSfx();
+  }, { passive: true });
+  document.addEventListener('mouseout', function (e) {
+    const el = e.target.closest(HOVER_SEL);
+    if (el && el === _lastHovered) {
+      const to = e.relatedTarget ? e.relatedTarget.closest(HOVER_SEL) : null;
+      if (to !== el) _lastHovered = null;
     }
   }, { passive: true });
 

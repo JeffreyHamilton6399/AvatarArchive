@@ -526,7 +526,7 @@
   <header class="anim-header">
     <a href="index.html" class="back-link">
       <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      Back to Hub
+      The Spirit Library
     </a>
     <span class="header-tag">Avatar Games</span>
   </header>
@@ -857,14 +857,24 @@ setTimeout(() => { if (!introDone) dismissIntro(); }, 1400);
     if (e.target.closest(CLICK_SEL)) playClickSfx();
   }, { passive: true });
 
-  // ── Delegated hover listener (mouseover = fires once per enter) ───────────
-  let _hoverCooldown = false;
+  // ── Delegated hover listener ─────────────────────────────────────────────
+  // Only fire when entering a NEW interactive element — compare the closest
+  // HOVER_SEL ancestor for both target and relatedTarget so moving between
+  // child nodes inside the same card doesn't re-trigger the sound.
+  let _lastHovered = null;
   document.addEventListener('mouseover', function (e) {
-    if (_hoverCooldown) return;
-    if (e.target.closest(HOVER_SEL)) {
-      playHoverSfx();
-      _hoverCooldown = true;
-      setTimeout(() => { _hoverCooldown = false; }, 80); // max ~12 ticks/s
+    const el = e.target.closest(HOVER_SEL);
+    if (!el) return;
+    const from = e.relatedTarget ? e.relatedTarget.closest(HOVER_SEL) : null;
+    if (el === from || el === _lastHovered) return; // still inside same element
+    _lastHovered = el;
+    playHoverSfx();
+  }, { passive: true });
+  document.addEventListener('mouseout', function (e) {
+    const el = e.target.closest(HOVER_SEL);
+    if (el && el === _lastHovered) {
+      const to = e.relatedTarget ? e.relatedTarget.closest(HOVER_SEL) : null;
+      if (to !== el) _lastHovered = null;
     }
   }, { passive: true });
 

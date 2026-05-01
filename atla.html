@@ -837,14 +837,24 @@ ccBtn.addEventListener('click',()=>{
     if (e.target.closest(CLICK_SEL)) playClickSfx();
   }, { passive: true });
 
-  // ── Delegated hover listener (mouseover = fires once per enter) ───────────
-  let _hoverCooldown = false;
+  // ── Delegated hover listener ─────────────────────────────────────────────
+  // Only fire when entering a NEW interactive element — compare the closest
+  // HOVER_SEL ancestor for both target and relatedTarget so moving between
+  // child nodes inside the same card doesn't re-trigger the sound.
+  let _lastHovered = null;
   document.addEventListener('mouseover', function (e) {
-    if (_hoverCooldown) return;
-    if (e.target.closest(HOVER_SEL)) {
-      playHoverSfx();
-      _hoverCooldown = true;
-      setTimeout(() => { _hoverCooldown = false; }, 80); // max ~12 ticks/s
+    const el = e.target.closest(HOVER_SEL);
+    if (!el) return;
+    const from = e.relatedTarget ? e.relatedTarget.closest(HOVER_SEL) : null;
+    if (el === from || el === _lastHovered) return; // still inside same element
+    _lastHovered = el;
+    playHoverSfx();
+  }, { passive: true });
+  document.addEventListener('mouseout', function (e) {
+    const el = e.target.closest(HOVER_SEL);
+    if (el && el === _lastHovered) {
+      const to = e.relatedTarget ? e.relatedTarget.closest(HOVER_SEL) : null;
+      if (to !== el) _lastHovered = null;
     }
   }, { passive: true });
 
