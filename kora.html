@@ -1062,7 +1062,7 @@ function loadEpisode(book,epNum){
   fetch(subUrl(book,epNum)).then(r=>r.ok?r.text():Promise.reject()).then(t=>{srtCues=parseSRT(t);}).catch(()=>{});
   document.getElementById('npTitle').textContent=title;
   document.getElementById('npEp').textContent=`Book ${book}, Ep ${epNum}`;
-  document.getElementById('nowPlayingBar').style.opacity='1';
+  document.getElementById('nowPlayingBar').style.opacity='1'; clearTimeout(window._npFadeTimer); window._npFadeTimer = setTimeout(() => { document.getElementById('nowPlayingBar').style.opacity='0'; }, 4000);
   // Switch book tab if needed and re-render
   if(currentBook !== book){ selectBook(book); } else { renderEpisodes(book); }
   const card=epGrid.querySelector(`.ep-card[data-b="${book}"][data-ep="${epNum}"]`);
@@ -1226,7 +1226,7 @@ renderEpisodes(1);
         },{once:true});
         document.getElementById('npTitle').textContent=ep.title;
         document.getElementById('npEp').textContent=`Book ${ep.book}, Ep ${ep.num}`;
-        document.getElementById('nowPlayingBar').style.opacity='1';
+        document.getElementById('nowPlayingBar').style.opacity='1'; clearTimeout(window._npFadeTimer); window._npFadeTimer = setTimeout(() => { document.getElementById('nowPlayingBar').style.opacity='0'; }, 4000);
         if(currentBook!==ep.book){ selectBook(ep.book); } else { renderEpisodes(ep.book); }
         setTimeout(()=>{
           const card=epGrid&&epGrid.querySelector(`.ep-card[data-b="${ep.book}"][data-ep="${ep.num}"]`);

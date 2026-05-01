@@ -834,7 +834,7 @@ async function loadBook(seriesIdx, bookIdx) {
 
   nrTitle.textContent  = b.title;
   nrSeries.textContent = s.label;
-  nrBar.style.opacity  = '1';
+  nrBar.style.opacity = '1'; clearTimeout(window._nrFadeTimer); window._nrFadeTimer = setTimeout(() => { nrBar.style.opacity = '0'; }, 4000);
 
   placeholder.style.display = 'none';
   pdfReader.style.display   = 'none';

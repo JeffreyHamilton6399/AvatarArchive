@@ -619,7 +619,7 @@
       <div class="corner corner-br"><img src="images/air.png" alt="" class="corner-img corner-air"></div>
       <div class="player-shell idle" id="playerShell">
         <video id="mainVideo" preload="none" playsinline poster="images/previewATLA.png">
-          <source src="" type="video/x-matroska" id="videoSource">
+          <source src="" type="video/mp4" id="videoSource">
         </video>
         <div class="big-play" id="bigPlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         <div id="bufferSpinner"></div>
@@ -1068,7 +1068,7 @@ function loadEpisode(book,epNum){
   const _su1=subUrl(book,epNum);if(_su1)fetch(_su1).then(r=>r.ok?r.text():Promise.reject()).then(t=>{srtCues=parseSRT(t);}).catch(()=>{});
   document.getElementById('npTitle').textContent=title;
   document.getElementById('npEp').textContent=epNum===0?`Book ${book}, Pilot`:`Book ${book}, Ep ${epNum}`;
-  document.getElementById('nowPlayingBar').style.opacity='1';
+  document.getElementById('nowPlayingBar').style.opacity='1'; clearTimeout(window._npFadeTimer); window._npFadeTimer = setTimeout(() => { document.getElementById('nowPlayingBar').style.opacity='0'; }, 4000);
   // Switch book tab if needed and re-render
   if(currentBook !== book){ selectBook(book); } else { renderEpisodes(book); }
   const card=epGrid.querySelector(`.ep-card[data-b="${book}"][data-ep="${epNum}"]`);
@@ -1269,7 +1269,7 @@ renderEpisodes(1);
         },{once:true});
         document.getElementById('npTitle').textContent=ep.title;
         document.getElementById('npEp').textContent=ep.num===0?`Book ${ep.book}, Pilot`:`Book ${ep.book}, Ep ${ep.num}`;
-        document.getElementById('nowPlayingBar').style.opacity='1';
+        document.getElementById('nowPlayingBar').style.opacity='1'; clearTimeout(window._npFadeTimer); window._npFadeTimer = setTimeout(() => { document.getElementById('nowPlayingBar').style.opacity='0'; }, 4000);
         // Switch to correct book tab
         if(currentBook!==ep.book){ selectBook(ep.book); } else { renderEpisodes(ep.book); }
         setTimeout(()=>{
