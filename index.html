@@ -415,6 +415,7 @@
     .hub-card.games           { --accent:#3ddc84;      --accent-rgb:61,220,132;   }
     .hub-card.merch           { --accent:#c9a84c;      --accent-rgb:201,168,76;   }
     .hub-card.timeline        { --accent:#9b7fe8;      --accent-rgb:155,127,232;  }
+    .hub-card.familytrees     { --accent:#c9a84c;      --accent-rgb:201,168,76;   }
     .hub-card:hover {
       box-shadow: 0 16px 55px rgba(var(--accent-rgb),.2), 0 0 0 1px rgba(var(--accent-rgb),.32);
       border-color: rgba(var(--accent-rgb),.38);
@@ -572,6 +573,7 @@
     .sr-dot.liveactionmovie { background: var(--fire); }
     .sr-dot.liveactionshow  { background: #e53935; }
     .sr-dot.games           { background: #3ddc84; }
+    .sr-dot.familytrees     { background: #c9a84c; }
     .sr-info { flex: 1; min-width: 0; }
     .sr-title { font-family: 'Philosopher', serif; font-size: clamp(.8rem,1.5vw,.95rem); color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .sr-meta  { font-family: 'Cinzel', serif; font-size: .42rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: .15rem; }
@@ -1134,6 +1136,61 @@ body.theme-earth    .install-banner-title { color: var(--white); }
           <span class="card-tag">All Eras</span>
           <span class="card-tag">BG → AG</span>
           <span class="card-tag">Wan → Korra</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-cta">
+          Explore
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Family Trees -->
+    <a href="familytrees.html" class="hub-card familytrees">
+      <div class="card-poster">
+        <div class="card-poster-bg" style="background-image:url('images/familytreesbg.png')"></div>
+        <div class="card-poster-overlay"></div>
+        <!-- Decorative mini tree SVG -->
+        <svg style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:3;opacity:.5;width:min(80%,280px)" viewBox="0 0 280 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- spine -->
+          <line x1="140" y1="4" x2="140" y2="20" stroke="rgba(201,168,76,.6)" stroke-width="1"/>
+          <!-- rail -->
+          <line x1="50" y1="20" x2="230" y2="20" stroke="rgba(201,168,76,.4)" stroke-width="1"/>
+          <!-- drops -->
+          <line x1="50"  y1="20" x2="50"  y2="36" stroke="rgba(201,168,76,.5)" stroke-width="1"/>
+          <line x1="140" y1="20" x2="140" y2="36" stroke="rgba(201,168,76,.5)" stroke-width="1"/>
+          <line x1="230" y1="20" x2="230" y2="36" stroke="rgba(201,168,76,.5)" stroke-width="1"/>
+          <!-- children rail 2 -->
+          <line x1="50"  y1="36" x2="95"  y2="36" stroke="rgba(201,168,76,.3)" stroke-width="1"/>
+          <line x1="50"  y1="36" x2="50"  y2="48" stroke="rgba(201,168,76,.4)" stroke-width="1"/>
+          <line x1="95"  y1="36" x2="95"  y2="48" stroke="rgba(201,168,76,.4)" stroke-width="1"/>
+          <line x1="185" y1="36" x2="230" y2="36" stroke="rgba(201,168,76,.3)" stroke-width="1"/>
+          <line x1="185" y1="36" x2="185" y2="48" stroke="rgba(201,168,76,.4)" stroke-width="1"/>
+          <line x1="230" y1="36" x2="230" y2="48" stroke="rgba(201,168,76,.4)" stroke-width="1"/>
+          <!-- nodes -->
+          <circle cx="140" cy="4"  r="4" fill="#c9a84c" opacity=".9"/>
+          <circle cx="50"  cy="20" r="3.5" fill="#f97316" opacity=".85"/>
+          <circle cx="140" cy="20" r="3.5" fill="#f5c518" opacity=".85"/>
+          <circle cx="230" cy="20" r="3.5" fill="#4db8ff" opacity=".85"/>
+          <circle cx="50"  cy="36" r="3" fill="#f97316" opacity=".7"/>
+          <circle cx="95"  cy="36" r="3" fill="#f97316" opacity=".7"/>
+          <circle cx="140" cy="36" r="3" fill="#f5c518" opacity=".7"/>
+          <circle cx="185" cy="36" r="3" fill="#4db8ff" opacity=".7"/>
+          <circle cx="230" cy="36" r="3" fill="#6abf69" opacity=".7"/>
+          <circle cx="50"  cy="48" r="2.5" fill="#f97316" opacity=".55"/>
+          <circle cx="95"  cy="48" r="2.5" fill="#f5c518" opacity=".55"/>
+          <circle cx="185" cy="48" r="2.5" fill="#4db8ff" opacity=".55"/>
+          <circle cx="230" cy="48" r="2.5" fill="#6abf69" opacity=".55"/>
+        </svg>
+      </div>
+      <div class="card-body">
+        <span class="card-label">Lineage &amp; Legacy</span>
+        <div class="card-title">Family Trees</div>
+        <div class="card-sub">Five Bloodlines, Every Generation</div>
+        <div class="card-meta">
+          <span class="card-tag">Fire Nation</span>
+          <span class="card-tag">Aang's Line</span>
+          <span class="card-tag">Beifongs</span>
         </div>
         <div class="card-divider"></div>
         <div class="card-cta">
@@ -1706,6 +1763,11 @@ const ALL_EPISODES = [
   {title:'The Legend of Korra (Discontinued)', series:'games', seriesLabel:'ATLA Games — Delisted 2018', ep:'No longer available', href:'games.html', cls:'games'},
   {title:'Avatar Legends TTRPG', series:'games', seriesLabel:'ATLA Games', ep:'Official Website', href:'https://www.magpiegames.com/pages/avatar-legends', cls:'games'},
   {title:'Avatar Official Merch', series:'games', seriesLabel:'Official Merchandise', ep:'Visit Store', href:'https://avatarthelastairbenderstore.com/', cls:'games'},
+  {title:'Fire Nation Royal Line', series:'familytrees', seriesLabel:'Family Trees', ep:'View Tree', href:'familytrees.html', cls:'familytrees'},
+  {title:'Aang & Katara\'s Lineage', series:'familytrees', seriesLabel:'Family Trees', ep:'View Tree', href:'familytrees.html', cls:'familytrees'},
+  {title:'Southern Water Tribe — Hakoda\'s Family', series:'familytrees', seriesLabel:'Family Trees', ep:'View Tree', href:'familytrees.html', cls:'familytrees'},
+  {title:'The Beifong Family', series:'familytrees', seriesLabel:'Family Trees', ep:'View Tree', href:'familytrees.html', cls:'familytrees'},
+  {title:'Korra\'s Family', series:'familytrees', seriesLabel:'Family Trees', ep:'View Tree', href:'familytrees.html', cls:'familytrees'},
 ];
 
 const searchInput   = document.getElementById('searchInput');

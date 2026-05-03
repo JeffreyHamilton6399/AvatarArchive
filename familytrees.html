@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <title>Family Trees · AvatarArchive</title>
+  <meta name="theme-color" content="#04070d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="icon" type="image/jpeg" href="images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cinzel+Decorative:wght@400;700;900&family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+
+  .page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 clamp(1rem,4vw,2.5rem);}
+
+  /* Back */
+  .back-link{position:fixed;top:18px;left:18px;z-index:50;display:inline-flex;align-items:center;gap:7px;font-family:'Cinzel',serif;font-size:.4rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(201,168,76,.75);background:rgba(4,7,13,.72);border:1px solid rgba(201,168,76,.2);border-radius:30px;padding:.48em 1em;text-decoration:none;transition:color .2s,border-color .2s,background .2s;backdrop-filter:blur(14px);}
+  .back-link:hover{color:#d4a832;border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.08);}
+  .back-link svg{width:12px;height:12px;fill:currentColor;}
+
+  /* Hero */
+  .hero{text-align:center;padding:clamp(4.5rem,9vh,7rem) 2rem clamp(1rem,1.5vh,1.8rem);width:100%;max-width:640px;animation:ft-in .7s cubic-bezier(.22,1,.36,1) both;}
+  .hero-eyebrow{font-family:'Cinzel',serif;font-size:clamp(.38rem,.9vw,.5rem);letter-spacing:.45em;text-transform:uppercase;color:rgba(201,168,76,.55);margin-bottom:.9rem;}
+  .hero-main{font-family:'Cinzel Decorative',serif;font-weight:900;font-size:clamp(1.4rem,3vw,2.5rem);letter-spacing:.06em;background:linear-gradient(135deg,#f0dfa0 0%,#c9a84c 55%,#8a6a1a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;padding:.1em .3em .15em;display:inline-block;margin-bottom:.4rem;}
+  .hero-sub{font-family:'Philosopher',serif;font-style:italic;font-size:clamp(.82rem,1.6vw,1rem);color:var(--muted);letter-spacing:.1em;}
+  .hero-rule{width:60px;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.45),transparent);margin:1.2rem auto 0;}
+
+  /* Tree tabs */
+  .tree-tabs{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;padding:.8rem 0 1.6rem;animation:ft-in .6s cubic-bezier(.22,1,.36,1) .1s both;}
+  .tab-pill{font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1);border-radius:30px;padding:.5em 1.1em;cursor:pointer;background:rgba(10,17,28,.6);color:var(--muted);transition:all .2s ease;backdrop-filter:blur(10px);}
+  .tab-pill:hover{color:var(--white);border-color:rgba(255,255,255,.2);}
+  .tab-pill.active{color:var(--deep);border-color:transparent;font-weight:700;}
+  .tab-pill[data-tree="fire"].active  {background:#f97316;}
+  .tab-pill[data-tree="aang"].active  {background:#f5c518;color:#1a1000;}
+  .tab-pill[data-tree="water"].active {background:#4db8ff;color:#041020;}
+  .tab-pill[data-tree="beifong"].active{background:#6abf69;color:#041208;}
+  .tab-pill[data-tree="korra"].active {background:#9b7fe8;}
+
+  /* Tree viewport */
+  .tree-viewport{width:100%;overflow-x:auto;overflow-y:visible;padding-bottom:clamp(4rem,8vh,6rem);animation:ft-in .7s cubic-bezier(.22,1,.36,1) .18s both;}
+  .tree-viewport::-webkit-scrollbar{height:3px;}
+  .tree-viewport::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:3px;}
+
+  .tree-wrap{display:none;min-width:max-content;padding:1rem 2rem 1rem;}
+  .tree-wrap.active{display:block;}
+
+  /* ──────────── FAMILY TREE CSS ──────────── */
+  .ftree{
+    display:flex;flex-direction:column;align-items:center;
+    font-family:'Philosopher',serif;
+  }
+
+  /* Family node — wraps a person/couple and their subtree */
+  .fn{display:flex;flex-direction:column;align-items:center;}
+
+  /* Couple row */
+  .couple{display:flex;align-items:center;gap:5px;}
+  .mx{font-family:'Cinzel',serif;font-size:.55rem;color:var(--muted);padding:0 2px;opacity:.6;margin-top:-8px;}
+
+  /* Vertical drop from parent to children rail */
+  .drop{width:1px;height:28px;background:var(--tc,rgba(201,168,76,.3));}
+
+  /* Children row */
+  .cr{display:flex;align-items:flex-start;}
+
+  /* Child branch */
+  .cb{
+    display:flex;flex-direction:column;align-items:center;
+    padding:0 10px;position:relative;
+  }
+  /* Vertical from rail down to child */
+  .cb::before{content:'';display:block;width:1px;height:28px;background:var(--tc,rgba(201,168,76,.3));}
+  /* Horizontal rail */
+  .cb::after{content:'';position:absolute;top:0;height:1px;background:var(--tc,rgba(201,168,76,.3));left:0;right:0;}
+  .cb:first-child::after{left:50%;}
+  .cb:last-child::after{right:50%;}
+  .cb:only-child::after{display:none;}
+  .cb:only-child::before{background:var(--tc,rgba(201,168,76,.3));}
+
+  /* ──────────── PERSON NODE ──────────── */
+  .pn{
+    width:110px;border-radius:9px;padding:7px 9px 8px;
+    background:rgba(10,17,28,.75);border:1px solid rgba(255,255,255,.07);
+    cursor:pointer;position:relative;overflow:hidden;
+    transition:transform .12s cubic-bezier(.3,0,.5,1),opacity .12s,border-color .2s,box-shadow .2s;
+    text-align:center;
+  }
+  .pn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--ec,rgba(201,168,76,.4));}
+  .pn:hover{border-color:rgba(var(--er,201,168,76),.35);box-shadow:0 0 16px rgba(var(--er,201,168,76),.12);}
+  .pn:active{transform:scale(0.95);opacity:.82;}
+
+  /* Element color variants */
+  .pn.fire  {--ec:#f97316;--er:249,115,22;}
+  .pn.water {--ec:#4db8ff;--er:77,184,255;}
+  .pn.earth {--ec:#6abf69;--er:106,191,105;}
+  .pn.air   {--ec:#f5c518;--er:245,197,24;}
+  .pn.spirit{--ec:#9b7fe8;--er:155,127,232;}
+  .pn.none  {--ec:rgba(107,138,171,.5);--er:107,138,171;}
+
+  /* Deceased */
+  .pn.dead{opacity:.52;}
+  .pn.dead .pn-name::after{content:'†';font-size:.7em;margin-left:3px;opacity:.8;}
+
+  /* Spouse — slightly muted */
+  .pn.sp{opacity:.8;}
+
+  .pn-top{display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:2px;}
+  .pn-dot{width:6px;height:6px;border-radius:50%;background:var(--ec,#c9a84c);flex-shrink:0;}
+  .pn-name{font-family:'Cinzel',serif;font-weight:700;font-size:.5rem;letter-spacing:.05em;color:var(--white);line-height:1.2;text-align:left;}
+  .pn-role{font-family:'Philosopher',serif;font-style:italic;font-size:.6rem;color:var(--muted);margin-bottom:2px;text-align:center;line-height:1.3;}
+  .pn-dates{font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:.08em;color:rgba(107,138,171,.7);text-align:center;}
+
+  /* Light themes */
+  body.theme-parchment .pn,body.theme-water .pn,body.theme-earth .pn{background:rgba(255,255,255,.6);border-color:rgba(0,0,0,.1);}
+  body.theme-parchment .pn-name,body.theme-water .pn-name,body.theme-earth .pn-name{color:var(--white);}
+
+  /* ──────────── LEGEND BAR ──────────── */
+  .legend{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;padding:.4rem 0 1.2rem;animation:ft-in .5s cubic-bezier(.22,1,.36,1) .15s both;}
+  .leg{display:inline-flex;align-items:center;gap:.35rem;font-family:'Cinzel',serif;font-size:.33rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
+  .leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+  /* ──────────── SECTION LABELS ──────────── */
+  .tree-label{font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(201,168,76,.45);text-align:center;margin-bottom:.8rem;}
+
+  /* Spacer between connected sub-trees */
+  .tree-spacer{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.07),transparent);margin:2.5rem 0;}
+
+  /* ──────────── DETAIL PANEL ──────────── */
+  #detailPanel{
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    background:rgba(6,10,20,.97);border-top:1px solid rgba(201,168,76,.15);border-radius:20px 20px 0 0;
+    padding:1.1rem 1.4rem;padding-bottom:calc(1.4rem + env(safe-area-inset-bottom,0px));
+    max-height:52vh;overflow-y:auto;
+    backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+    box-shadow:0 -10px 50px rgba(0,0,0,.6);
+    transform:translateY(100%);transition:transform .36s cubic-bezier(.22,1,.36,1);
+    display:flex;flex-direction:column;gap:.6rem;
+  }
+  #detailPanel.open{transform:translateY(0);}
+  #detailPanel::-webkit-scrollbar{width:3px;}
+  #detailPanel::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:3px;}
+
+  .dp-handle{width:36px;height:3px;border-radius:3px;background:rgba(255,255,255,.13);margin:0 auto .3rem;cursor:pointer;flex-shrink:0;}
+  .dp-meta{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+  .dp-element{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .dp-name-tag{font-family:'Cinzel',serif;font-weight:700;font-size:.42rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dp-color,#c9a84c);}
+  .dp-dates{font-family:'Cinzel',serif;font-size:.34rem;letter-spacing:.12em;color:var(--muted);}
+  .dp-title-txt{font-family:'Philosopher',serif;font-weight:700;font-size:clamp(.95rem,2vw,1.12rem);color:var(--white);line-height:1.35;}
+  .dp-desc-txt{font-family:'Philosopher',serif;font-style:italic;font-size:clamp(.78rem,1.4vw,.9rem);color:rgba(172,188,208,.85);line-height:1.72;}
+  .dp-family{font-family:'Cinzel',serif;font-size:.33rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.2rem;}
+  .dp-close{position:absolute;top:1rem;right:1.1rem;background:none;border:none;cursor:pointer;color:var(--muted);padding:.25em;display:flex;align-items:center;transition:color .15s;}
+  .dp-close:hover{color:var(--white);}
+  .dp-close svg{width:18px;height:18px;fill:currentColor;}
+
+  body.panel-open .page{padding-bottom:56vh;}
+  body.theme-parchment #detailPanel,body.theme-water #detailPanel,body.theme-earth #detailPanel{background:rgba(242,236,220,.98);}
+  body.theme-parchment .dp-desc-txt,body.theme-water .dp-desc-txt,body.theme-earth .dp-desc-txt{color:var(--muted);}
+
+  /* ──────────── PRESS FEEDBACK ──────────── */
+  .tab-pill,.back-link,#settingsBtn,.theme-opt,.sp-ambient-row,.dp-handle,.dp-close{
+    transition:transform .1s cubic-bezier(.3,0,.5,1),opacity .1s ease,background .2s,border-color .2s,color .2s;
+  }
+  .tab-pill:active{transform:scale(0.95);opacity:.8;}
+  .back-link:active,.dp-close:active,.dp-handle:active{transform:scale(0.94);opacity:.75;}
+  #settingsBtn:active{transform:scale(0.92);}
+  .theme-opt:active,.sp-ambient-row:active{transform:scale(0.96);opacity:.8;}
+
+  @keyframes ft-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+<script>(function(){var t=localStorage.getItem('avatarhub_theme');if(t&&t!=='dark')document.body.classList.add(t);})();</script>
+<script src="player-shared.js"></script>
+
+<div class="bg-layer" style="background-image:url('images/familytreesbg.png')"></div>
+<canvas id="particleCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.22;width:100%;height:100%;"></canvas>
+
+<a href="index.html" class="back-link">
+  <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Home
+</a>
+
+<button id="settingsBtn" aria-label="Settings">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+</button>
+<div id="settingsPanel">
+  <div class="sp-section">
+    <div class="sp-section-label">Theme</div>
+    <button class="theme-opt" data-theme="dark"><span class="theme-swatch" style="background:#04070d;border:1px solid rgba(255,255,255,.2)"></span>Dark</button>
+    <button class="theme-opt" data-theme="theme-parchment"><span class="theme-swatch" style="background:#f5efe0"></span>Parchment</button>
+    <button class="theme-opt" data-theme="theme-water"><span class="theme-swatch" style="background:#4db8ff"></span>Water</button>
+    <button class="theme-opt" data-theme="theme-earth"><span class="theme-swatch" style="background:#6abf69"></span>Earth</button>
+  </div>
+  <div class="sp-divider"></div>
+  <div class="sp-section">
+    <div class="sp-ambient-row" id="ambientRow">
+      <span class="sp-ambient-label"><span class="ambient-wave"><span></span><span></span><span></span></span>Ambient</span>
+      <span class="sp-toggle"></span>
+    </div>
+  </div>
+</div>
+<div class="watermark">AvatarArchive</div>
+
+<!-- Detail panel -->
+<div id="detailPanel">
+  <div class="dp-handle" id="dpHandle"></div>
+  <button class="dp-close" id="dpClose"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+  <div class="dp-meta">
+    <div class="dp-element" id="dpElement"></div>
+    <span class="dp-name-tag" id="dpName"></span>
+    <span class="dp-dates" id="dpDates"></span>
+  </div>
+  <div class="dp-title-txt" id="dpTitle"></div>
+  <div class="dp-desc-txt"  id="dpDesc"></div>
+  <div class="dp-family"    id="dpFamily"></div>
+</div>
+
+<div class="page">
+ <div class="hero">
+  <p class="hero-eyebrow">Lineage &amp; Legacy</p>
+  <h1 class="hero-main">Family Trees</h1>
+  <p class="hero-sub">Every bloodline — across nations, eras, and the Avatar Cycle</p>
+  <div class="hero-rule"></div>
+ </div>
+
+ <div class="legend">
+  <span class="leg"><span class="leg-dot" style="background:#f97316"></span>Fire</span>
+  <span class="leg"><span class="leg-dot" style="background:#4db8ff"></span>Water</span>
+  <span class="leg"><span class="leg-dot" style="background:#6abf69"></span>Earth</span>
+  <span class="leg"><span class="leg-dot" style="background:#f5c518"></span>Air</span>
+  <span class="leg"><span class="leg-dot" style="background:#9b7fe8"></span>Spirit</span>
+  <span class="leg"><span class="leg-dot" style="background:#6b8aab"></span>Non-bender</span>
+  <span class="leg"><span class="leg-dot" style="background:rgba(107,138,171,.4);border:1px solid rgba(107,138,171,.4)"></span>Deceased †</span>
+ </div>
+
+ <!-- Tab pills -->
+ <div class="tree-tabs">
+  <button class="tab-pill active" data-tree="fire">Fire Nation Royal Line</button>
+  <button class="tab-pill" data-tree="aang">Aang's Lineage</button>
+  <button class="tab-pill" data-tree="water">Southern Water Tribe</button>
+  <button class="tab-pill" data-tree="beifong">The Beifong Family</button>
+  <button class="tab-pill" data-tree="korra">Korra's Family</button>
+ </div>
+
+ <div class="tree-viewport">
+  <div class="tree-wrap active" id="tree-fire"></div>
+  <div class="tree-wrap" id="tree-aang"></div>
+  <div class="tree-wrap" id="tree-water"></div>
+  <div class="tree-wrap" id="tree-beifong"></div>
+  <div class="tree-wrap" id="tree-korra"></div>
+ </div>
+</div>
+
+<script>
+/* ── Person Data ── */
+const PEOPLE = {};
+let _pid = 0;
+
+function p(name, title, element, born, died, desc, family) {
+  const id = 'p'+ (_pid++);
+  PEOPLE[id] = { name, title, element, born, died, desc, family };
+  return id;
+}
+
+/* ══════════════════════════════════════
+   TREE DEFINITIONS
+══════════════════════════════════════ */
+
+const TREES = {
+
+  fire: {
+    label: 'Fire Nation Royal Line',
+    treeColor: 'rgba(249,115,22,0.35)',
+    root: {
+      pid: p('Fire Lord Sozin','Fire Lord · Architect of the War','fire','82 BG','20 AG',
+        'The Fire Lord who weaponized his comet to massacre the Air Nomads and launch the Hundred Year War. He died at age 102, having watched the world burn for decades without finding the Avatar. His childhood best friend was Avatar Roku — whom he ultimately betrayed, watching him suffocate to death in volcanic fumes when he could have saved him.',
+        'Fire Nation Royal Family'),
+      spouse: {
+        pid: p('Lady Sozin','Fire Lady','none','?','?',
+          'Sozin\'s wife and the Fire Lady during his reign. She is the mother of Azulon. Little is recorded of her individually, but she is part of the bloodline that produces some of the most powerful firebenders in history.',
+          'Fire Nation Royal Family')
+      },
+      children: [{
+        pid: p('Fire Lord Azulon','Fire Lord','fire','0 AG','95 AG',
+          'Son of Sozin, Azulon ruled the Fire Nation for 75 years — longer than any other wartime Fire Lord. Cold, authoritarian, and obsessed with maintaining the dynasty\'s power. He continued his father\'s campaign, oversaw the systematic raids on the Southern Water Tribe, and ordered the execution of his own grandson Zuko as punishment for Ozai\'s ambition. He was poisoned by Ursa before the order could be carried out.',
+          'Fire Nation Royal Family'),
+        spouse: {
+          pid: p('Fire Lady Ilah','Fire Lady','none','?','?',
+            'Azulon\'s wife and the mother of Iroh and Ozai. Little is recorded of her personally, though she raised two sons who became polar opposites in character — one who sought to conquer the world, and one who learned to let it go.',
+            'Fire Nation Royal Family')
+        },
+        children: [
+          {
+            pid: p('General Iroh','Dragon of the West · Grand Lotus · Tea Master','fire','c. 45 AG',null,
+              'The elder son of Azulon, Iroh was once the Fire Nation\'s most feared military commander — the man who breached Ba Sing Se\'s outer wall after a 600-day siege, a feat no army had ever achieved. His son Lu Ten\'s death during that siege shattered him. He abandoned the campaign and spent the following decades traveling, studying tea, mastering Pai Sho, and seeking wisdom under masters of every nation. He is the secret founder of the Order of the White Lotus. He can generate lightning and redirect it. He is Zuko\'s true father figure — and the moral heart of the entire series.',
+              'Fire Nation Royal Family'),
+            children: [
+              {
+                pid: p('Lu Ten','Captain · Son of Iroh','fire','?','95 AG',
+                  'Iroh\'s only son, killed during the legendary Siege of Ba Sing Se at the outer wall. He died at the peak of his father\'s military glory, in the campaign Iroh had spent years building toward. His death was the pivot point that transformed Iroh from conqueror to sage — and left the Fire Nation throne open for Ozai to seize.',
+                  'Fire Nation Royal Family')
+              }
+            ]
+          },
+          {
+            pid: p('Fire Lord Ozai','Fire Lord · Phoenix King','fire','c. 55 AG',null,
+              'The younger son of Azulon, Ozai manipulated events — through his wife Ursa — to seize the throne that should have gone to Iroh. He rules through fear, cruelty, and absolute certainty in his own superiority. He burned his 13-year-old son\'s face for speaking out of turn in a war meeting and banished him. He crowned himself Phoenix King and launched an airship armada to burn the entire Earth Kingdom to ash. Avatar Aang stripped him of his firebending permanently using energybending — the ancient art of touching a person\'s spirit directly.',
+              'Fire Nation Royal Family'),
+            spouse: {
+              pid: p('Ursa','Princess · Exiled · "Noriko"','none','c. 64 AG',null,
+                'Granddaughter of Avatar Roku, making Zuko and Azula direct descendants of the Avatar. She married Ozai in a political arrangement. To save Zuko from Azulon\'s execution order, Ursa struck a deal with Ozai: she would poison Azulon so Ozai could take the throne, and in exchange Ozai would spare Zuko\'s life. She was then banished from the Fire Nation. Years later, using a mask provided by the spirit Mother of Faces, she had her face and memories changed and lived as "Noriko" in the town of Hira\'a with her childhood love Ikem. Zuko eventually found her and had her memories restored.',
+                'Fire Nation Royal Family')
+            },
+            children: [
+              {
+                pid: p('Fire Lord Zuko','Fire Lord · Blue Spirit · Tea Boy','fire','83 AG',null,
+                  'Banished at 13 by his own father for speaking out of turn in a war council, Zuko spent three years hunting the Avatar to restore his honor. His journey — from desperate antagonist to the series\' greatest redemption arc — is one of the most celebrated in animation. He eventually joined Team Avatar, helped Aang master firebending by relearning it from the last dragons, and ascended the throne vowing to undo a century of war. He can generate lightning and redirect it.',
+                  'Fire Nation Royal Family'),
+                spouse: {
+                  pid: p('Mai','Lady · Weapons Master','none','85 AG',null,
+                    'Childhood friend of Azula and Zuko\'s girlfriend. Known for her lethal precision with thrown needles and knives concealed across her entire body. Calm, sardonic, and emotionally guarded — but far braver than she appears. She saved Zuko\'s life at the Boiling Rock prison, choosing him over Azula at enormous personal risk. She and Zuko reunite after the war.',
+                    'Fire Nation Royal Family')
+                },
+                children: [{
+                  pid: p('Fire Lord Izumi','Fire Lord','fire','c. 101 AG',null,
+                    'Daughter of Zuko and Mai, Izumi rules the Fire Nation in Korra\'s era. She is measured, reserved, and diplomatically cautious — notably refusing to commit Fire Nation troops to stop Kuvira without more information, frustrating President Raiko. A firebending master who has continued her father\'s legacy of diplomacy over aggression.',
+                    'Fire Nation Royal Family'),
+                  children: [{
+                    pid: p('General Iroh II','General · United Forces Commander','fire','134 AG',null,
+                      'Named after his great-great-uncle, General Iroh II commands a division of the United Forces fleet. He leads the naval response to the Equalist attacks on Republic City and later fights in the battle against the Earth Empire. Skilled, compassionate, and a leader who earns loyalty rather than demanding it — very much in the spirit of his namesake.',
+                      'Fire Nation Royal Family')
+                  }]
+                }]
+              },
+              {
+                pid: p('Princess Azula','Princess · Fire Lord (brief)','fire','85 AG',null,
+                  'A firebending prodigy who mastered lightning generation and the rare blue flame at a young age. Cold, calculating, and obsessively perfectionist. She orchestrated the fall of Ba Sing Se using the Dai Li, defeated Aang with lightning (apparently killing him), and was briefly crowned Fire Lord. Her obsession with perfection, combined with her mother\'s perceived rejection, caused a complete psychological breakdown during her coronation Agni Kai with Zuko. Her fate after ATLA is explored in the comics — she searches for Ursa and her fate remains darkly ambiguous.',
+                  'Fire Nation Royal Family')
+              }
+            ]
+          }
+        ]
+      }]
+    }
+  },
+
+  aang: {
+    label: "Aang & Katara's Lineage",
+    treeColor: 'rgba(245,197,24,0.3)',
+    root: {
+      pid: p('Monk Gyatso','Air Nomad Elder · Guardian','air','?','0 AG',
+        'Aang\'s guardian, mentor, and closest family figure at the Southern Air Temple. One of the greatest airbenders of his generation, Gyatso was also a master of Pai Sho and the person who kept Aang grounded when the burden of being the Avatar threatened to overwhelm him. He argued against revealing Aang\'s Avatar identity early and paid a terrible price: he was among the Air Nomads slaughtered by Sozin\'s forces. His skeleton, surrounded by Fire Nation helmets, told Aang everything about how fiercely he fought at the end.',
+        "Aang's Lineage"),
+      children: [{
+        pid: p('Avatar Aang','Avatar · Air Nomad Master','air','12 BG','153 AG',
+          'The last Air Nomad and the Avatar of his generation. Frozen in ice at age 12 to escape a storm, he woke 100 years later to find his entire nation gone. Over the course of a single year he mastered all four elements, ended the Hundred Year War using energybending to strip Ozai of his firebending, founded the United Republic of Nations, and spent the rest of his life preserving Air Nomad culture through the Air Acolytes. He married Katara and had three children — only the youngest inherited airbending.',
+          "Aang's Lineage"),
+        spouse: {
+          pid: p('Master Katara','Master Waterbender · Healer · Warrior','water','85 AG',null,
+            'Born in the Southern Water Tribe, Katara discovered and freed Aang from the iceberg. She taught herself waterbending from a scroll, then trained under Master Pakku of the Northern Water Tribe to become one of the greatest waterbenders alive — and the most skilled healer in the world. She is the emotional center of Team Avatar. She can bloodbend (reluctantly) and twice used spirit water to revive Aang from death.',
+            "Aang's Lineage")
+        },
+        children: [
+          {
+            pid: p('Bumi','Commander · Air Nomad','none','c. 102 AG',null,
+              'The eldest child of Aang and Katara, Bumi was born a non-bender — a painful irony for the son of the last airbender. He served as a United Forces commander for decades. After Harmonic Convergence, he spontaneously developed airbending — one of the very first of the new Air Nomads. He is wild, funny, and deeply loyal, retiring from the military to live at Air Temple Island.',
+              "Aang's Lineage")
+          },
+          {
+            pid: p('Kya','Healer · Waterbender · Traveler','water','c. 100 AG',null,
+              'The middle child of Aang and Katara, Kya inherited her mother\'s waterbending. A gifted healer, she spent years traveling the world and building a reputation before returning to the Southern Water Tribe to support her grieving mother after Aang\'s death. She later moves to Air Temple Island. Open, warm, and perceptive — she is the sibling most like Katara in spirit.',
+              "Aang's Lineage")
+          },
+          {
+            pid: p('Tenzin','Airbending Master · Republic City Councilman','air','119 AG',null,
+              'Aang and Katara\'s youngest child and their only airbender. For decades he and his father were the last two practicing airbenders in the world, carrying the entire Air Nomad culture between them. He served on the United Republic Council until democratic elections replaced it. He is Korra\'s airbending teacher and, imperfect as their relationship is, her most important mentor. He is the father of four new-generation airbenders.',
+              "Aang's Lineage"),
+            spouse: {
+              pid: p('Pema','Air Acolyte · Mother','none','135 AG',null,
+                'A non-bending Air Acolyte who fell for Tenzin while he was still with Lin Beifong, confessing her feelings and starting a relationship that would define both their lives. She and Tenzin have four children, all airbenders — making their family the literal foundation of the rebuilt Air Nation. Practical, warm, and often the clearest head on Air Temple Island. She gave birth to Rohan during the Equalist siege.',
+                "Aang's Lineage")
+            },
+            children: [
+              {
+                pid: p('Jinora','Airbending Master · Spiritual Prodigy','air','160 AG',null,
+                  'Tenzin\'s eldest daughter. A spiritual prodigy who can project her astral form into the Spirit World with extraordinary ease and range. She located Wan Shi Tong\'s library from the physical world and guided Korra spiritually during the Harmonic Convergence crisis. She received her airbending tattoos and was anointed a master at 11 — the first new Air Nomad master since Avatar Aang himself.',
+                  "Aang's Lineage")
+              },
+              {
+                pid: p('Ikki','Airbender · Chatterbox','air','163 AG',null,
+                  'Tenzin and Pema\'s second daughter. Energetic, relentlessly talkative, and perceptive in ways that catch everyone off guard. She has a gift for asking the exact questions everyone else is desperately avoiding. She trains earthbender lemurs and contributes to the resistance against the Earth Empire.',
+                  "Aang's Lineage")
+              },
+              {
+                pid: p('Meelo','Airbender · "General"','air','165 AG',null,
+                  'The first son of Tenzin and Pema. Wild, hyper-creative, and entirely unpredictable. He trains a personal squad of lemurs as a fighting force and develops a distinctive combat style — using his own body functions as part of his airbending. His contributions to the battle against the Earth Empire cannot be fully explained but definitely happened.',
+                  "Aang's Lineage")
+              },
+              {
+                pid: p('Rohan','Airbender','air','170 AG',null,
+                  'The youngest child of Tenzin and Pema, born during the Equalist siege of Air Temple Island — Pema went into labor in the middle of the attack. He appears primarily as an infant during the series.',
+                  "Aang's Lineage")
+              }
+            ]
+          }
+        ]
+      }]
+    }
+  },
+
+  water: {
+    label: 'Southern Water Tribe',
+    treeColor: 'rgba(77,184,255,0.35)',
+    root: {
+      pid: p('Kanna (Gran-Gran)','Matriarch · Northern Water Tribe exile','water','?',null,
+        'The grandmother of Sokka and Katara and the unofficial matriarch of the Southern Water Tribe\'s small remaining community. Originally from the Northern Water Tribe, Kanna fled an arranged marriage to Pakku and traveled south — a decision that shaped everything. She raised Sokka and Katara after Hakoda left for the war and Kya was killed. She and Pakku eventually reconcile and marry after the war.',
+        'Southern Water Tribe'),
+      spouse: {
+        pid: p('Master Pakku','Waterbending Master · Northern Tribe','water','?',null,
+          'One of the greatest waterbending masters alive and the top instructor of the Northern Water Tribe. Rigid and traditionalist, he initially refused to teach Katara because of her gender — until she challenged him to a duel and he realized she was the granddaughter of Kanna, the woman he had loved and lost decades earlier. He eventually trains both Katara and Aang, joins the Order of the White Lotus, and marries Kanna after the war.',
+          'Southern Water Tribe')
+      },
+      children: [
+        {
+          pid: p('Chief Hakoda','Chief · Warrior · Strategist','none','?',null,
+            'The chief of the Southern Water Tribe and father of Katara and Sokka. After his wife Kya\'s death at the hands of the Southern Raiders, Hakoda led his tribe\'s warriors to the Earth Kingdom to fight in the war, leaving his children with their grandmother. He is a brilliant tactician — the architect of the solar eclipse invasion plan — and deeply respected by everyone who serves with him. He is captured at the Boiling Rock prison and rescued by Sokka.',
+            'Southern Water Tribe'),
+          spouse: {
+            pid: p('Kya','Waterbender · Warrior','water','?','94 AG',
+              'Katara and Sokka\'s mother, a waterbender of the Southern Tribe. She was killed by the Southern Raiders — specifically by their commander Yon Rha — when she sacrificed herself by claiming to be the last Southern waterbender, drawing their attention away from eight-year-old Katara who was hiding nearby. Her death shaped everything about who Katara and Sokka became. She is Katara\'s deepest loss and the reason she keeps fighting.',
+              'Southern Water Tribe')
+          },
+          children: [
+            {
+              pid: p('Sokka','Warrior · Strategist · Sword Master · Councilman','none','84 AG',null,
+                'The boomerang-wielding, self-proclaimed genius of Team Avatar. A non-bender who compensated with relentless tactical intelligence, dry humor, and genuine creativity. He trained under the swordmaster Piandao and earned a sword forged from a meteorite. He planned the solar eclipse invasion, personally piloted the Fire Nation airship that destroyed the armada, and later served as Southern Water Tribe representative on the United Republic Council. He dates Suki after Yue\'s death.',
+                'Southern Water Tribe'),
+              spouse: {
+                pid: p('Suki','Kyoshi Warrior Captain','none','?',null,
+                  'Leader of the Kyoshi Warriors and Sokka\'s partner. A non-bender whose skill, discipline, and tactical instincts make her one of the most effective fighters in Team Avatar. She and her warriors disguised themselves as Kyoshi Warriors to infiltrate the Fire Nation. She was imprisoned at the Boiling Rock before being rescued by Sokka.',
+                  'Southern Water Tribe')
+              }
+            },
+            {
+              pid: p('Master Katara','Master Waterbender · Healer','water','85 AG',null,
+                'See Aang\'s Lineage — Katara married Aang and their family tree continues there.',
+                'Southern Water Tribe')
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  beifong: {
+    label: 'The Beifong Family',
+    treeColor: 'rgba(106,191,105,0.35)',
+    root: {
+      pid: p('Lao Beifong','Wealthy Earth Kingdom Merchant','none','?',null,
+        'Toph\'s father and the head of the Beifong family — one of the wealthiest and most prominent families in Gaoling. Overprotective and deeply ashamed of Toph\'s blindness, he hid her from the world and arranged comfortable but restrictive conditions for her upbringing, unaware that she had secretly become the greatest earthbender alive. He hired Xin Fu and Master Yu to bring Toph back when she left with Aang.',
+        'The Beifong Family'),
+      spouse: {
+        pid: p('Poppy Beifong','Lady of the Beifong estate','none','?',null,
+          'Toph\'s mother, a refined and status-conscious noblewoman. Like her husband, she was overprotective of Toph out of concern for her blindness, and deeply uncomfortable with the idea that Toph might be anything other than a delicate daughter to be sheltered. She never fully reconciled with Toph\'s choices.',
+          'The Beifong Family')
+      },
+      children: [{
+        pid: p('Toph Beifong','Earthbending Master · Metalbending Inventor · Chief of Police · Founder','earth','88 AG',null,
+          'Born blind into wealth and sheltered by parents who saw her disability as weakness, Toph secretly learned earthbending directly from the badgermoles — the original earthbenders — and became the greatest earthbender alive by age 12. She invented metalbending entirely on her own by sensing the trace earth inside refined metal, a technique everyone said was impossible. She taught herself to use seismic sense as a form of sight, perceiving the world through vibrations in the ground. She became Republic City\'s first Chief of Police, commanding the world\'s first metalbending police force. Her relationships with her daughters are complicated by her difficulty expressing care through anything other than toughness.',
+          'The Beifong Family'),
+        children: [
+          {
+            pid: p('Chief Lin Beifong','Chief of Police · Republic City','earth','120 AG',null,
+              'Toph\'s elder daughter, born to an earthbender named Kanto. Lin followed her mother into law enforcement and became Republic City\'s Chief of Police — more rigid, more disciplined, and arguably tougher than Toph ever was. She voluntarily gave up her bending to protect the Air Acolytes from Amon, choosing sacrifice over survival. Korra later restored her bending using energybending. Her fractured relationship with half-sister Suyin traces back to a painful confrontation in their youth involving a criminal gang and a scar.',
+              'The Beifong Family'),
+            spouse: {
+              pid: p('Kanto','Earthbender','earth','?',null,
+                'Lin\'s father and one of Toph\'s past relationships. Very little is recorded about him beyond his connection to Toph and Lin.',
+                'The Beifong Family')
+            }
+          },
+          {
+            pid: p('Suyin Beifong','Matriarch of Zaofu · Dancer · Metalbender','earth','126 AG',null,
+              'Toph\'s younger daughter, born to an unknown father. After a troubled youth — including accidentally scarring Lin\'s face during a confrontation with a criminal gang — Suyin was sent away, traveled the world, and eventually founded Zaofu: a city-state built entirely of platinum and metal, the most technologically advanced settlement on Earth. She is a dancer, an artist, a mother of five, and an authority on metalbending who leads the Metal Clan. Her relationship with Lin was estranged for 30 years before Korra helped bridge it.',
+              'The Beifong Family'),
+            spouse: {
+              pid: p('Baatar Sr.','Chief Engineer · Architect of Zaofu','none','?',null,
+                'Suyin\'s husband and the primary architect and engineer behind Zaofu\'s extraordinary design. Warm, creative, and deeply committed to Suyin\'s vision. The contrast between his gentle nature and his eldest son\'s choices is one of Zaofu\'s quiet heartbreaks.',
+                'The Beifong Family')
+            },
+            children: [
+              {
+                pid: p('Baatar Jr.','Engineer · Earth Empire Commander','none','?',null,
+                  'Suyin\'s eldest son. A brilliant structural engineer who became Kuvira\'s second-in-command — betraying his own family, his city, and everything his mother built for the sake of the Earth Empire\'s ideology and his personal devotion to Kuvira. He helped design the spirit energy cannon. President Raiko ultimately used him as leverage against Kuvira, threatening his life to force her hand — which backfired catastrophically when Kuvira fired the cannon anyway.',
+                  'The Beifong Family')
+              },
+              {
+                pid: p('Huan','Sculptor · Earthbender','earth','?',null,
+                  'Suyin\'s second son. An abstract sculptor who bends earth and metal into sweeping, unconventional forms. Eccentric, intense, and impatient with conventional thinking. His aesthetic sensibility is entirely his own.',
+                  'The Beifong Family')
+              },
+              {
+                pid: p('Wing','Power Disc Athlete · Earthbender','earth','?',null,
+                  'One of Suyin\'s twin sons. Along with Wei, he plays Power Disc — a competitive earthbending sport popular in Zaofu. Energetic and sports-focused.',
+                  'The Beifong Family')
+              },
+              {
+                pid: p('Wei','Power Disc Athlete · Earthbender','earth','?',null,
+                  'The other twin. Functionally identical to Wing in the series. Both are enthusiastic athletes who take Power Disc very seriously.',
+                  'The Beifong Family')
+              },
+              {
+                pid: p('Opal','Airbender · Air Nation','air','?',null,
+                  'Suyin\'s youngest child and only daughter. One of the new airbenders spontaneously born after Harmonic Convergence. Thoughtful, compassionate, and quietly fierce. She trained on Air Temple Island under Tenzin to master her new abilities. She is in a relationship with Bolin, which survives considerable strain during the Earth Empire crisis.',
+                  'The Beifong Family')
+              }
+            ]
+          }
+        ]
+      }]
+    }
+  },
+
+  korra: {
+    label: "Korra's Family & the Northern Tribe",
+    treeColor: 'rgba(77,184,255,0.35)',
+    root: {
+      pid: p('Northern Water Tribe Chief','Chief of the Northern Water Tribe (Deceased)','water','?','?',
+        'The father of Tonraq and Unalaq, and the previous chief of the Northern Water Tribe. He banished his elder son Tonraq after Tonraq destroyed a spirit forest during a military campaign — a decision secretly engineered by Unalaq, who wanted the chiefdom for himself. He died before the events of Korra\'s story, leaving Unalaq in power.',
+        "Korra's Family"),
+      children: [
+        {
+          pid: p('Chief Tonraq','Chief of the Southern Water Tribe','water','?',null,
+            'Korra\'s father, originally heir to the Northern Water Tribe. He was banished after leading a military assault that accidentally destroyed a spirit forest — causing dark spirits to attack the North. The banishment was secretly orchestrated by his brother Unalaq. Tonraq settled in the Southern Water Tribe and became its chief after Unalaq\'s defeat. Fiercely protective of Korra, sometimes to a fault — he kept her isolated from the world throughout her training.',
+            "Korra's Family"),
+          spouse: {
+            pid: p('Senna','Southern Water Tribe · Healer','water','?',null,
+              'Korra\'s mother, a gentle and deeply loving woman of the Southern Water Tribe. She supported Korra through both her training and her long recovery after the Red Lotus\'s poison nearly killed her. She is the warm, steady constant in Korra\'s life — the parent who worries quietly while Tonraq charges in.',
+              "Korra's Family")
+          },
+          children: [{
+            pid: p('Avatar Korra','Avatar · Warrior · Metalbender','water','153 AG',null,
+              'The current Avatar — born the same day Aang died. She mastered fire, water, and earth as a child but struggled with airbending and spirit. She survived Amon\'s revolution (having her bending removed and restored), Harmonic Convergence (losing her connection to all past Avatars permanently), three years of recovery after the Red Lotus poisoned her, and Kuvira\'s Earth Empire. She is the first Avatar since Wan to reopen the spirit portals — and the first Avatar ever to master metalbending. She remains in the middle of her era.',
+              "Korra's Family")
+          }]
+        },
+        {
+          pid: p('Chief Unalaq','Chief of the Northern Water Tribe · Dark Avatar','water','?','171 AG',
+            'Tonraq\'s younger brother, who secretly engineered Tonraq\'s banishment to seize the chiefdom. The world\'s most advanced waterbender and a genuine spiritual master, Unalaq truly believed that the separation of the human and spirit worlds was wrong — and that he alone could fix it. He fused with Vaatu during Harmonic Convergence to become the Dark Avatar. He purged Raava from Korra and destroyed her. Korra defeated him using his own spiritual cleansing technique. He died when Vaatu\'s spirit was purified.',
+            "Korra's Family"),
+          spouse: {
+            pid: p('Malina','Northern Water Tribe','water','?',null,
+              'Unalaq\'s wife and the mother of Desna and Eska. She remains in the North after Unalaq\'s defeat, while her children inherit the co-chiefdom.',
+              "Korra's Family")
+          },
+          children: [
+            {
+              pid: p('Prince Desna','Co-Chief of the Northern Water Tribe','water','155 AG',null,
+                'Unalaq\'s son and twin to Eska. After their father\'s death, Desna and Eska became co-chiefs of the Northern Water Tribe. They are identically deadpan, utterly unbothered by most things, and surprisingly pragmatic about their father\'s villainy. Desna briefly dates Eska\'s paramour Bolin before the confusion is resolved.',
+                "Korra's Family")
+            },
+            {
+              pid: p('Princess Eska','Co-Chief of the Northern Water Tribe','water','155 AG',null,
+                'Unalaq\'s daughter and twin to Desna. She and Desna co-rule the North after their father\'s defeat. Eska becomes intensely fixated on Bolin during the civil war arc — in a way that is alarming to him and completely matter-of-fact to her. Her emotional register is delivered entirely in flat monotone regardless of content.',
+                "Korra's Family")
+            }
+          ]
+        }
+      ]
+    }
+  }
+};
+
+/* ══════════════════════════════════════
+   RENDER ENGINE
+══════════════════════════════════════ */
+
+const EL_COLORS = {
+  fire:'#f97316', water:'#4db8ff', earth:'#6abf69',
+  air:'#f5c518', spirit:'#9b7fe8', none:'#6b8aab'
+};
+
+function renderTree(treeDef) {
+  const { treeColor, root, label } = treeDef;
+  return `<div class="tree-label">${label}</div><div class="ftree" style="--tc:${treeColor}">${renderNode(root, treeColor)}</div>`;
+}
+
+function renderNode(node, tc) {
+  const main = PEOPLE[node.pid];
+  const hasChildren = node.children && node.children.length > 0;
+
+  let html = `<div class="fn">`;
+
+  // Person card(s)
+  if (node.spouse) {
+    html += `<div class="couple">`;
+    html += card(node.pid, false);
+    html += `<div class="mx">×</div>`;
+    html += card(node.spouse.pid, true);
+    html += `</div>`;
+  } else {
+    html += card(node.pid, false);
+  }
+
+  // Children
+  if (hasChildren) {
+    html += `<div class="drop"></div><div class="cr">`;
+    for (const child of node.children) {
+      html += `<div class="cb">${renderNode(child, tc)}</div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function card(pid, isSpouse) {
+  const p = PEOPLE[pid];
+  const ec = EL_COLORS[p.element] || '#6b8aab';
+  const dead = p.died ? 'dead' : '';
+  const sp = isSpouse ? 'sp' : '';
+  const datesStr = p.born
+    ? (p.died ? `${p.born} – ${p.died}` : `${p.born}`)
+    : '';
+
+  return `<div class="pn ${p.element||'none'} ${dead} ${sp}" data-pid="${pid}" style="--ec:${ec}">
+    <div class="pn-top"><span class="pn-dot"></span><span class="pn-name">${p.name}</span></div>
+    ${p.title ? `<div class="pn-role">${p.title.split('/')[0].trim()}</div>` : ''}
+    ${datesStr ? `<div class="pn-dates">${datesStr}${!p.died && p.born ? ' →' : ''}</div>` : ''}
+  </div>`;
+}
+
+// Render all trees
+Object.entries(TREES).forEach(([key, tree]) => {
+  const el = document.getElementById('tree-' + key);
+  if (el) el.innerHTML = renderTree(tree);
+});
+
+/* ══════════════════════════════════════
+   TABS
+══════════════════════════════════════ */
+document.querySelectorAll('.tab-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.tab-pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tree-wrap').forEach(w => w.classList.remove('active'));
+    pill.classList.add('active');
+    document.getElementById('tree-' + pill.dataset.tree)?.classList.add('active');
+    closePanel();
+  });
+});
+
+/* ══════════════════════════════════════
+   DETAIL PANEL
+══════════════════════════════════════ */
+const panel   = document.getElementById('detailPanel');
+const dpEl    = document.getElementById('dpElement');
+const dpName  = document.getElementById('dpName');
+const dpDates = document.getElementById('dpDates');
+const dpTitle = document.getElementById('dpTitle');
+const dpDesc  = document.getElementById('dpDesc');
+const dpFam   = document.getElementById('dpFamily');
+
+function openPanel(pid) {
+  const d = PEOPLE[pid];
+  if (!d) return;
+  const ec = EL_COLORS[d.element] || '#6b8aab';
+  panel.style.setProperty('--dp-color', ec);
+  dpEl.style.background = ec;
+  dpName.textContent  = d.name;
+  dpDates.textContent = d.born ? (d.died ? `${d.born} – ${d.died}` : `b. ${d.born}`) : '';
+  dpTitle.textContent = d.title || '';
+  dpDesc.textContent  = d.desc || '';
+  dpFam.textContent   = d.family || '';
+  panel.classList.add('open');
+  document.body.classList.add('panel-open');
+}
+function closePanel() {
+  panel.classList.remove('open');
+  document.body.classList.remove('panel-open');
+}
+
+document.addEventListener('click', e => {
+  const pn = e.target.closest('.pn');
+  if (pn) { openPanel(pn.dataset.pid); return; }
+});
+document.getElementById('dpClose').addEventListener('click', closePanel);
+document.getElementById('dpHandle').addEventListener('click', closePanel);
+let _sy = 0;
+panel.addEventListener('touchstart', e => { _sy = e.touches[0].clientY; }, { passive: true });
+panel.addEventListener('touchend', e => { if (e.changedTouches[0].clientY - _sy > 55) closePanel(); }, { passive: true });
+
+/* ══════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════ */
+(function(){
+  const btn=document.getElementById('settingsBtn'),p=document.getElementById('settingsPanel');
+  if(!btn||!p)return;
+  btn.addEventListener('click',()=>{const o=p.classList.toggle('open');btn.classList.toggle('open',o);});
+  document.addEventListener('click',e=>{if(!p.contains(e.target)&&!btn.contains(e.target)){p.classList.remove('open');btn.classList.remove('open');}});
+  document.querySelectorAll('.theme-opt').forEach(o=>{
+    o.addEventListener('click',()=>{
+      const t=o.dataset.theme;
+      document.body.className=document.body.className.replace(/\btheme-\S+/g,'').trim();
+      if(t!=='dark')document.body.classList.add(t);
+      localStorage.setItem('avatarhub_theme',t==='dark'?'dark':t);
+      document.querySelectorAll('.theme-opt').forEach(x=>x.classList.remove('active'));
+      o.classList.add('active');
+    });
+  });
+  const cur=localStorage.getItem('avatarhub_theme')||'dark';
+  document.querySelectorAll('.theme-opt').forEach(o=>{if((cur==='dark'&&o.dataset.theme==='dark')||(o.dataset.theme===cur))o.classList.add('active');});
+  const ar=document.getElementById('ambientRow');
+  if(ar){ar.classList.toggle('active',localStorage.getItem('avatarhub_ambient_off')!=='1');ar.addEventListener('click',()=>{const on=!ar.classList.contains('active');ar.classList.toggle('active',on);localStorage.setItem('avatarhub_ambient_off',on?'0':'1');});}
+})();
+
+/* ══════════════════════════════════════
+   PARTICLES
+══════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('particleCanvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H;
+  function r(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  r();window.addEventListener('resize',r);
+  const s=['\u{1F701}','\u{1F704}','\u{1F703}','\u{1F702}'];
+  const cl=['rgba(245,197,24,','rgba(77,184,255,','rgba(106,191,105,','rgba(249,115,22,'];
+  const pts=Array.from({length:12},(_,i)=>({x:Math.random()*1400,y:Math.random()*900,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,sz:Math.random()*7+5,sym:s[i%4],col:cl[i%4],al:Math.random()*.13+.03,ph:Math.random()*Math.PI*2}));
+  let fr=0;
+  function draw(){ctx.clearRect(0,0,W,H);fr++;pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=W+30;if(p.x>W+30)p.x=-30;if(p.y<-30)p.y=H+30;if(p.y>H+30)p.y=-30;ctx.font=`${p.sz}px serif`;ctx.fillStyle=p.col+(p.al*(0.6+0.4*Math.sin(fr*.011+p.ph)))+')';ctx.fillText(p.sym,p.x,p.y);});requestAnimationFrame(draw);}
+  draw();
+})();
+</script>
+</body>
+</html>
