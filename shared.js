@@ -629,3 +629,334 @@ self.addEventListener('fetch', e => {
     navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
   }
 })();
+
+
+/* ══════════════════════════════════════════
+   9. CURSOR RIPPLE
+   On every click, a small coloured ripple
+   blooms at the cursor then fades.
+   Element colours: fire/water/earth/air nearest
+   card accent, otherwise gold.
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if ('ontouchstart' in window) return; // skip on touch devices
+
+  const ACCENT_PROPS = ['--accent','--ec','--fire','--water','--earth','--air'];
+  const FALLBACK = '#c9a84c';
+
+  function nearestAccent(el) {
+    let node = el;
+    while (node && node !== document.body) {
+      const style = getComputedStyle(node);
+      for (const prop of ACCENT_PROPS) {
+        const val = style.getPropertyValue(prop).trim();
+        if (val && val.startsWith('#') || val.startsWith('rgb')) return val;
+      }
+      node = node.parentElement;
+    }
+    return FALLBACK;
+  }
+
+  const style = document.createElement('style');
+  style.textContent = `
+@keyframes _avatarRipple {
+  0%   { transform: scale(0);   opacity: .55; }
+  60%  { transform: scale(1);   opacity: .22; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+._avatar-ripple {
+  position: fixed; pointer-events: none; z-index: 9998;
+  border-radius: 50%; mix-blend-mode: screen;
+  animation: _avatarRipple .55s cubic-bezier(.22,1,.36,1) forwards;
+}`;
+  document.head.appendChild(style);
+
+  document.addEventListener('click', e => {
+    const size = 80;
+    const el   = document.createElement('div');
+    el.className = '_avatar-ripple';
+    const color = nearestAccent(e.target);
+    el.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${e.clientX - size/2}px; top:${e.clientY - size/2}px;
+      background: radial-gradient(circle, ${color} 0%, transparent 70%);
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }, { passive: true });
+})();
+
+
+/* ══════════════════════════════════════════
+   10. PAGE TRANSITION — fade-out on navigate
+   Wraps every internal link click with a
+   smooth 220ms fade before the browser
+   follows the href.
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+@keyframes _avatarPageOut { to { opacity: 0; } }
+body._avatar-leaving { animation: _avatarPageOut .22s ease forwards; pointer-events: none; }`;
+  document.head.appendChild(style);
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || a.target === '_blank') return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    document.body.classList.add('_avatar-leaving');
+    setTimeout(() => { window.location.href = href; }, 230);
+  });
+})();
+
+
+/* ══════════════════════════════════════════
+   11. SHOOTING STARS
+   Rare, slow golden streaks on the particle
+   canvas — one every 18–45 seconds.
+   Respects reduced-motion and visibility.
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  function scheduleNext() {
+    const delay = 18000 + Math.random() * 27000; // 18–45s
+    setTimeout(fireStar, delay);
+  }
+
+  function fireStar() {
+    if (document.hidden) { scheduleNext(); return; }
+    const canvas = document.getElementById('particleCanvas');
+    if (!canvas) { scheduleNext(); return; }
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    // Start from a random top/right-edge point, streak diagonally
+    const angle   = Math.PI / 4 + (Math.random() - .5) * .4; // ~45° ± 23°
+    const startX  = Math.random() * W;
+    const startY  = Math.random() * (H * .45);
+    const len     = 80 + Math.random() * 140;
+    const endX    = startX + Math.cos(angle) * len;
+    const endY    = startY + Math.sin(angle) * len;
+    const dur     = 900 + Math.random() * 600; // ms
+    const start   = performance.now();
+    let raf;
+
+    function draw(now) {
+      const t = Math.min(1, (now - start) / dur);
+      const ease = t < .5 ? 2*t*t : -1+(4-2*t)*t;
+
+      // Progress along trail: head moves forward, tail lags
+      const hx = startX + (endX - startX) * ease;
+      const hy = startY + (endY - startY) * ease;
+      const tailLen = 0.38;
+      const tx = startX + (endX - startX) * Math.max(0, ease - tailLen);
+      const ty = startY + (endY - startY) * Math.max(0, ease - tailLen);
+
+      // Fade in for first 25%, full for 50%, fade out last 25%
+      const alpha = t < .25 ? t/.25 : t > .75 ? (1-t)/.25 : 1;
+
+      const grad = ctx.createLinearGradient(tx, ty, hx, hy);
+      grad.addColorStop(0,   `rgba(240,220,140,0)`);
+      grad.addColorStop(.5,  `rgba(240,220,140,${(alpha * .6).toFixed(3)})`);
+      grad.addColorStop(1,   `rgba(255,245,200,${(alpha * .9).toFixed(3)})`);
+
+      ctx.save();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = grad;
+      ctx.lineCap = 'round';
+      ctx.globalCompositeOperation = 'screen';
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(hx, hy);
+      ctx.stroke();
+      ctx.restore();
+
+      if (t < 1) {
+        raf = requestAnimationFrame(draw);
+      } else {
+        scheduleNext();
+      }
+    }
+
+    raf = requestAnimationFrame(draw);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && raf) { cancelAnimationFrame(raf); scheduleNext(); }
+    }, { passive: true, once: true });
+  }
+
+  scheduleNext();
+})();
+
+
+/* ══════════════════════════════════════════
+   12. DYNAMIC VIGNETTE — parallax mouse glow
+   A very subtle directional glow follows the
+   mouse slowly, making the bg feel alive.
+   Low cost: single div, CSS vars, rAF-throttled.
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if ('ontouchstart' in window) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+#_avatar-vignette {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 60% at var(--vx, 50%) var(--vy, 40%),
+    rgba(77,184,255,.028) 0%,
+    transparent 70%
+  );
+  transition: --vx .1s, --vy .1s;
+  mix-blend-mode: screen;
+}`;
+  document.head.appendChild(style);
+
+  const v = document.createElement('div');
+  v.id = '_avatar-vignette';
+  document.body.appendChild(v);
+
+  let mx = 50, my = 40;          // target %
+  let cx = 50, cy = 40;          // current %  (lerped)
+  let raf = null;
+
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth)  * 100;
+    my = (e.clientY / window.innerHeight) * 100;
+    if (!raf) raf = requestAnimationFrame(tick);
+  }, { passive: true });
+
+  function tick() {
+    cx += (mx - cx) * 0.04;
+    cy += (my - cy) * 0.04;
+    v.style.setProperty('--vx', cx.toFixed(2) + '%');
+    v.style.setProperty('--vy', cy.toFixed(2) + '%');
+    raf = (Math.abs(mx - cx) > 0.05 || Math.abs(my - cy) > 0.05)
+      ? requestAnimationFrame(tick)
+      : null;
+  }
+})();
+
+
+/* ══════════════════════════════════════════
+   13. SCROLL PARALLAX — bg-layer depth
+   As the user scrolls down, the background
+   image drifts up slightly, adding depth.
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const bg = document.querySelector('.bg-layer');
+  if (!bg) return;
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const offset = window.scrollY * 0.18;
+      bg.style.transform = `scale(1.04) translateY(${-offset}px)`;
+      ticking = false;
+    });
+  }, { passive: true });
+})();
+
+
+/* ══════════════════════════════════════════
+   14. TIME-OF-DAY TINT
+   Adds a very subtle warm (dawn/dusk) or cool
+   (night) tint overlay based on real time.
+   Updates once on load; imperceptible shift.
+══════════════════════════════════════════ */
+(function () {
+  const h = new Date().getHours();
+
+  // Hour → tint colour + opacity
+  let color, alpha;
+  if (h >= 5  && h < 8)  { color='255,160,60';  alpha=0.022; } // dawn — warm amber
+  else if (h >= 8  && h < 17) { color='240,248,255'; alpha=0.008; } // day — near neutral
+  else if (h >= 17 && h < 20) { color='255,140,60';  alpha=0.025; } // dusk — golden orange
+  else if (h >= 20 && h < 23) { color='60,90,200';   alpha=0.018; } // evening — deep blue
+  else                         { color='20,30,80';    alpha=0.03;  } // deep night — indigo
+
+  const style = document.createElement('style');
+  style.textContent = `
+#_avatar-tod {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: rgba(${color},${alpha});
+  mix-blend-mode: screen;
+}`;
+  document.head.appendChild(style);
+
+  const el = document.createElement('div');
+  el.id = '_avatar-tod';
+  document.body.appendChild(el);
+})();
+
+
+/* ══════════════════════════════════════════
+   15. CARD SHIMMER on hover
+   A single travelling highlight stripe
+   sweeps across .hub-card elements on hover,
+   making them feel almost holographic.
+   Pure CSS injection — zero JS per-frame cost.
+══════════════════════════════════════════ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+.hub-card { overflow: hidden; }
+.hub-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255,255,255,.055) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  background-position: 200% center;
+  opacity: 0;
+  transition: opacity .2s, background-position 0s;
+  pointer-events: none;
+  z-index: 3;
+}
+.hub-card:hover::after {
+  opacity: 1;
+  background-position: -60% center;
+  transition: opacity .15s, background-position .6s cubic-bezier(.22,1,.36,1);
+}`;
+  document.head.appendChild(style);
+})();
+
+
+/* ══════════════════════════════════════════
+   16. FOCUS GLOW — keyboard nav polish
+   Adds a visible, element-tinted focus ring
+   to any focused interactive element so
+   keyboard users get clear feedback that
+   matches the visual language of the site.
+══════════════════════════════════════════ */
+(function () {
+  const style = document.createElement('style');
+  style.textContent = `
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(77,184,255,.85), 0 0 0 4px rgba(77,184,255,.2) !important;
+  border-radius: inherit;
+  transition: box-shadow .15s;
+}
+.pn:focus-visible   { box-shadow: 0 0 0 2px rgba(var(--er,77,184,255),.9) !important; }
+.hub-card:focus-visible { box-shadow: 0 0 0 2px rgba(var(--accent-rgb,77,184,255),.85), 0 16px 55px rgba(var(--accent-rgb,77,184,255),.2) !important; }
+`;
+  document.head.appendChild(style);
+})();

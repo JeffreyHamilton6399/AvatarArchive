@@ -57,6 +57,7 @@
   .legend{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;padding:.6rem 0 1.6rem;animation:tl-in .6s cubic-bezier(.22,1,.36,1) .12s both;}
   .leg{display:inline-flex;align-items:center;gap:.38rem;font-family:'Cinzel',serif;font-size:.34rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
   .leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .leg-img{width:14px;height:14px;object-fit:contain;flex-shrink:0;opacity:.85;}
 
   /* ── Outer wrapper ── */
   .tl-outer{width:100%;max-width:780px;padding-bottom:clamp(4rem,8vh,6rem);animation:tl-in .7s cubic-bezier(.22,1,.36,1) .2s both;}
@@ -98,7 +99,8 @@
   .era-dates{font-family:'Philosopher',serif;font-style:italic;font-size:clamp(.62rem,1.1vw,.74rem);color:var(--muted);margin-top:.1rem;}
 
   .era-hd-right{display:flex;align-items:center;gap:.75rem;flex-shrink:0;margin-left:.8rem;}
-  .era-nation{font-family:'Cinzel',serif;font-size:.33rem;letter-spacing:.16em;text-transform:uppercase;padding:.28em .65em;border-radius:20px;border:1px solid;flex-shrink:0;white-space:nowrap;}
+  .era-nation{font-family:'Cinzel',serif;font-size:.33rem;letter-spacing:.16em;text-transform:uppercase;padding:.28em .65em;border-radius:20px;border:1px solid;flex-shrink:0;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;}
+  .era-nation img{width:12px;height:12px;object-fit:contain;opacity:.9;}
   .era-count{font-family:'Cinzel',serif;font-size:.33rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
   .era-arrow{width:16px;height:16px;color:var(--muted);flex-shrink:0;transition:transform .3s cubic-bezier(.22,1,.36,1),color .2s;}
   .era.open .era-arrow{transform:rotate(180deg);color:var(--ec,#9b7fe8);}
@@ -325,10 +327,10 @@
   <div class="hero-rule"></div>
  </div>
  <div class="legend">
-  <span class="leg"><span class="leg-dot" style="background:#f5c518"></span>Air</span>
-  <span class="leg"><span class="leg-dot" style="background:#4db8ff"></span>Water</span>
-  <span class="leg"><span class="leg-dot" style="background:#6abf69"></span>Earth</span>
-  <span class="leg"><span class="leg-dot" style="background:#f97316"></span>Fire</span>
+  <span class="leg"><img class="leg-img" src="images/air.png"   alt="Air"  >Air</span>
+  <span class="leg"><img class="leg-img" src="images/water.png" alt="Water">Water</span>
+  <span class="leg"><img class="leg-img" src="images/earth.png" alt="Earth">Earth</span>
+  <span class="leg"><img class="leg-img" src="images/fire.png"  alt="Fire" >Fire</span>
   <span class="leg"><span class="leg-dot" style="background:#9b7fe8"></span>Spirit</span>
   <span class="leg"><span class="leg-dot" style="background:#c9a84c;box-shadow:0 0 5px #c9a84c"></span>Major</span>
  </div>
@@ -406,7 +408,7 @@
    <div class="era-dates">c. 9,850 – 9,829 BG · The First Avatar</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-fire">Fire</span>
+   <span class="era-nation tag-fire"><img src="images/fire.png" alt="">Fire</span>
    <span class="era-count">3 folders · 9 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -559,7 +561,7 @@
    <div class="era-dates">Before 345 BG</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-air">Air</span>
+   <span class="era-nation tag-air"><img src="images/air.png" alt="">Air</span>
    <span class="era-count">3 folders · 9 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -634,7 +636,7 @@
    <div class="era-dates">345 – 312 BG · Died Age 33</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-water">Water</span>
+   <span class="era-nation tag-water"><img src="images/water.png" alt="">Water</span>
    <span class="era-count">2 folders · 7 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -694,7 +696,7 @@
    <div class="era-dates">312 – 82 BG · Lived 230 Years</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-earth">Earth</span>
+   <span class="era-nation tag-earth"><img src="images/earth.png" alt="">Earth</span>
    <span class="era-count">4 folders · 13 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -790,7 +792,7 @@
    <div class="era-dates">82 – 12 BG · Died Age 70</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-fire">Fire</span>
+   <span class="era-nation tag-fire"><img src="images/fire.png" alt="">Fire</span>
    <span class="era-count">3 folders · 10 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -868,7 +870,7 @@
    <div class="era-dates">0 – 100 AG · Fire Lord Sozin's Conquest</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-fire">Fire</span>
+   <span class="era-nation tag-fire"><img src="images/fire.png" alt="">Fire</span>
    <span class="era-count">4 folders · 14 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -967,7 +969,7 @@
    <div class="era-dates">100 – 153 AG</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-air">Air</span>
+   <span class="era-nation tag-air"><img src="images/air.png" alt="">Air</span>
    <span class="era-count">3 folders · 11 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>
@@ -1048,7 +1050,7 @@
    <div class="era-dates">153 AG and beyond</div>
   </div>
   <div class="era-hd-right">
-   <span class="era-nation tag-water">Water</span>
+   <span class="era-nation tag-water"><img src="images/water.png" alt="">Water</span>
    <span class="era-count">4 folders · 17 events</span>
    <svg class="era-arrow" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
   </div>

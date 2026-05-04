@@ -32,6 +32,7 @@ body{background:var(--bg);color:var(--white);font-family:'Philosopher',serif;ove
   background-size:cover;background-position:center top;
   filter:blur(8px) brightness(0.15) saturate(1.2);
   transform:scale(1.04);z-index:0;pointer-events:none;
+  contain:strict;
 }
 .bg-layer::after{
   content:'';position:absolute;inset:0;
@@ -45,41 +46,49 @@ body{background:var(--bg);color:var(--white);font-family:'Philosopher',serif;ove
 #bridgeSvg{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:2;}
 
 /* ── Header ── */
-.header{position:fixed;top:0;left:0;right:0;z-index:50;padding:.6rem 1.4rem .4rem;
-  background:linear-gradient(to bottom,rgba(4,7,13,.98) 60%,transparent);
+.header{position:fixed;top:0;left:0;right:0;z-index:50;padding:.7rem 1.5rem .5rem;
+  background:linear-gradient(to bottom,rgba(4,7,13,.97) 55%,transparent);
   display:flex;align-items:center;justify-content:space-between;pointer-events:none;}
-.header-title{font-family:'Cinzel Decorative',serif;font-weight:900;font-size:1.1rem;
+.header-left{display:flex;align-items:center;gap:.75rem;}
+.header-icon{width:28px;height:28px;object-fit:contain;opacity:.85;filter:drop-shadow(0 0 6px rgba(201,168,76,.3));}
+.header-title{font-family:'Cinzel Decorative',serif;font-weight:900;font-size:1.15rem;
   background:linear-gradient(135deg,#f0dfa0,#c9a84c 50%,#8a6a1a);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.header-sub{font-family:'Cinzel',serif;font-size:.3rem;letter-spacing:.35em;
-  text-transform:uppercase;color:rgba(201,168,76,.45);margin-top:.1rem;}
+.header-sub{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.28em;
+  text-transform:uppercase;color:rgba(201,168,76,.45);margin-top:2px;}
 
 /* ── Legend ── */
-.legend{position:fixed;bottom:14px;left:14px;z-index:50;display:flex;flex-wrap:wrap;gap:.3rem .6rem;max-width:300px;}
-.leg{display:inline-flex;align-items:center;gap:.28rem;font-family:'Cinzel',serif;font-size:.26rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.leg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.legend{position:fixed;bottom:16px;left:16px;z-index:50;display:flex;flex-wrap:wrap;gap:5px 10px;max-width:320px;
+  background:rgba(4,7,13,.72);border:1px solid rgba(255,255,255,.07);border-radius:12px;
+  padding:8px 12px;backdrop-filter:blur(14px);}
+.leg{display:inline-flex;align-items:center;gap:5px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.leg-img{width:14px;height:14px;object-fit:contain;flex-shrink:0;opacity:.85;}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}/* fallback */
 
 /* ── HUD ── */
-.hud{position:fixed;bottom:14px;right:14px;z-index:50;display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
-.zbtn{width:32px;height:32px;border-radius:50%;background:rgba(6,10,20,.85);border:1px solid rgba(201,168,76,.2);
-  color:rgba(201,168,76,.8);font-size:1rem;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;pointer-events:all;transition:background .15s;}
-.zbtn:hover{background:rgba(201,168,76,.12);}
-.zreset{font-family:'Cinzel',serif;font-size:.28rem;letter-spacing:.1em;text-transform:uppercase;
-  padding:.35em .8em;border-radius:20px;background:rgba(6,10,20,.8);border:1px solid rgba(201,168,76,.15);
-  color:rgba(201,168,76,.5);cursor:pointer;pointer-events:all;transition:all .15s;}
-.zreset:hover{color:rgba(201,168,76,.9);}
+.hud{position:fixed;bottom:16px;right:16px;z-index:50;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+.zbtn{width:38px;height:38px;border-radius:50%;background:rgba(6,10,20,.88);border:1px solid rgba(201,168,76,.25);
+  color:rgba(201,168,76,.85);font-size:1.15rem;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;pointer-events:all;transition:background .15s,border-color .15s;
+  box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.zbtn:hover{background:rgba(201,168,76,.14);border-color:rgba(201,168,76,.45);}
+.zreset{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:.4em .9em;border-radius:20px;background:rgba(6,10,20,.88);border:1px solid rgba(201,168,76,.2);
+  color:rgba(201,168,76,.6);cursor:pointer;pointer-events:all;transition:all .15s;
+  box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.zreset:hover{color:rgba(201,168,76,.95);border-color:rgba(201,168,76,.5);}
 
 /* ── Tree block ── */
 .tree-wrap{position:absolute;display:inline-flex;flex-direction:column;align-items:center;}
-.tree-title{font-family:'Cinzel',serif;font-size:.3rem;letter-spacing:.28em;text-transform:uppercase;
-  margin-bottom:4px;white-space:nowrap;}
+.tree-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+  margin-bottom:5px;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.tree-title-img{width:14px;height:14px;object-fit:contain;opacity:.8;}
 
 /* ── Family tree nodes ── */
 .ftree{display:flex;flex-direction:column;align-items:center;position:relative;}
 .fn{display:flex;flex-direction:column;align-items:center;}
 .couple{display:flex;align-items:flex-start;gap:2px;}
-.mx{font-family:'Cinzel',serif;font-size:.5rem;color:var(--muted);padding:0 2px;opacity:.5;margin-top:12px;}
+.mx{font-family:'Cinzel',serif;font-size:9px;color:var(--muted);padding:0 3px;opacity:.5;margin-top:12px;}
 .drop{width:1px;height:8px;background:var(--tc,var(--gold-dim));}
 .cr{display:flex;align-items:flex-start;}
 .cb{display:flex;flex-direction:column;align-items:center;padding:0 3px;position:relative;}
@@ -90,14 +99,15 @@ body{background:var(--bg);color:var(--white);font-family:'Philosopher',serif;ove
 .cb:only-child::after{display:none;}
 
 /* ── Person card ── */
-.pn{width:96px;border-radius:8px;padding:5px 7px 6px;background:rgba(10,17,28,.9);
-  border:1px solid rgba(255,255,255,.07);cursor:pointer;position:relative;overflow:hidden;
-  transition:border-color .18s,box-shadow .18s,opacity .12s;text-align:left;user-select:none;}
+.pn{width:104px;border-radius:8px;padding:6px 8px 7px;background:rgba(10,17,28,.92);
+  border:1px solid rgba(255,255,255,.08);cursor:pointer;position:relative;overflow:hidden;
+  transition:border-color .18s,box-shadow .18s,opacity .12s,transform .1s;text-align:left;user-select:none;}
 .pn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--ec,var(--gold));}
-.pn:hover{border-color:rgba(var(--er,201,168,76),.4);box-shadow:0 0 14px rgba(var(--er,201,168,76),.14);}
+.pn:hover{border-color:rgba(var(--er,201,168,76),.45);box-shadow:0 0 16px rgba(var(--er,201,168,76),.18);transform:translateY(-1px);}
+.pn:active{transform:scale(.97);opacity:.85;}
 .pn.sp{opacity:.78;}
 .pn.dead{opacity:.48;}
-.pn.dead .pname::after{content:'†';font-size:.7em;margin-left:2px;opacity:.75;}
+.pn.dead .pname::after{content:' †';font-size:.75em;opacity:.75;}
 /* element colors */
 .pn.fire{--ec:#f97316;--er:249,115,22;}
 .pn.water{--ec:#4db8ff;--er:77,184,255;}
@@ -106,59 +116,62 @@ body{background:var(--bg);color:var(--white);font-family:'Philosopher',serif;ove
 .pn.spirit{--ec:#9b7fe8;--er:155,127,232;}
 .pn.none{--ec:rgba(107,138,171,.6);--er:107,138,171;}
 
-.pn-top{display:flex;align-items:center;gap:4px;margin-bottom:1px;}
-.pn-dot{width:5px;height:5px;border-radius:50%;background:var(--ec,var(--gold));flex-shrink:0;}
-.pname{font-family:'Cinzel',serif;font-weight:700;font-size:.46rem;letter-spacing:.04em;
+.pn-top{display:flex;align-items:center;gap:4px;margin-bottom:2px;}
+/* Nation image badge instead of dot */
+.pn-nation{width:11px;height:11px;object-fit:contain;flex-shrink:0;opacity:.9;}
+.pname{font-family:'Cinzel',serif;font-weight:700;font-size:9.5px;letter-spacing:.03em;
   color:var(--white);line-height:1.25;}
-.prole{font-family:'Philosopher',serif;font-style:italic;font-size:.55rem;color:var(--muted);
+.prole{font-family:'Philosopher',serif;font-style:italic;font-size:10px;color:var(--muted);
   line-height:1.25;margin-bottom:1px;}
-.pdates{font-family:'Cinzel',serif;font-size:.34rem;letter-spacing:.06em;color:rgba(107,138,171,.65);}
+.pdates{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.05em;color:rgba(107,138,171,.65);}
 
 /* ── Bridge SVG lines ── */
 .bridge{stroke:rgba(201,168,76,.22);stroke-width:1.5;fill:none;stroke-dasharray:5 4;}
 
 /* ── Search bar ── */
-#searchWrap{position:fixed;top:12px;right:14px;z-index:60;display:flex;align-items:center;gap:6px;pointer-events:all;position:fixed;}
+#searchWrap{position:fixed;top:14px;right:16px;z-index:60;display:flex;align-items:center;gap:8px;pointer-events:all;}
 #searchInner{position:relative;display:flex;align-items:center;}
-#searchBox{font-family:'Cinzel',serif;font-size:.34rem;letter-spacing:.1em;
-  background:rgba(6,10,20,.88);border:1px solid rgba(201,168,76,.25);border-radius:20px;
-  padding:.42em 1em .42em 2em;color:var(--white);width:180px;outline:none;
-  backdrop-filter:blur(16px);transition:border-color .2s,width .2s,box-shadow .2s;}
-#searchBox:focus{border-color:rgba(201,168,76,.6);width:230px;box-shadow:0 0 18px rgba(201,168,76,.12);}
-#searchBox::placeholder{color:rgba(107,138,171,.5);}
-#searchIcon{position:absolute;left:9px;top:50%;transform:translateY(-50%);
-  pointer-events:none;color:rgba(201,168,76,.5);font-size:.65rem;line-height:1;}
-#searchCount{font-family:'Cinzel',serif;font-size:.28rem;letter-spacing:.12em;
-  color:rgba(201,168,76,.55);white-space:nowrap;min-width:36px;text-align:left;}
-#searchClear{background:none;border:none;color:rgba(107,138,171,.5);cursor:pointer;
-  font-size:.8rem;padding:.15em .4em;transition:color .15s;display:none;line-height:1;}
+#searchBox{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.08em;
+  background:rgba(6,10,20,.9);border:1px solid rgba(201,168,76,.28);border-radius:22px;
+  padding:.5em 2.2em .5em 2.2em;color:var(--white);width:200px;outline:none;
+  backdrop-filter:blur(16px);transition:border-color .2s,width .25s,box-shadow .2s;
+  box-shadow:0 2px 12px rgba(0,0,0,.4);}
+#searchBox:focus{border-color:rgba(201,168,76,.65);width:260px;box-shadow:0 0 0 3px rgba(201,168,76,.1),0 2px 18px rgba(0,0,0,.5);}
+#searchBox::placeholder{color:rgba(107,138,171,.55);}
+#searchIcon{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  pointer-events:none;color:rgba(201,168,76,.55);font-size:13px;line-height:1;}
+#searchCount{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;
+  color:rgba(201,168,76,.6);white-space:nowrap;min-width:44px;text-align:left;}
+#searchClear{position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(107,138,171,.55);cursor:pointer;
+  font-size:12px;padding:.15em;transition:color .15s;display:none;line-height:1;}
 #searchClear:hover{color:var(--white);}
 
 /* ── Search highlight states ── */
-body.searching .pn{opacity:.15;filter:saturate(0.2);transition:opacity .2s,filter .2s;}
+body.searching .pn{opacity:.12;filter:saturate(0.15);transition:opacity .2s,filter .2s;}
 body.searching .pn.search-match{opacity:1!important;filter:none!important;
-  border-color:rgba(201,168,76,.85)!important;
-  box-shadow:0 0 16px rgba(201,168,76,.4)!important;z-index:10;position:relative;}
+  border-color:rgba(201,168,76,.9)!important;
+  box-shadow:0 0 18px rgba(201,168,76,.45)!important;z-index:10;position:relative;}
 body.searching .pn.search-match .pname{color:#f0dfa0;}
 
 /* ── Tree glow border ── */
-.tree-wrap{border-radius:12px;padding:10px 10px 8px;
+.tree-wrap{border-radius:14px;padding:12px 12px 10px;
   border:1px solid var(--tree-border,rgba(255,255,255,.05));
   box-shadow:0 0 22px var(--tree-glow,transparent);
-  background:rgba(4,7,13,.3);
+  background:rgba(4,7,13,.32);
   transition:box-shadow .3s;}
-.tree-wrap:hover{box-shadow:0 0 36px var(--tree-glow,transparent);}
+.tree-wrap:hover{box-shadow:0 0 40px var(--tree-glow,transparent);}
 
 /* ── Collapse toggle ── */
 .collapse-btn{display:inline-flex;align-items:center;justify-content:center;
-  width:13px;height:13px;border-radius:50%;
+  width:15px;height:15px;border-radius:50%;
   border:1px solid var(--tc,var(--gold-dim));
   background:rgba(4,7,13,.95);cursor:pointer;
-  position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
-  z-index:5;font-size:7px;color:var(--tc,var(--gold));
+  position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+  z-index:5;font-size:8px;color:var(--tc,var(--gold));
   line-height:1;user-select:none;
   transition:transform .22s,background .15s;}
-.collapse-btn:hover{background:rgba(201,168,76,.18);}
+.collapse-btn:hover{background:rgba(201,168,76,.2);}
 .fn-collapsible{position:relative;}
 .fn-collapsible.collapsed > .collapse-btn{transform:translateX(-50%) rotate(-90deg);}
 .fn-collapsible.collapsed > .drop{display:none;}
@@ -166,22 +179,35 @@ body.searching .pn.search-match .pname{color:#f0dfa0;}
 
 /* ── Detail panel ── */
 #panel{position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(6,10,20,.97);border-top:1px solid rgba(201,168,76,.15);border-radius:16px 16px 0 0;
-  padding:1rem 1.3rem 1.2rem;max-height:48vh;overflow-y:auto;backdrop-filter:blur(24px);
-  box-shadow:0 -8px 40px rgba(0,0,0,.6);transform:translateY(100%);
+  background:rgba(6,10,20,.97);border-top:1px solid rgba(201,168,76,.18);border-radius:18px 18px 0 0;
+  padding:1.1rem 1.4rem 1.3rem;max-height:50vh;overflow-y:auto;backdrop-filter:blur(28px);
+  box-shadow:0 -10px 50px rgba(0,0,0,.65);transform:translateY(100%);
   transition:transform .32s cubic-bezier(.22,1,.36,1);}
 #panel.open{transform:translateY(0);}
-.ph{width:32px;height:3px;border-radius:3px;background:rgba(255,255,255,.12);margin:0 auto .5rem;cursor:pointer;}
-.pmeta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.3rem;}
-.pdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.pntag{font-family:'Cinzel',serif;font-weight:700;font-size:.4rem;letter-spacing:.16em;text-transform:uppercase;}
-.pdatestag{font-family:'Cinzel',serif;font-size:.32rem;letter-spacing:.1em;color:var(--muted);}
-.ptitle{font-family:'Philosopher',serif;font-weight:700;font-size:1rem;color:var(--white);line-height:1.35;margin-bottom:.3rem;}
-.pdesc{font-family:'Philosopher',serif;font-style:italic;font-size:.85rem;color:rgba(172,188,208,.85);line-height:1.7;}
-.pfamily{font-family:'Cinzel',serif;font-size:.28rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;}
-.pclose{position:absolute;top:.8rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--muted);padding:.25em;transition:color .15s;}
+#panel::-webkit-scrollbar{width:3px;}
+#panel::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:3px;}
+.ph{width:36px;height:3px;border-radius:3px;background:rgba(255,255,255,.14);margin:0 auto .6rem;cursor:pointer;}
+.pmeta{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.35rem;}
+.pdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.pmeta-nation{width:18px;height:18px;object-fit:contain;flex-shrink:0;opacity:.9;}
+.pntag{font-family:'Cinzel',serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;}
+.pdatestag{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.08em;color:var(--muted);}
+.ptitle{font-family:'Philosopher',serif;font-weight:700;font-size:1rem;color:var(--white);line-height:1.35;margin-bottom:.35rem;}
+.pdesc{font-family:'Philosopher',serif;font-style:italic;font-size:.88rem;color:rgba(172,188,208,.88);line-height:1.72;}
+.pfamily{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.5rem;}
+.pclose{position:absolute;top:.9rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--muted);padding:.3em;transition:color .15s;display:flex;align-items:center;}
 .pclose:hover{color:var(--white);}
-.pclose svg{width:16px;height:16px;fill:currentColor;}
+.pclose svg{width:18px;height:18px;fill:currentColor;}
+/* ── Pulse keyframes for header icons ── */
+@keyframes gatePulseAir  {0%,100%{filter:drop-shadow(0 0 3px rgba(245,197,24,.5))}50%{filter:drop-shadow(0 0 10px rgba(245,197,24,.9))}}
+@keyframes gatePulseWater{0%,100%{filter:drop-shadow(0 0 3px rgba(77,184,255,.5))}50%{filter:drop-shadow(0 0 10px rgba(77,184,255,.9))}}
+@keyframes gatePulseEarth{0%,100%{filter:drop-shadow(0 0 3px rgba(106,191,105,.5))}50%{filter:drop-shadow(0 0 10px rgba(106,191,105,.9))}}
+@keyframes gatePulseFire {0%,100%{filter:drop-shadow(0 0 3px rgba(249,115,22,.5))}50%{filter:drop-shadow(0 0 10px rgba(249,115,22,.9))}}
+
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+}
 </style>
 </head>
 <body>
@@ -189,9 +215,15 @@ body.searching .pn.search-match .pname{color:#f0dfa0;}
 <div class="bg-layer"></div>
 
 <div class="header">
-  <div>
-    <div class="header-title">Family Trees</div>
-    <div class="header-sub">Lineage &amp; Legacy · Drag · Scroll to zoom · Click any card</div>
+  <div class="header-left">
+    <img class="header-icon" src="images/air.png"   alt="Air"   style="animation:gatePulseAir   3s ease-in-out infinite 0s">
+    <img class="header-icon" src="images/water.png" alt="Water" style="animation:gatePulseWater 3s ease-in-out infinite .5s">
+    <img class="header-icon" src="images/earth.png" alt="Earth" style="animation:gatePulseEarth 3s ease-in-out infinite 1s">
+    <img class="header-icon" src="images/fire.png"  alt="Fire"  style="animation:gatePulseFire  3s ease-in-out infinite 1.5s">
+    <div>
+      <div class="header-title">Family Trees</div>
+      <div class="header-sub">Lineage &amp; Legacy · Drag to pan · Scroll/pinch to zoom · Tap any card</div>
+    </div>
   </div>
 </div>
 
@@ -206,13 +238,13 @@ body.searching .pn.search-match .pname{color:#f0dfa0;}
 </div>
 
 <div class="legend">
-  <span class="leg"><span class="leg-dot" style="background:#f97316"></span>Fire</span>
-  <span class="leg"><span class="leg-dot" style="background:#4db8ff"></span>Water</span>
-  <span class="leg"><span class="leg-dot" style="background:#6abf69"></span>Earth</span>
-  <span class="leg"><span class="leg-dot" style="background:#f5c518"></span>Air</span>
+  <span class="leg"><img class="leg-img" src="images/fire.png"  alt="Fire">Fire</span>
+  <span class="leg"><img class="leg-img" src="images/water.png" alt="Water">Water</span>
+  <span class="leg"><img class="leg-img" src="images/earth.png" alt="Earth">Earth</span>
+  <span class="leg"><img class="leg-img" src="images/air.png"   alt="Air">Air</span>
   <span class="leg"><span class="leg-dot" style="background:#9b7fe8"></span>Spirit</span>
   <span class="leg"><span class="leg-dot" style="background:#6b8aab"></span>Non-bender</span>
-  <span class="leg"><span class="leg-dot" style="background:rgba(107,138,171,.28);border:1px solid rgba(107,138,171,.35)"></span>Deceased †</span>
+  <span class="leg"><span class="leg-dot" style="background:rgba(107,138,171,.3);border:1px solid rgba(107,138,171,.4)"></span>Deceased †</span>
 </div>
 
 <div class="hud">
@@ -663,6 +695,7 @@ const TREES = {
 
 /* ══ RENDER ENGINE ══ */
 const EL_RGB = {fire:'249,115,22',water:'77,184,255',earth:'106,191,105',air:'245,197,24',spirit:'155,127,232',none:'107,138,171'};
+const EL_IMG = {fire:'images/fire.png',water:'images/water.png',earth:'images/earth.png',air:'images/air.png'};
 
 function card(pid, isSpouse=false){
   const d = PEOPLE[pid];
@@ -670,8 +703,11 @@ function card(pid, isSpouse=false){
   const dead = d.died ? 'dead' : '';
   const sp = isSpouse ? 'sp' : '';
   const dates = d.born ? (d.died ? `${d.born} – ${d.died}` : `${d.born} →`) : '';
+  const nationImg = EL_IMG[d.el]
+    ? `<img class="pn-nation" src="${EL_IMG[d.el]}" alt="${d.el}" loading="lazy">`
+    : `<span class="pn-dot" style="background:${ec}"></span>`;
   return `<div class="pn ${d.el||'none'} ${dead} ${sp}" data-pid="${pid}" style="--ec:${ec};--er:${EL_RGB[d.el]||'107,138,171'}">
-    <div class="pn-top"><span class="pn-dot"></span><span class="pname">${d.name}</span></div>
+    <div class="pn-top">${nationImg}<span class="pname">${d.name}</span></div>
     ${d.title?`<div class="prole">${d.title.split('·')[0].trim()}</div>`:''}
     ${dates?`<div class="pdates">${dates}</div>`:''}
   </div>`;
@@ -740,6 +776,15 @@ const bsvg  = document.getElementById('bridgeSvg');
 
 const treeEls = {};
 
+// Tree nation icon mapping
+const TREE_NATION_IMG = {
+  fire:'images/fire.png', ursa:'images/fire.png', mako:'images/fire.png',
+  water:'images/water.png', northern:'images/water.png', korra:'images/water.png', adversaries:'images/water.png',
+  beifong:'images/earth.png', earth:'images/earth.png',
+  aang:'images/air.png',
+  sato:null,
+};
+
 // Render trees
 Object.entries(TREES).forEach(([key, tree]) => {
   const wrap = document.createElement('div');
@@ -748,8 +793,10 @@ Object.entries(TREES).forEach(([key, tree]) => {
   const glow = TREE_GLOWS[key] || {border:'rgba(255,255,255,.05)',glow:'transparent'};
   wrap.style.cssText = `position:absolute;left:0;top:0;--tree-border:${glow.border};--tree-glow:${glow.glow};`;
   const tc = tree.color;
+  const img = TREE_NATION_IMG[key];
+  const iconHtml = img ? `<img class="tree-title-img" src="${img}" alt="" loading="lazy">` : '';
   wrap.innerHTML = `
-    <div class="tree-title" style="color:${tc.replace(/[\d.]+\)$/,'0.65)')};">${tree.label}</div>
+    <div class="tree-title" style="color:${tc.replace(/[\d.]+\)$/,'0.7)')};">${iconHtml}${tree.label}</div>
     <div class="ftree" style="--tc:${tc}">${renderNode(tree.root, tc)}</div>`;
   inner.appendChild(wrap);
   treeEls[key] = wrap;
@@ -892,7 +939,19 @@ const panel = document.getElementById('panel');
 function openPanel(pid){
   const d = PEOPLE[pid]; if(!d) return;
   const ec = EL[d.el]||'#6b8aab';
-  document.getElementById('pdot').style.background = ec;
+  const dotEl = document.getElementById('pdot');
+  const imgSrc = EL_IMG[d.el];
+  if(imgSrc){
+    dotEl.innerHTML = `<img class="pmeta-nation" src="${imgSrc}" alt="${d.el}" style="width:18px;height:18px;object-fit:contain;">`;
+    dotEl.style.background = 'none';
+    dotEl.style.width = 'auto';
+    dotEl.style.height = 'auto';
+  } else {
+    dotEl.innerHTML = '';
+    dotEl.style.background = ec;
+    dotEl.style.width = '10px';
+    dotEl.style.height = '10px';
+  }
   document.getElementById('pntag').textContent = d.name;
   document.getElementById('pntag').style.color  = ec;
   document.getElementById('pdatestag').textContent = d.born ? (d.died ? `${d.born} – ${d.died}` : `b. ${d.born}`) : '';
@@ -907,7 +966,7 @@ document.getElementById('ph').onclick     = () => panel.classList.remove('open')
 /* ══ PAN + ZOOM ══ */
 const outer = document.getElementById('canvasOuter');
 let tx=0, ty=0, currentScale=0.62;
-const MIN_SC=0.28, MAX_SC=2.2;
+const MIN_SC=0.45, MAX_SC=2.4;
 
 function applyT(anim){
   inner.style.transition = anim ? 'transform .28s cubic-bezier(.22,1,.36,1)' : 'none';

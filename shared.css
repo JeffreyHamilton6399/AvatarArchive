@@ -289,3 +289,53 @@ body.theme-earth    .sp-install-row:hover { background: rgba(0,0,0,.05); color: 
   font-family: 'Cinzel', serif; font-size: .38rem; letter-spacing: .22em; text-transform: uppercase;
   color: rgba(107,138,171,.28); pointer-events: none; user-select: none;
 }
+
+/* ══════════════════════════════════════════
+   ATMOSPHERE ADDITIONS
+   Injected by shared.css — complements the
+   JS atmosphere modules in shared.js.
+══════════════════════════════════════════ */
+
+/* ── Richer background gradient ── */
+.bg-layer::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(4,7,13,.72) 0%,
+    transparent 22%,
+    transparent 62%,
+    rgba(4,7,13,.55) 82%,
+    rgba(4,7,13,.88) 100%
+  );
+}
+
+/* ── Particle canvas — softer edge fade ── */
+#particleCanvas {
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 55%, transparent 100%);
+}
+
+/* ── Page-entry fade-in ── */
+@keyframes _avatarPageIn { from { opacity: 0; } to { opacity: 1; } }
+body {
+  animation: _avatarPageIn .28s ease both;
+}
+
+/* ── Hub card shimmer base (fallback for JS blocker) ── */
+.hub-card { position: relative; }
+
+/* ── Card hover — stronger accent glow ── */
+.hub-card:hover {
+  box-shadow:
+    0 18px 60px rgba(var(--accent-rgb,201,168,76), .22),
+    0 0 0 1px rgba(var(--accent-rgb,201,168,76), .35),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,.22); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,.45); }
+
+/* ── Selection colour ── */
+::selection { background: rgba(77,184,255,.28); color: #f0f4ff; }
