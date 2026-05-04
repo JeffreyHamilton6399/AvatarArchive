@@ -79,8 +79,22 @@
     background:var(--ec,#9b7fe8);
     box-shadow:0 0 0 3px rgba(4,7,13,1),0 0 0 4px var(--ec,#9b7fe8),0 0 10px var(--ec,#9b7fe8);
     z-index:2;transition:box-shadow .25s;
+    /* Hidden when element img is present — JS adds .has-dot-img */
   }
+  .era.has-dot-img::before { display: none; }
   .era.open::before{box-shadow:0 0 0 3px rgba(4,7,13,1),0 0 0 4px var(--ec,#9b7fe8),0 0 22px var(--ec,#9b7fe8);}
+
+  /* Element dot images on timeline spine */
+  .era-dot-img {
+    position: absolute; left: -44px; top: 16px;
+    width: 20px; height: 20px; object-fit: contain;
+    z-index: 2; pointer-events: none;
+    filter: drop-shadow(0 0 4px var(--ec, #9b7fe8));
+    transition: filter .25s;
+  }
+  .era.open .era-dot-img {
+    filter: drop-shadow(0 0 10px var(--ec, #9b7fe8)) drop-shadow(0 0 4px var(--ec, #9b7fe8));
+  }
 
   .era-hd{
     display:flex;align-items:center;
@@ -1241,6 +1255,31 @@
   let fr=0;
   function draw(){ctx.clearRect(0,0,W,H);fr++;pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<-30)p.x=W+30;if(p.x>W+30)p.x=-30;if(p.y<-30)p.y=H+30;if(p.y>H+30)p.y=-30;ctx.font=`${p.sz}px serif`;ctx.fillStyle=p.col+(p.al*(0.6+0.4*Math.sin(fr*.011+p.ph)))+')';ctx.fillText(p.sym,p.x,p.y);});requestAnimationFrame(draw);}
   draw();
+})();
+
+
+/* Era spine — inject element PNG dot images */
+(function(){
+  var ERA_IMG = {
+    'era-wan':     'images/air.png',
+    'era-yangchen':'images/air.png',
+    'era-kuruk':   'images/water.png',
+    'era-kyoshi':  'images/earth.png',
+    'era-roku':    'images/fire.png',
+    'era-war':     'images/fire.png',
+    'era-aang':    'images/air.png',
+    'era-korra':   'images/water.png',
+  };
+  Object.entries(ERA_IMG).forEach(function(entry){
+    var id=entry[0], src=entry[1];
+    var era=document.getElementById(id);
+    if(!era||!src)return;
+    var img=document.createElement('img');
+    img.src=src; img.className='era-dot-img';
+    img.alt=''; img.setAttribute('aria-hidden','true'); img.loading='lazy';
+    era.appendChild(img);
+    era.classList.add('has-dot-img');
+  });
 })();
 </script>
 </body>

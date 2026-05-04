@@ -49,7 +49,7 @@ body{background:var(--bg);color:var(--white);font-family:'Philosopher',serif;ove
 .header{position:fixed;top:0;left:0;right:0;z-index:50;padding:.7rem 1.5rem .5rem;
   background:linear-gradient(to bottom,rgba(4,7,13,.97) 55%,transparent);
   display:flex;align-items:center;justify-content:space-between;pointer-events:none;}
-.header-left{display:flex;align-items:center;gap:.75rem;}
+.header-left{display:flex;align-items:center;gap:.75rem;pointer-events:all;}
 .header-icon{width:28px;height:28px;object-fit:contain;opacity:.85;filter:drop-shadow(0 0 6px rgba(201,168,76,.3));}
 .header-title{font-family:'Cinzel Decorative',serif;font-weight:900;font-size:1.15rem;
   background:linear-gradient(135deg,#f0dfa0,#c9a84c 50%,#8a6a1a);
@@ -204,6 +204,18 @@ body.searching .pn.search-match .pname{color:#f0dfa0;}
 @keyframes gatePulseEarth{0%,100%{filter:drop-shadow(0 0 3px rgba(106,191,105,.5))}50%{filter:drop-shadow(0 0 10px rgba(106,191,105,.9))}}
 @keyframes gatePulseFire {0%,100%{filter:drop-shadow(0 0 3px rgba(249,115,22,.5))}50%{filter:drop-shadow(0 0 10px rgba(249,115,22,.9))}}
 
+/* ── Back button ── */
+.back-link{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(4,7,13,.72);border:1px solid rgba(201,168,76,.2);
+  color:rgba(201,168,76,.65);text-decoration:none;
+  transition:color .2s,border-color .2s,background .2s;
+  pointer-events:all;flex-shrink:0;
+}
+.back-link:hover{color:rgba(201,168,76,.95);border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.08);}
+.back-link svg{width:14px;height:14px;fill:currentColor;}
+
 /* ── Reduced motion ── */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
@@ -216,6 +228,9 @@ body.searching .pn.search-match .pname{color:#f0dfa0;}
 
 <div class="header">
   <div class="header-left">
+    <a href="index.html" class="back-link" title="Back to Hub">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </a>
     <img class="header-icon" src="images/air.png"   alt="Air"   style="animation:gatePulseAir   3s ease-in-out infinite 0s">
     <img class="header-icon" src="images/water.png" alt="Water" style="animation:gatePulseWater 3s ease-in-out infinite .5s">
     <img class="header-icon" src="images/earth.png" alt="Earth" style="animation:gatePulseEarth 3s ease-in-out infinite 1s">

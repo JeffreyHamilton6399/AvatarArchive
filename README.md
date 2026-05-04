@@ -25,6 +25,8 @@ AvatarArchive is a fully self-contained fan site bringing together every corner 
 | `books.html` | Avatar graphic novels & comics (Dark Horse) |
 | `games.html` | ATLA games collection |
 | `merch.html` | Official merchandise — Paramount, Netflix, Nick, Funko, and more |
+| `timeline.html` | Full in-universe chronological timeline — all eras, accordion layout, element PNG spine markers |
+| `familytrees.html` | Interactive pan-and-zoom family tree canvas — all major lineages with bridges |
 
 ---
 
@@ -69,8 +71,38 @@ Film pages include a 5-star interactive rating widget. Ratings are stored per ti
 ### Countdown Timer
 The 2026 film page features a live countdown displaying days, hours, minutes, and seconds remaining until the October 9, 2026 Paramount+ premiere.
 
+### Interactive Family Trees
+A pan-and-zoom canvas displaying all major lineages across the Avatar universe — Fire Nation Royal Line, Avatar Cycle, Water Tribes, Beifong family, and more. Each node is a tappable card with element colour-coding and a bottom-sheet detail panel. Shared characters are linked by dashed SVG bridges. Includes live search with match highlighting and collapsible subtrees.
+
+### Full Chronological Timeline
+An accordion timeline spanning from Avatar Wan's era (~10,000 BG) through Korra's era. Each Avatar's age has nested subfolders of events. Spine markers use real element PNG images instead of plain dots. Every event opens a detail panel with full description.
+
 ### Progressive Web App
 Fully installable on mobile and desktop via an inline Web App Manifest and a service worker registered from a Blob URL. Offline shell caching covers all HTML pages so the site loads without a network connection after the first visit.
+
+---
+
+## Atmosphere & Performance Modules (`shared.js` + `shared.css`)
+
+All atmosphere effects are bundled in `shared.js` and `shared.css` and run on every page. They respect `prefers-reduced-motion` and are deferred via `requestIdleCallback` so they never compete with first paint.
+
+| # | Feature | How it works |
+|---|---------|-------------|
+| 9 | **Cursor Ripple** | On every click, a coloured radial bloom appears at the cursor position. Colour is inherited from the nearest element accent (`--ec`, `--accent`). Uses `mix-blend-mode: screen` so it never looks jarring. |
+| 10 | **Page Transition** | Internal link clicks trigger a 220 ms `opacity: 0` fade before navigation. The fade-in on arrival is handled by `@keyframes _avatarPageIn` in `shared.css`. |
+| 11 | **Shooting Stars** | Every 18–45 seconds a slow golden streak crosses the existing `#particleCanvas` diagonally. Pauses when tab is hidden. Zero extra DOM cost. |
+| 12 | **Dynamic Vignette** | A `radial-gradient` div lerps toward the mouse position at 4% per frame — the glow lags far behind the cursor, giving a soft ambient depth shift. `mix-blend-mode: screen`. |
+| 13 | **Scroll Parallax** | The `.bg-layer` translates upward at 18% of scroll offset, giving an illusion of depth behind content. One `transform` per scroll frame. |
+| 14 | **Time-of-Day Tint** | Checks `new Date().getHours()` on load and places a single tint over the page — amber at dawn, near-neutral by day, golden-orange at dusk, deep blue in the evening, indigo late at night. |
+| 15 | **Card Shimmer** | A `::after` pseudo-element sweeps a 4% opacity highlight stripe across `.hub-card` on hover via `background-position` transition. Zero JS per-frame cost. |
+| 16 | **Focus Glow** | `:focus-visible` shows a `box-shadow`-based ring matching the element colour of the focused item. Only appears for keyboard users, never on click. |
+
+### `shared.css` Enhancements
+- **Richer `bg-layer::after`** — five-stop gradient for a more atmospheric fade (darker top and bottom, lighter mid)
+- **Particle canvas edge fade** — `mask-image` radial gradient makes symbols fade at screen edges
+- **Page fade-in** — `body { animation: _avatarPageIn .28s }` on every page arrival
+- **Custom scrollbar** — thin gold-tinted 4px scrollbar replacing browser default
+- **Text selection** — `::selection` uses water blue at 28% opacity
 
 ---
 
@@ -97,10 +129,12 @@ Available on all video pages. Press `?` at any time to display the shortcuts ove
 |------------|-------|
 | HTML / CSS / JavaScript | Everything — zero frameworks |
 | PDF.js | Graphic novel two-page spread rendering |
-| Web Audio API | Ambient music with intro cue and crossfade |
-| Canvas 2D | Animated background particles |
-| localStorage | Progress, preferences, auth, ratings |
+| Web Audio API | Ambient music with intro cue and crossfade; UI SFX |
+| Canvas 2D | Animated background particles + shooting stars |
+| `localStorage` | Progress, preferences, auth, ratings |
 | PWA / Service Worker | Installability and offline shell caching |
+| `requestIdleCallback` | Defer atmosphere modules to after first paint |
+| `mix-blend-mode: screen` | Ripple, vignette, and ToD tint without washing out content |
 
 ---
 
